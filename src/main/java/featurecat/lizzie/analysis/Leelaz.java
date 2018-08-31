@@ -17,6 +17,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,6 +62,15 @@ public class Leelaz {
 
     private boolean isLoaded = false;
     private boolean isCheckingVersion;
+    
+    // for Multiple Engine
+    private String engineCommand = null;
+    private List<String> commands = null;
+    private JSONObject config = null;
+    private String currentWeight = null;
+    private String isSwitching = "";
+    private int currentEngineNo = -1;
+    private ScheduledExecutorService executor = null;
 
     // dynamic komi and opponent komi as reported by dynamic-komi version of leelaz
     private float dynamicKomi = Float.NaN, dynamicOppKomi = Float.NaN;
@@ -78,7 +90,7 @@ public class Leelaz {
         currentCmdNum = 0;
         cmdQueue = new ArrayDeque<>();
 
-        JSONObject config = Lizzie.config.config.getJSONObject("leelaz");
+        config = Lizzie.config.config.getJSONObject("leelaz");
 
         printCommunication = config.getBoolean("print-comms");
         maxAnalyzeTimeMillis = MINUTE * config.getInt("max-analyze-time-minutes");
@@ -87,6 +99,46 @@ public class Leelaz {
             updateToLatestNetwork();
         }
 
+//        String startfolder = new File(Config.getBestDefaultLeelazPath()).getParent(); // todo make this a little more obvious/less bug-prone
+//
+//        // Check if network file is present
+//        File wf = new File(startfolder + '/' + config.getString("network-file"));
+//        if (!wf.exists()) {
+//            JOptionPane.showMessageDialog(null, resourceBundle.getString("LizzieFrame.display.network-missing"));
+//        }
+
+
+        // command string for starting the engine
+        engineCommand = config.getString("engine-command");
+        // substitute in the weights file
+        engineCommand = engineCommand.replaceAll("%network-file", config.getString("network-file"));
+        // create this as a list which gets passed into the processbuilder
+//        commands = Arrays.asList(engineCommand.split(" "));
+
+        // run leelaz
+//        ProcessBuilder processBuilder = new ProcessBuilder(commands);
+//        processBuilder.directory(new File(config.optString("engine-start-location", ".")));
+//        processBuilder.redirectErrorStream(true);
+//        process = processBuilder.start();
+//
+//        initializeStreams();
+//
+//        // Send a version request to check that we have a supported version
+//        // Response handled in parseLine
+//        isCheckingVersion = true;
+//        sendCommand("version");
+//
+//        // start a thread to continuously read Leelaz output
+//        new Thread(this::read).start();
+        currentEngineNo = 0;
+        startEngine(engineCommand);
+        Lizzie.frame.refreshBackground();
+    }
+    
+    public void startEngine(String engineCommand) throws IOException {
+    	if (engineCommand == null || "".equals(engineCommand.trim())) {
+    		return;
+    	}
         String startfolder = new File(Config.getBestDefaultLeelazPath()).getParent(); // todo make this a little more obvious/less bug-prone
 
         // Check if network file is present
@@ -94,16 +146,18 @@ public class Leelaz {
         if (!wf.exists()) {
             JOptionPane.showMessageDialog(null, resourceBundle.getString("LizzieFrame.display.network-missing"));
         }
-
-
-        // command string for starting the engine
-        String engineCommand = config.getString("engine-command");
-        // substitute in the weights file
-        engineCommand = engineCommand.replaceAll("%network-file", config.getString("network-file"));
-        // create this as a list which gets passed into the processbuilder
-        List<String> commands = Arrays.asList(engineCommand.split(" "));
-
-        // run leelaz
+    	commands = Arrays.asList(engineCommand.split(" "));
+    	if (commands != null) {
+    		int weightIndex = commands.indexOf("--weights");
+    		if (weightIndex > -1) {
+    			currentWeight = commands.get(weightIndex+1);
+    		} else {
+    			weightIndex = commands.indexOf("-w");
+        		if (weightIndex > -1) {
+        			currentWeight = commands.get(weightIndex+1);
+        		}
+    		}
+    	}
         ProcessBuilder processBuilder = new ProcessBuilder(commands);
         processBuilder.directory(new File(startfolder));
         processBuilder.redirectErrorStream(true);
@@ -117,10 +171,41 @@ public class Leelaz {
         sendCommand("version");
 
         // start a thread to continuously read Leelaz output
-        new Thread(this::read).start();
-        Lizzie.frame.refreshBackground();
+        //new Thread(this::read).start();
+        executor = Executors.newSingleThreadScheduledExecutor();
+        executor.execute(this::read);
     }
 
+
+    public void restartEngine(String engineCommand, int index) throws IOException {
+    	if (engineCommand == null || "".equals(engineCommand.trim())) {
+    		return;
+    	}
+    	isSwitching = " Switching";
+    	this.engineCommand = engineCommand;
+    	normalQuit();
+    	//shutdown();
+    	startEngine(engineCommand);
+    	currentEngineNo = index;
+    	//togglePonder();
+    }
+    
+    public void normalQuit() {
+    	sendCommand("quit");
+    	executor.shutdown();
+        try {
+            while (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+            	executor.shutdownNow();
+            }
+            if (executor.awaitTermination(1, TimeUnit.SECONDS)) {
+            	shutdown();
+            }
+        } catch (InterruptedException e) {
+        	executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+    }
+    
     private void updateToLatestNetwork() {
         try {
             if (needToDownloadLatestNetwork()) {
@@ -204,6 +289,7 @@ public class Leelaz {
                 // End of response
             } else if (line.startsWith("info")) {
                 isLoaded = true;
+                isSwitching = "";
                 if (isResponseUpToDate()) {
                     // This should not be stale data when the command number match
                     parseInfo(line.substring(5));
@@ -294,7 +380,7 @@ public class Leelaz {
             System.out.println("Leelaz process ended.");
 
             shutdown();
-            System.exit(-1);
+            //System.exit(-1);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(-1);
@@ -560,5 +646,17 @@ public class Leelaz {
 
     public boolean isLoaded() {
         return isLoaded;
+    }
+    
+    public String currentWeight() {
+    	return currentWeight;
+    }
+    
+    public String isSwitching() {
+    	return isSwitching;
+    }
+    
+    public int currentEngineNo() {
+    	return currentEngineNo;
     }
 }
