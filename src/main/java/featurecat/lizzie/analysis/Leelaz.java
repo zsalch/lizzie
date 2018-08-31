@@ -183,11 +183,15 @@ public class Leelaz {
     	}
     	isSwitching = " Switching";
     	this.engineCommand = engineCommand;
+        // stop the ponder
+        if (Lizzie.leelaz.isPondering()) {
+            Lizzie.leelaz.togglePonder();
+        }
     	normalQuit();
     	//shutdown();
     	startEngine(engineCommand);
     	currentEngineNo = index;
-    	//togglePonder();
+    	togglePonder();
     }
     
     public void normalQuit() {

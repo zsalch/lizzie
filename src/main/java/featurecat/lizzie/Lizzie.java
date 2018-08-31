@@ -110,9 +110,11 @@ public class Lizzie {
     		JSONArray commandList = Lizzie.config.leelazConfig.getJSONArray("engine-command-list");
     		if (commandList != null && commandList.length() >= index) {
     			commandLine = commandList.getString(index - 1);
+    		} else {
+    			index = -1;
     		}
     	}
-    	if (commandLine == null || commandLine.trim().length() == 0 || index == Lizzie.leelaz.currentEngineNo()) {
+    	if (index < 0 || commandLine == null || commandLine.trim().length() == 0 || index == Lizzie.leelaz.currentEngineNo()) {
     		return;
     	}
     	
