@@ -492,11 +492,13 @@ public class LizzieFrame extends JFrame {
         Font font = new Font(systemDefaultFontName, Font.PLAIN, (int)(Math.max(getWidth(), getHeight()) * size));
         FontMetrics fm = g.getFontMetrics(font);
         // for trim long text
-        int mainBoardX = (boardRenderer != null && boardRenderer.getLocation() != null) ? boardRenderer.getLocation().x : 0;
-        if (mainBoardX > x) {
-	        ArrayList<String> list = (ArrayList<String>) WrapString.wrap(text, fm, mainBoardX - x);
-	        if (list != null && list.size() > 0) {
-	        	text = list.get(0);
+        if (Lizzie.leelaz.isLoaded()) {
+        	int mainBoardX = (boardRenderer != null && boardRenderer.getLocation() != null) ? boardRenderer.getLocation().x : 0;
+	        if (mainBoardX > x) {
+		        ArrayList<String> list = (ArrayList<String>) WrapString.wrap(text, fm, mainBoardX - x);
+		        if (list != null && list.size() > 0) {
+		        	text = list.get(0);
+		        }
 	        }
         }
         int stringWidth = fm.stringWidth(text);
