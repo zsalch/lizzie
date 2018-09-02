@@ -7,11 +7,14 @@ import featurecat.lizzie.analysis.MoveData;
 import featurecat.lizzie.rules.SGFParser;
 
 import java.io.IOException;
+
 import javax.swing.*;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Queue;
 import java.util.List;
+
 import org.json.JSONException;
 
 public class Board implements LeelazListener {
@@ -26,6 +29,8 @@ public class Board implements LeelazListener {
     private boolean analysisMode = false;
     private int playoutsAnalysis = 100;
 
+    // back to Branch
+    private BoardHistoryNode saveNode = null;
 
     public Board() {
         initialize();
@@ -446,6 +451,79 @@ public class Board implements LeelazListener {
         }
     }
 
+    /**
+     * Goes to the next coordinate, thread safe
+     */
+    public boolean nextMove(int fromBackChildren) {
+        synchronized (this) {
+            // Update win rate statistics
+            Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
+            if (stats.totalPlayouts >= history.getData().playouts) {
+                history.getData().winrate = stats.maxWinrate;
+                history.getData().playouts = stats.totalPlayouts;
+            }
+            return nextVariation(fromBackChildren);
+        }
+    }
+    
+    public BoardHistoryNode saveMoveNumber() {
+    	BoardHistoryNode curNode = history.getCurrentHistoryNode();
+        int curMoveNum = curNode.getData().moveNumber;
+	    if (curMoveNum > 0) {
+	        if (!BoardHistoryList.isMainTrunk(curNode)) {
+	        	// If in Branch, save the back routing
+	        	saveBackRouting(curNode);
+	        }
+        	goToMoveNumber(0);
+	    }
+	    saveNode = curNode;
+	    return curNode;
+    }
+    
+    public void saveBackRouting(BoardHistoryNode node) {
+    	if (node != null && node.previous() != null) {
+    		node.previous().setFromBackChildren(node.previous().getNexts().indexOf(node));
+    		saveBackRouting(node.previous());
+    	}
+    	return;
+    }
+    
+    public void restoreMoveNumber() {
+    	restoreMoveNumber(saveNode);
+    }
+
+    public void restoreMoveNumber(BoardHistoryNode node) {
+    	if (node == null) {
+    		return;
+    	}
+    	int moveNumber = node.getData().moveNumber;
+    	if (moveNumber > 0) {
+	        if (BoardHistoryList.isMainTrunk(node)) {
+	        	goToMoveNumber(moveNumber);
+	        } else {
+	        	// If in Branch, restore by the back routing
+	        	goToMoveNumberByBack(moveNumber);
+	        }
+    	}
+    }
+
+    public boolean goToMoveNumberByBack(int moveNumber) {
+        int delta = moveNumber - history.getMoveNumber();
+        boolean moved = false;
+        for (int i = 0; i < Math.abs(delta); i++) {
+            BoardHistoryNode curNode = history.getCurrentHistoryNode();
+            if (curNode.numberOfChildren() > 1 && delta > 0) {
+            	nextMove(curNode.getFromBackChildren());
+            } else {
+	            if (!(delta > 0 ? nextMove() : previousMove())) {
+	                break;
+	            }
+            }
+            moved = true;
+        }
+        return moved;
+    }
+    
     public boolean goToMoveNumber(int moveNumber) {
         return goToMoveNumberHelper(moveNumber, false);
     }

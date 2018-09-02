@@ -157,6 +157,12 @@ public class Leelaz {
         			currentWeight = commands.get(weightIndex+1);
         		}
     		}
+    		if (currentWeight != null) {
+				String[] names = currentWeight.split("[\\\\|/]");
+				if (names != null && names.length > 1) {
+					currentWeight = names[names.length - 1];
+				}
+    		}
     	}
         ProcessBuilder processBuilder = new ProcessBuilder(commands);
         processBuilder.directory(new File(startfolder));
