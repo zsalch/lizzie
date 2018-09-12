@@ -118,7 +118,7 @@ public class SGFParser {
                     if (!inTag) {
                         if (isMultiGo) {
                             // restore the variation nodes
-                            for (int s = 0; s < subTreeStepMap.get(new Integer(subTreeDepth)).intValue(); s++) {
+                            for (int s = 0; s < subTreeStepMap.get(Integer.valueOf(subTreeDepth)).intValue(); s++) {
                                 Lizzie.board.previousMove();
                             }
 //                            break PARSE_LOOP;
