@@ -96,6 +96,9 @@ public class LizzieFrame extends JFrame {
     private String systemDefaultFontName = new JLabel().getFont().getFontName();
 
     private long lastAutosaveTime = System.currentTimeMillis();
+    
+    // Engine Title
+    private String playerTitle = null;
 
     static {
         // load fonts
@@ -898,8 +901,13 @@ public class LizzieFrame extends JFrame {
     }
 
     public void setPlayers(String whitePlayer, String blackPlayer) {
-        setTitle(String.format("%s (%s [W] vs %s [B])", DEFAULT_TITLE,
-                whitePlayer, blackPlayer));
+    	this.playerTitle = String.format("%s (%s [W] vs %s [B])", DEFAULT_TITLE,
+                whitePlayer, blackPlayer);
+        setTitle(this.playerTitle + (Lizzie.leelaz.engineCommand() != null ? " - " + Lizzie.leelaz.engineCommand() : ""));
+    }
+
+    public void setEngineTitle(String engineCommand) {
+        setTitle((this.playerTitle != null ? this.playerTitle + " - " : "") + engineCommand);
     }
 
     private void setDisplayedBranchLength(int n) {
@@ -921,7 +929,7 @@ public class LizzieFrame extends JFrame {
     }
 
     public void resetTitle() {
-        setTitle(DEFAULT_TITLE);
+        setTitle(DEFAULT_TITLE + (Lizzie.leelaz.engineCommand() != null ? " - " + Lizzie.leelaz.engineCommand() : ""));
     }
 
     public void copySgf() {
@@ -999,7 +1007,7 @@ public class LizzieFrame extends JFrame {
 	        int width = stringWidth;
 	        int height = stringHeight;	//(int)(stringHeight * 1.2);
 	
-	        ArrayList<String> list = (ArrayList<String>) WrapString.wrap(comment, fm, (int)(w - height/2));
+	        ArrayList<String> list = (ArrayList<String>) WrapString.wrap(comment, fm, (int)(w - height*0.9));
 	        if (list != null && list.size() > 0) {
 	        	if (!full) {
 		            if (list.size() * height > cHeight) {

@@ -300,6 +300,7 @@ public class Leelaz {
             } else if (line.startsWith("info")) {
                 isLoaded = true;
                 isSwitching = "";
+                if (Lizzie.frame != null) Lizzie.frame.setEngineTitle(this.engineCommand);
                 if (isResponseUpToDate()) {
                     // This should not be stale data when the command number match
                     parseInfo(line.substring(5));
@@ -668,5 +669,9 @@ public class Leelaz {
     
     public int currentEngineNo() {
     	return currentEngineNo;
+    }
+    
+    public String engineCommand() {
+    	return this.engineCommand;
     }
 }
