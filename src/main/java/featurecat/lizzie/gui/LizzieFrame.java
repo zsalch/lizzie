@@ -125,7 +125,11 @@ public class LizzieFrame extends JFrame {
         setLocationRelativeTo(null); // start centered
         JSONArray windowSize = Lizzie.config.uiConfig.getJSONArray("window-size");
         setSize(windowSize.getInt(0), windowSize.getInt(1)); // use config file window size
-
+        
+        if (!Lizzie.config.uiConfig.isNull("font-name")) {
+        	systemDefaultFontName = Lizzie.config.uiConfig.getString("font-name");
+        }
+        
         if (Lizzie.config.startMaximized) {
             setExtendedState(Frame.MAXIMIZED_BOTH); // start maximized
         }
@@ -1022,7 +1026,7 @@ public class LizzieFrame extends JFrame {
 	            int ystart = full ? y : h - cHeight;
 	            // Draw background
 	            Color oriColor = g.getColor();
-	            g.setColor(new Color(0, 0, 0, 150));
+	            g.setColor(new Color(0, 0, 0, 200));
 	            g.fillRect(x, ystart - height, w, cHeight + height * 2);
 	            g.setColor(Color.white);
 	            g.setFont(font);

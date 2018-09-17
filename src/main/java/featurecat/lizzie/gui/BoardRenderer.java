@@ -462,7 +462,7 @@ public class BoardRenderer {
                 // set color to the opposite color of whatever is on the board
                 g.setColor(Lizzie.board.getStones()[Board.getIndex(lastMove[0], lastMove[1])].isWhite() ?
                         Color.BLACK : Color.WHITE);
-                drawCircle(g, stoneX, stoneY, lastMoveMarkerRadius);
+                fillCircle(g, stoneX, stoneY, (int)(lastMoveMarkerRadius * 0.65));
             } else if (lastMove == null && Lizzie.board.getData().moveNumber != 0 && !Lizzie.board.inScoreMode()) {
                 g.setColor(Lizzie.board.getData().blackToPlay ? new Color(255, 255, 255, 150) : new Color(0, 0, 0, 150));
                 g.fillOval(x + boardLength / 2 - 4 * stoneRadius, y + boardLength / 2 - 4 * stoneRadius, stoneRadius * 8, stoneRadius * 8);
@@ -474,12 +474,19 @@ public class BoardRenderer {
         }
 
         int[] moveNumberList = branch == null ? Lizzie.board.getMoveNumberList() : branch.data.moveNumberList;
-
+        
+        int lastMoveNumber = Lizzie.board.getData().moveNumber;
+        int onlyLastMoveNumber = (!Lizzie.config.uiConfig.isNull("only-last-move-number")) ? Lizzie.config.uiConfig.getInt("only-last-move-number") : 9999;
+        
         for (int i = 0; i < Board.BOARD_SIZE; i++) {
             for (int j = 0; j < Board.BOARD_SIZE; j++) {
                 int stoneX = x + scaledMargin + squareLength * i;
                 int stoneY = y + scaledMargin + squareLength * j;
 
+                if (lastMoveNumber - moveNumberList[Board.getIndex(i, j)] >= onlyLastMoveNumber) {
+                    continue;
+                }
+                
                 Stone stoneAtThisPoint = branch == null ? Lizzie.board.getStones()[Board.getIndex(i, j)] :
                         branch.data.stones[Board.getIndex(i, j)];
 
