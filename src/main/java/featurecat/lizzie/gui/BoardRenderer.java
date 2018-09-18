@@ -16,6 +16,7 @@ import java.awt.*;
 import java.awt.font.TextAttribute;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -836,6 +837,12 @@ public class BoardRenderer {
             default:
         }
     }
+    
+    private void drawScaleSmoothImage(Graphics2D g, Image stone, int x, int y, int width, int height,  ImageObserver observer) {
+	    BufferedImage newstone = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+	    newstone.getGraphics().drawImage(stone.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH), 0, 0, observer);
+	    g.drawImage(newstone, x, y, width, height, observer);
+	}
 
     /**
      * Fills in a circle centered at (centerX, centerY) with radius $radius$
