@@ -199,10 +199,6 @@ public class BoardHistoryList {
     public BoardHistoryNode getCurrentHistoryNode() {
         return head;
     }
-    
-    public void setCurrentHistoryNode(BoardHistoryNode head) {
-    	this.head = head;
-    }
 
     /**
      * @param data the board position to check against superko

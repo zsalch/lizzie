@@ -2,18 +2,14 @@ package featurecat.lizzie;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-
 import featurecat.lizzie.analysis.Leelaz;
 import featurecat.lizzie.plugin.PluginManager;
 import featurecat.lizzie.rules.Board;
-import featurecat.lizzie.rules.BoardHistoryNode;
 import featurecat.lizzie.rules.SGFParser;
 import featurecat.lizzie.gui.LizzieFrame;
-
 import org.json.JSONObject;
 
 import javax.swing.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ResourceBundle;
@@ -121,7 +117,7 @@ public class Lizzie {
     	if (index < 0 || commandLine == null || commandLine.trim().length() == 0 || index == Lizzie.leelaz.currentEngineNo()) {
     		return;
     	}
-    	
+
         // Workaround for leelaz cannot exit when restarting
         if (leelaz.isThinking) {
             if (Lizzie.frame.isPlayingAgainstLeelaz) {
@@ -137,9 +133,7 @@ public class Lizzie {
 			leelaz.restartEngine(commandLine, index);
 			board.restoreMoveNumber();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
     }
 }

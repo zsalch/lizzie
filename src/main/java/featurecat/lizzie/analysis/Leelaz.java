@@ -90,6 +90,7 @@ public class Leelaz {
         currentCmdNum = 0;
         cmdQueue = new ArrayDeque<>();
 
+        // Move config to member for other method call
         config = Lizzie.config.config.getJSONObject("leelaz");
 
         printCommunication = config.getBoolean("print-comms");
@@ -99,46 +100,24 @@ public class Leelaz {
             updateToLatestNetwork();
         }
 
-//        String startfolder = new File(Config.getBestDefaultLeelazPath()).getParent(); // todo make this a little more obvious/less bug-prone
-//
-//        // Check if network file is present
-//        File wf = new File(startfolder + '/' + config.getString("network-file"));
-//        if (!wf.exists()) {
-//            JOptionPane.showMessageDialog(null, resourceBundle.getString("LizzieFrame.display.network-missing"));
-//        }
-
 
         // command string for starting the engine
         engineCommand = config.getString("engine-command");
         // substitute in the weights file
         engineCommand = engineCommand.replaceAll("%network-file", config.getString("network-file"));
-        // create this as a list which gets passed into the processbuilder
-//        commands = Arrays.asList(engineCommand.split(" "));
 
-        // run leelaz
-//        ProcessBuilder processBuilder = new ProcessBuilder(commands);
-//        processBuilder.directory(new File(config.optString("engine-start-location", ".")));
-//        processBuilder.redirectErrorStream(true);
-//        process = processBuilder.start();
-//
-//        initializeStreams();
-//
-//        // Send a version request to check that we have a supported version
-//        // Response handled in parseLine
-//        isCheckingVersion = true;
-//        sendCommand("version");
-//
-//        // start a thread to continuously read Leelaz output
-//        new Thread(this::read).start();
+        // Init current engine no and start engine
         currentEngineNo = 0;
         startEngine(engineCommand);
         Lizzie.frame.refreshBackground();
     }
     
     public void startEngine(String engineCommand) throws IOException {
+    	// Check engine command
     	if (engineCommand == null || "".equals(engineCommand.trim())) {
     		return;
     	}
+
         String startfolder = new File(Config.getBestDefaultLeelazPath()).getParent(); // todo make this a little more obvious/less bug-prone
 
         // Check if network file is present
@@ -146,7 +125,11 @@ public class Leelaz {
         if (!wf.exists()) {
             JOptionPane.showMessageDialog(null, resourceBundle.getString("LizzieFrame.display.network-missing"));
         }
+
+        // create this as a list which gets passed into the processbuilder
     	commands = Arrays.asList(engineCommand.split(" "));
+
+    	// get weight name
     	if (commands != null) {
     		int weightIndex = commands.indexOf("--weights");
     		if (weightIndex > -1) {
@@ -164,6 +147,8 @@ public class Leelaz {
 				}
     		}
     	}
+
+        // run leelaz
         ProcessBuilder processBuilder = new ProcessBuilder(commands);
         processBuilder.directory(new File(startfolder));
         processBuilder.redirectErrorStream(true);
@@ -178,6 +163,7 @@ public class Leelaz {
 
         // start a thread to continuously read Leelaz output
         //new Thread(this::read).start();
+		//can stop engine for switching weights
         executor = Executors.newSingleThreadScheduledExecutor();
         executor.execute(this::read);
     }
@@ -194,7 +180,6 @@ public class Leelaz {
             Lizzie.leelaz.togglePonder();
         }
     	normalQuit();
-    	//shutdown();
     	startEngine(engineCommand);
     	currentEngineNo = index;
     	togglePonder();
@@ -215,7 +200,7 @@ public class Leelaz {
             Thread.currentThread().interrupt();
         }
     }
-    
+
     private void updateToLatestNetwork() {
         try {
             if (needToDownloadLatestNetwork()) {
@@ -299,7 +284,9 @@ public class Leelaz {
                 // End of response
             } else if (line.startsWith("info")) {
                 isLoaded = true;
+				// Clear switching prompt
                 isSwitching = "";
+				// Display engine command in the title
                 if (Lizzie.frame != null) Lizzie.frame.setEngineTitle(this.engineCommand);
                 if (isResponseUpToDate()) {
                     // This should not be stale data when the command number match
@@ -391,6 +378,7 @@ public class Leelaz {
             System.out.println("Leelaz process ended.");
 
             shutdown();
+			// Do no exit for switching weights
             //System.exit(-1);
         } catch (IOException e) {
             e.printStackTrace();

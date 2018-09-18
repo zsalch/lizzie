@@ -10,8 +10,8 @@ public class BoardHistoryNode {
     private ArrayList<BoardHistoryNode> nexts;
 
     private BoardData data;
-    
-    // for restore to branch
+
+    // Save the children for restore to branch
     private int fromBackChildren;
 
     /**

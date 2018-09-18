@@ -96,8 +96,8 @@ public class LizzieFrame extends JFrame {
     private String systemDefaultFontName = new JLabel().getFont().getFontName();
 
     private long lastAutosaveTime = System.currentTimeMillis();
-    
-    // Engine Title
+
+    // Save the player title
     private String playerTitle = null;
 
     static {
@@ -125,11 +125,12 @@ public class LizzieFrame extends JFrame {
         setLocationRelativeTo(null); // start centered
         JSONArray windowSize = Lizzie.config.uiConfig.getJSONArray("window-size");
         setSize(windowSize.getInt(0), windowSize.getInt(1)); // use config file window size
-        
+
+        // Allow change font in the config
         if (!Lizzie.config.uiConfig.isNull("font-name")) {
         	systemDefaultFontName = Lizzie.config.uiConfig.getString("font-name");
         }
-        
+
         if (Lizzie.config.startMaximized) {
             setExtendedState(Frame.MAXIMIZED_BOTH); // start maximized
         }
@@ -404,6 +405,7 @@ public class LizzieFrame extends JFrame {
 
             if (Lizzie.leelaz != null && Lizzie.leelaz.isLoaded()) {
                 if (Lizzie.config.showStatus) {
+                    // Display switching prompt
                     drawPonderingState(g, resourceBundle.getString("LizzieFrame.display.pondering") +
                             (Lizzie.leelaz.isPondering()?resourceBundle.getString("LizzieFrame.display.on"):resourceBundle.getString("LizzieFrame.display.off")) + " " + Lizzie.leelaz.currentWeight() + Lizzie.leelaz.isSwitching(),
                             ponderingX, ponderingY, ponderingSize);
@@ -484,7 +486,7 @@ public class LizzieFrame extends JFrame {
         BufferedImage background = boardRenderer.theme.getBackground();
         int drawWidth = Math.max(background.getWidth(), getWidth());
         int drawHeight = Math.max(background.getHeight(), getHeight());
-//      g.drawImage(background, 0, 0, drawWidth, drawHeight, null);
+        // Support seamless texture
         TexturePaint paint = new TexturePaint(background, new Rectangle(0, 0, background.getWidth(), background.getHeight()));
         g.setPaint(paint);
         g.fill(new Rectangle(0, 0, drawWidth, drawHeight));
@@ -506,7 +508,7 @@ public class LizzieFrame extends JFrame {
     private void drawPonderingState(Graphics2D g, String text, int x, int y, double size) {
         Font font = new Font(systemDefaultFontName, Font.PLAIN, (int)(Math.max(getWidth(), getHeight()) * size));
         FontMetrics fm = g.getFontMetrics(font);
-        // for trim long text
+        // Trim too long text when display switching prompt
         if (Lizzie.leelaz.isLoaded()) {
         	int mainBoardX = (boardRenderer != null && boardRenderer.getLocation() != null) ? boardRenderer.getLocation().x : 0;
 	        if (mainBoardX > x) {
@@ -907,12 +909,14 @@ public class LizzieFrame extends JFrame {
     }
 
     public void setPlayers(String whitePlayer, String blackPlayer) {
+    	// Display engine command in title
     	this.playerTitle = String.format("%s (%s [W] vs %s [B])", DEFAULT_TITLE,
                 whitePlayer, blackPlayer);
         setTitle(this.playerTitle + (Lizzie.leelaz.engineCommand() != null ? " - " + Lizzie.leelaz.engineCommand() : ""));
     }
 
     public void setEngineTitle(String engineCommand) {
+    	// Display engine command in title
         setTitle((this.playerTitle != null ? this.playerTitle + " - " : "") + engineCommand);
     }
 
@@ -935,6 +939,7 @@ public class LizzieFrame extends JFrame {
     }
 
     public void resetTitle() {
+    	// Display engine command in title
         setTitle(DEFAULT_TITLE + (Lizzie.leelaz.engineCommand() != null ? " - " + Lizzie.leelaz.engineCommand() : ""));
     }
 
@@ -994,8 +999,6 @@ public class LizzieFrame extends JFrame {
         if (comment != null && comment.trim().length() > 0) {
         	double rate = full ? 1 : 0.1;
         	cHeight = (int)(h * rate);
-	    	// May be need to set up a Chinese Font for display a Chinese Text in the non-Chinese environment
-//	    	String systemDefaultFontName = "宋体";
 	        int fontSize = (int)(Math.min(getWidth(), getHeight()) * 0.98 * 0.03);
 	        try {
 	        	fontSize = Lizzie.config.uiConfig.getInt("comment-font-size");
@@ -1009,9 +1012,9 @@ public class LizzieFrame extends JFrame {
 	        Font font = new Font(systemDefaultFontName, Font.PLAIN, fontSize);
 	        FontMetrics fm = g.getFontMetrics(font);
 	        int stringWidth = fm.stringWidth(comment);
-	        int stringHeight = fm.getHeight();	//fm.getAscent() - fm.getDescent();
+	        int stringHeight = fm.getHeight();
 	        int width = stringWidth;
-	        int height = stringHeight;	//(int)(stringHeight * 1.2);
+	        int height = stringHeight;
 	
 	        ArrayList<String> list = (ArrayList<String>) WrapString.wrap(comment, fm, (int)(w - height*0.9));
 	        if (list != null && list.size() > 0) {

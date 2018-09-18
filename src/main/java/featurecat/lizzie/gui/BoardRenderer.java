@@ -3,7 +3,6 @@ package featurecat.lizzie.gui;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.analysis.Branch;
 import featurecat.lizzie.analysis.MoveData;
@@ -68,6 +67,7 @@ public class BoardRenderer {
 
     public BoardRenderer(boolean isMainBoard) {
         uiConfig = Lizzie.config.config.getJSONObject("ui");
+		// Custome theme to allow use external image and config file
         if ("Custom".equals(uiConfig.getString("theme")) && !uiConfig.isNull("custom-theme")) {
         	theme = new CustomTheme(uiConfig.getString("custom-theme"));
         } else {
@@ -462,6 +462,7 @@ public class BoardRenderer {
                 // set color to the opposite color of whatever is on the board
                 g.setColor(Lizzie.board.getStones()[Board.getIndex(lastMove[0], lastMove[1])].isWhite() ?
                         Color.BLACK : Color.WHITE);
+                // Use a solid circle instead of
                 fillCircle(g, stoneX, stoneY, (int)(lastMoveMarkerRadius * 0.65));
             } else if (lastMove == null && Lizzie.board.getData().moveNumber != 0 && !Lizzie.board.inScoreMode()) {
                 g.setColor(Lizzie.board.getData().blackToPlay ? new Color(255, 255, 255, 150) : new Color(0, 0, 0, 150));
@@ -474,7 +475,8 @@ public class BoardRenderer {
         }
 
         int[] moveNumberList = branch == null ? Lizzie.board.getMoveNumberList() : branch.data.moveNumberList;
-        
+
+        // Allow to display only last move number
         int lastMoveNumber = Lizzie.board.getData().moveNumber;
         int onlyLastMoveNumber = (!Lizzie.config.uiConfig.isNull("only-last-move-number")) ? Lizzie.config.uiConfig.getInt("only-last-move-number") : 9999;
         
@@ -483,10 +485,11 @@ public class BoardRenderer {
                 int stoneX = x + scaledMargin + squareLength * i;
                 int stoneY = y + scaledMargin + squareLength * j;
 
+                // Allow to display only last move number
                 if (lastMoveNumber - moveNumberList[Board.getIndex(i, j)] >= onlyLastMoveNumber) {
                     continue;
                 }
-                
+
                 Stone stoneAtThisPoint = branch == null ? Lizzie.board.getStones()[Board.getIndex(i, j)] :
                         branch.data.stones[Board.getIndex(i, j)];
 
@@ -652,8 +655,8 @@ public class BoardRenderer {
         if (uiConfig.getBoolean("fancy-board")) {
             // fancy version
             int shadowRadius = (int) (boardLength * MARGIN / 6);
+            // Support seamless texture
             BufferedImage boardImage = theme.getBoard();
-//            g.drawImage(boardImage == null ? theme.getBoard() : boardImage, x - 2 * shadowRadius, y - 2 * shadowRadius, boardLength + 4 * shadowRadius, boardLength + 4 * shadowRadius, null);
             TexturePaint paint = new TexturePaint(boardImage, new Rectangle(0, 0, boardImage.getWidth(), boardImage.getHeight()));
             g.setPaint(paint);
             g.fill(new Rectangle(x - 2 * shadowRadius, y - 2 * shadowRadius, boardLength + 4 * shadowRadius, boardLength + 4 * shadowRadius));
@@ -768,6 +771,7 @@ public class BoardRenderer {
             case BLACK_CAPTURED:
                 if (uiConfig.getBoolean("fancy-stones")) {
                     drawShadow(gShadow, centerX, centerY, false);
+					// Enhance draw quality
                     BufferedImage stone = theme.getBlackStone(new int[]{x, y});
                     BufferedImage newstone = new BufferedImage(stoneRadius * 2 + 1, stoneRadius * 2 + 1, BufferedImage.TYPE_INT_ARGB);
                     newstone.getGraphics().drawImage(stone.getScaledInstance(stoneRadius * 2 + 1, stoneRadius * 2 + 1, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
@@ -784,6 +788,7 @@ public class BoardRenderer {
                 if (uiConfig.getBoolean("fancy-stones")) {
                     drawShadow(gShadow, centerX, centerY, false);
                     Image stone = theme.getWhiteStone(new int[]{x, y});
+					// Enhance draw quality
                     BufferedImage newstone = new BufferedImage(stoneRadius * 2 + 1, stoneRadius * 2 + 1, BufferedImage.TYPE_INT_ARGB);
                     newstone.getGraphics().drawImage(stone.getScaledInstance(stoneRadius * 2 + 1, stoneRadius * 2 + 1, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
                     g.drawImage(newstone, centerX - stoneRadius, centerY - stoneRadius, stoneRadius * 2 + 1, stoneRadius * 2 + 1, null);
@@ -799,6 +804,7 @@ public class BoardRenderer {
             case BLACK_GHOST:
                 if (uiConfig.getBoolean("fancy-stones")) {
                     drawShadow(gShadow, centerX, centerY, true);
+					// Enhance draw quality
                     BufferedImage stone = theme.getBlackStone(new int[]{x, y});
                     BufferedImage newstone = new BufferedImage(stoneRadius * 2 + 1, stoneRadius * 2 + 1, BufferedImage.TYPE_INT_ARGB);
                     newstone.getGraphics().drawImage(stone.getScaledInstance(stoneRadius * 2 + 1, stoneRadius * 2 + 1, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
@@ -813,6 +819,7 @@ public class BoardRenderer {
             case WHITE_GHOST:
                 if (uiConfig.getBoolean("fancy-stones")) {
                     drawShadow(gShadow, centerX, centerY, true);
+					// Enhance draw quality
                     BufferedImage stone = theme.getWhiteStone(new int[]{x, y});
                     BufferedImage newstone = new BufferedImage(stoneRadius * 2 + 1, stoneRadius * 2 + 1, BufferedImage.TYPE_INT_ARGB);
                     newstone.getGraphics().drawImage(stone.getScaledInstance(stoneRadius * 2 + 1, stoneRadius * 2 + 1, java.awt.Image.SCALE_SMOOTH), 0, 0, null);

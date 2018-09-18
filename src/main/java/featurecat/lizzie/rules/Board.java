@@ -7,14 +7,11 @@ import featurecat.lizzie.analysis.MoveData;
 import featurecat.lizzie.rules.SGFParser;
 
 import java.io.IOException;
-
 import javax.swing.*;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Queue;
 import java.util.List;
-
 import org.json.JSONException;
 
 public class Board implements LeelazListener {
@@ -29,7 +26,7 @@ public class Board implements LeelazListener {
     private boolean analysisMode = false;
     private int playoutsAnalysis = 100;
 
-    // back to Branch
+    // Save the node for restore move when in the branch
     private BoardHistoryNode saveNode = null;
 
     public Board() {
@@ -104,7 +101,7 @@ public class Board implements LeelazListener {
     public static boolean isValid(int x, int y) {
         return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
     }
-    
+
     /**
      * The comment. Thread safe
      * @param comment the comment of stone
@@ -465,7 +462,7 @@ public class Board implements LeelazListener {
             return nextVariation(fromBackChildren);
         }
     }
-    
+    // Save the move number
     public BoardHistoryNode saveMoveNumber() {
     	BoardHistoryNode curNode = history.getCurrentHistoryNode();
         int curMoveNum = curNode.getData().moveNumber;
@@ -479,7 +476,7 @@ public class Board implements LeelazListener {
 	    saveNode = curNode;
 	    return curNode;
     }
-    
+    // Save the back routing
     public void saveBackRouting(BoardHistoryNode node) {
     	if (node != null && node.previous() != null) {
     		node.previous().setFromBackChildren(node.previous().getNexts().indexOf(node));
@@ -487,11 +484,11 @@ public class Board implements LeelazListener {
     	}
     	return;
     }
-    
+    // Restore move number
     public void restoreMoveNumber() {
     	restoreMoveNumber(saveNode);
     }
-
+    // Restore move number by node
     public void restoreMoveNumber(BoardHistoryNode node) {
     	if (node == null) {
     		return;
@@ -506,7 +503,7 @@ public class Board implements LeelazListener {
 	        }
     	}
     }
-
+    // Go to move number by back routing when in branch
     public boolean goToMoveNumberByBack(int moveNumber) {
         int delta = moveNumber - history.getMoveNumber();
         boolean moved = false;
@@ -523,7 +520,7 @@ public class Board implements LeelazListener {
         }
         return moved;
     }
-    
+
     public boolean goToMoveNumber(int moveNumber) {
         return goToMoveNumberHelper(moveNumber, false);
     }

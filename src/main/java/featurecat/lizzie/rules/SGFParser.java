@@ -69,9 +69,12 @@ public class SGFParser {
             return false;
         }
         int subTreeDepth = 0;
-        // the variation step count
+        // Save the variation step count
         Map<Integer, Integer> subTreeStepMap = new HashMap<Integer, Integer>();
-        String awabComment = null, prevTag = null;
+        // Comment of the AW/AB (Add White/Add Black) stone
+        String awabComment = null;
+		// Previous Tag
+        String prevTag = null;
         boolean inTag = false, isMultiGo = false, escaping = false;
         String tag = null;
         StringBuilder tagBuilder = new StringBuilder();
@@ -85,16 +88,9 @@ public class SGFParser {
         String blackPlayer = "", whitePlayer = "";
 
         PARSE_LOOP:
-        // for suppoert unicode char
-        // for (byte b : value.getBytes()) {
+        // Suppoert unicode charactors (UTF-8)
         for (int i = 0; i < value.length(); i++) {
-            // Check unicode charactors (UTF-8)
-            // for suppoert unicode char
-            // char c = (char) b;
             char c = value.charAt(i);
-            // if (((int) b & 0x80) != 0) {
-            //     continue;
-            // }
             if (escaping) {
                 // Any char following "\" is inserted verbatim
                 // (ref) "3.2. Text" in https://www.red-bean.com/sgf/sgf4.html
@@ -106,25 +102,26 @@ public class SGFParser {
                 case '(':
                     if (!inTag) {
                         subTreeDepth += 1;
-                        // init the step count
+                        // Initialize the step count
                         subTreeStepMap.put(Integer.valueOf(subTreeDepth), Integer.valueOf(0));
                     } else {
                     	if (i > 0) {
-                    		tagContentBuilder.append(c);
+                    	    // Allow the comment tag includes '('
+                    	    tagContentBuilder.append(c);
                     	}
                     }
                     break;
                 case ')':
                     if (!inTag) {
                         if (isMultiGo) {
-                            // restore the variation nodes
+                            // Restore to the variation node
                             for (int s = 0; s < subTreeStepMap.get(Integer.valueOf(subTreeDepth)).intValue(); s++) {
                                 Lizzie.board.previousMove();
                             }
-//                            break PARSE_LOOP;
                         }
                         subTreeDepth -= 1;
                     } else {
+                        // Allow the comment tag includes '('
                         tagContentBuilder.append(c);
                     }
                     break;
@@ -156,6 +153,7 @@ public class SGFParser {
                         if (move == null) {
                             Lizzie.board.pass(Stone.BLACK);
                         } else {
+                        	// Save the step count
                         	subTreeStepMap.put(Integer.valueOf(subTreeDepth), Integer.valueOf(subTreeStepMap.get(Integer.valueOf(subTreeDepth)).intValue() + 1));
                             Lizzie.board.place(move[0], move[1], Stone.BLACK);
                         }
@@ -164,11 +162,12 @@ public class SGFParser {
                         if (move == null) {
                             Lizzie.board.pass(Stone.WHITE);
                         } else {
+                        	// Save the step count
                         	subTreeStepMap.put(Integer.valueOf(subTreeDepth), Integer.valueOf(subTreeStepMap.get(Integer.valueOf(subTreeDepth)).intValue() + 1));
                             Lizzie.board.place(move[0], move[1], Stone.WHITE);
                         }
                     }  else if (tag.equals("C")) {
-                    	// for comment
+                    	// Support comment
                     	if ("AW".equals(prevTag) || "AB".equals(prevTag)) {
                     		awabComment = tagContent;
                     	} else {
@@ -230,7 +229,7 @@ public class SGFParser {
 
         // Rewind to game start
         while (Lizzie.board.previousMove()) ;
-        
+
         // Set AW/AB Comment
         if (awabComment != null) {
     		Lizzie.board.comment(awabComment);        	
@@ -297,7 +296,7 @@ public class SGFParser {
                 }
             }
         } else {
-        	//has AW/AB?
+        	// Process the AW/AB stone
             Stone[] stones = history.getStones();
             StringBuilder abStone = new StringBuilder();
             StringBuilder awStone = new StringBuilder();
@@ -326,7 +325,7 @@ public class SGFParser {
             }
         }
 
-        // Start Comment
+        // The AW/AB Comment
         if (history.getData().comment != null) {
         	builder.append(String.format("C[%s]", history.getData().comment));
     	}
@@ -334,69 +333,20 @@ public class SGFParser {
         // replay moves, and convert them to tags.
         // *  format: ";B[xy]" or ";W[xy]"
         // *  with 'xy' = coordinates ; or 'tt' for pass.
-//        BoardData data;
 
-        // TODO: this code comes from cngoodboy's plugin PR #65. It looks like it might be useful for handling
-        //       AB/AW commands for sgfs in general -- we can extend it beyond just handicap. TODO integrate it
-//        data = history.getData();
-//
-//        // For handicap
-//        ArrayList<int[]> abList = new ArrayList<int[]>();
-//        ArrayList<int[]> awList = new ArrayList<int[]>();
-//
-//        for (int i = 0; i < Board.BOARD_SIZE; i++) {
-//            for (int j = 0; j < Board.BOARD_SIZE; j++) {
-//                switch (data.stones[Board.getIndex(i, j)]) {
-//                    case BLACK:
-//                        abList.add(new int[]{i, j});
-//                        break;
-//                    case WHITE:
-//                        awList.add(new int[]{i, j});
-//                        break;
-//                    default:
-//                        break;
-//                }
-//            }
-//        }
-//
-//        if (!abList.isEmpty()) {
-//            builder.append(";AB");
-//            for (int i = 0; i < abList.size(); i++) {
-//                builder.append(String.format("[%s]", convertCoordToSgfPos(abList.get(i))));
-//            }
-//        }
-//
-//        if (!awList.isEmpty()) {
-//            builder.append(";AW");
-//            for (int i = 0; i < awList.size(); i++) {
-//                builder.append(String.format("[%s]", convertCoordToSgfPos(awList.get(i))));
-//            }
-//        }
 
         // Write variation tree
-//        while ((data = history.next()) != null) {
-//
-//            String stone;
-//            if (Stone.BLACK.equals(data.lastMoveColor)) stone = "B";
-//            else if (Stone.WHITE.equals(data.lastMoveColor)) stone = "W";
-//            else continue;
-//
-//            char x = data.lastMove == null ? 't' : (char) (data.lastMove[0] + 'a');
-//            char y = data.lastMove == null ? 't' : (char) (data.lastMove[1] + 'a');
-//
-//            builder.append(String.format(";%s[%c%c]", stone, x, y));
-//        }
         builder.append(generateNode(board, writer, history.nextNode()));
 
         // close file
         builder.append(')');
         writer.append(builder.toString());
     }
-    
 
+    // Generate node
     private static String generateNode(Board board, Writer writer, BoardHistoryNode node) throws IOException {
         StringBuilder builder = new StringBuilder("");
-        
+
         if (node != null) {
 
 	        BoardData data = node.getData();
@@ -405,24 +355,16 @@ public class SGFParser {
 
 	            if (Stone.BLACK.equals(data.lastMoveColor)) stone = "B";
 	            else if (Stone.WHITE.equals(data.lastMoveColor)) stone = "W";
-	
+
 	            char x = data.lastMove == null ? 't' : (char) (data.lastMove[0] + 'a');
 	            char y = data.lastMove == null ? 't' : (char) (data.lastMove[1] + 'a');
-	
+
 	            builder.append(String.format(";%s[%c%c]", stone, x, y));
-	            
-	            // Write the comment with win rate
-	            String winrateComment = formatWinrate(node);
-	            if (data.comment != null) {
-	            	String winratePattern = "\\([^\\(\\)/]*\\/[0-9\\.]*[kmKM]*\\)[0-9\\.\\-]+%*\\(*[0-9\\.\\-]+%*\\)*";
-	                if (data.comment.matches("(?s).*" + winratePattern + "(?s).*")) {
-	                	winrateComment = data.comment.replaceAll(winratePattern, winrateComment);
-	            	} else {
-	            		winrateComment = String.format("%s %s", data.comment, winrateComment);
-	            	}
-	            }
-	            builder.append(String.format("C[%s]", winrateComment));
-	            
+
+	            // Write the comment
+	            data.comment = formatComment(node);
+	            builder.append(String.format("C[%s]", data.comment));
+
 	        	if (node.numberOfChildren() > 1) {
 	        		// Variation
 	        		for (BoardHistoryNode sub : node.getNexts()) {
@@ -437,15 +379,15 @@ public class SGFParser {
 	        	}
             }
         }
-        
+
         return builder.toString();
     }
-    
+
     /**
-     * Format Winrate
+     * Format Comment with (Weight/Playouts)Winrate(Last Move Rate)
      * 
      */
-    private static String formatWinrate(BoardHistoryNode node) {
+    private static String formatComment(BoardHistoryNode node) {
     	if (node == null) {
     		return "";
     	}
@@ -487,9 +429,19 @@ public class SGFParser {
         	}
         }
         
-        return String.format("(%s/%s)%s%s", engine, playouts, curWinrate, lastMoveWinrate);
+        String newComment = String.format("(%s/%s)%s%s", engine, playouts, curWinrate, lastMoveWinrate);
+
+        if (data.comment != null) {
+        	String winratePattern = "\\([^\\(\\)/]*\\/[0-9\\.]*[kmKM]*\\)[0-9\\.\\-]+%*\\(*[0-9\\.\\-]+%*\\)*";
+            if (data.comment.matches("(?s).*" + winratePattern + "(?s).*")) {
+            	newComment = data.comment.replaceAll(winratePattern, newComment);
+        	} else {
+        		newComment = String.format("%s %s", data.comment, newComment);
+        	}
+        }
+        return newComment;
     }
-    
+
     /**
      * Temp TODO
      * @return a shorter, rounded string version of playouts. e.g. 345 -> 345, 1265 -> 1.3k, 44556 -> 45k, 133523 -> 134k, 1234567 -> 1.2m
