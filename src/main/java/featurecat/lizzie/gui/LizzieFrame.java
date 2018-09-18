@@ -1000,15 +1000,10 @@ public class LizzieFrame extends JFrame {
         	double rate = full ? 1 : 0.1;
         	cHeight = (int)(h * rate);
 	        int fontSize = (int)(Math.min(getWidth(), getHeight()) * 0.98 * 0.03);
-	        try {
-	        	fontSize = Lizzie.config.uiConfig.getInt("comment-font-size");
-	        } catch (JSONException e) {
-	        	if (fontSize < 16) {
-	        		fontSize = 16;
-	        	} else if (fontSize < 16) {
-	        		fontSize = 16;
-	        	}
-	        }
+	        fontSize = Lizzie.config.uiConfig.optInt("comment-font-size", fontSize);
+	        if (fontSize < 16) {
+        		fontSize = 16;
+        	}
 	        Font font = new Font(systemDefaultFontName, Font.PLAIN, fontSize);
 	        FontMetrics fm = g.getFontMetrics(font);
 	        int stringWidth = fm.stringWidth(comment);
