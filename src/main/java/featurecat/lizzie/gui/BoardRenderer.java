@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import featurecat.lizzie.Lizzie;
+import featurecat.lizzie.Util;
 import featurecat.lizzie.analysis.Branch;
 import featurecat.lizzie.analysis.MoveData;
 import featurecat.lizzie.plugin.PluginManager;
@@ -619,7 +620,7 @@ public class BoardRenderer {
                         }
                         
                         drawString(g, suggestionX, suggestionY, LizzieFrame.OpenSansSemiboldBase, Font.PLAIN, text, stoneRadius, stoneRadius * 1.5, 1);
-                        drawString(g, suggestionX, suggestionY + stoneRadius * 2 / 5, LizzieFrame.OpenSansRegularBase, getPlayoutsString(move.playouts), (float) (stoneRadius * 0.8), stoneRadius * 1.4);
+                        drawString(g, suggestionX, suggestionY + stoneRadius * 2 / 5, LizzieFrame.OpenSansRegularBase, Util.formatShorterNumber(move.playouts), (float) (stoneRadius * 0.8), stoneRadius * 1.4);
                     }
                 }
             }
@@ -912,26 +913,6 @@ public class BoardRenderer {
         atts.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
         return font.deriveFont(atts);
     }
-
-
-    /**
-     * @return a shorter, rounded string version of playouts. e.g. 345 -> 345, 1265 -> 1.3k, 44556 -> 45k, 133523 -> 134k, 1234567 -> 1.2m
-     */
-    private String getPlayoutsString(int playouts) {
-        if (playouts >= 1_000_000) {
-            double playoutsDouble = (double) playouts / 100_000; // 1234567 -> 12.34567
-            return Math.round(playoutsDouble) / 10.0 + "m";
-        } else if (playouts >= 10_000) {
-            double playoutsDouble = (double) playouts / 1_000; // 13265 -> 13.265
-            return Math.round(playoutsDouble) + "k";
-        } else if (playouts >= 1_000) {
-            double playoutsDouble = (double) playouts / 100; // 1265 -> 12.65
-            return Math.round(playoutsDouble) / 10.0 + "k";
-        } else {
-            return String.valueOf(playouts);
-        }
-    }
-
 
     private int[] calculatePixelMargins() {
         return calculatePixelMargins(boardLength);

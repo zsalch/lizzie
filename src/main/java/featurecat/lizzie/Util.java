@@ -80,4 +80,24 @@ public class Util {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Format the number to shorter
+     * 
+     * @return a shorter, rounded string version of playouts. e.g. 345 -> 345, 1265 -> 1.3k, 44556 -> 45k, 133523 -> 134k, 1234567 -> 1.2m
+     */
+    public static String formatShorterNumber(int playouts) {
+        if (playouts >= 1_000_000) {
+            double playoutsDouble = (double) playouts / 100_000; // 1234567 -> 12.34567
+            return Math.round(playoutsDouble) / 10.0 + "m";
+        } else if (playouts >= 10_000) {
+            double playoutsDouble = (double) playouts / 1_000; // 13265 -> 13.265
+            return Math.round(playoutsDouble) + "k";
+        } else if (playouts >= 1_000) {
+            double playoutsDouble = (double) playouts / 100; // 1265 -> 12.65
+            return Math.round(playoutsDouble) / 10.0 + "k";
+        } else {
+            return String.valueOf(playouts);
+        }
+    }
 }
