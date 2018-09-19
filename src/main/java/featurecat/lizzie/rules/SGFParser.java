@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import featurecat.lizzie.Lizzie;
+import featurecat.lizzie.Util;
 import featurecat.lizzie.analysis.GameInfo;
 import featurecat.lizzie.analysis.Leelaz;
 import featurecat.lizzie.plugin.PluginManager;
@@ -267,13 +268,17 @@ public class SGFParser {
         builder.append(String.format("KM[%s]PW[%s]PB[%s]DT[%s]AP[Lizzie: %s]",
                 komi, playerWhite, playerBlack, date, Lizzie.lizzieVersion));
 
-        // Update winrate
-        Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
+        // For append the Winrate to the comment of sgf, maybe need to update the Winrate
+        if (Lizzie.config.uiConfig.optBoolean("append-winrate-to-comment")) {
 
-        if (stats.maxWinrate >= 0 && stats.totalPlayouts > history.getData().playouts)
-        {
-            history.getData().winrate = stats.maxWinrate;
-            history.getData().playouts = stats.totalPlayouts;
+        	// Update winrate
+	        Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
+	
+	        if (stats.maxWinrate >= 0 && stats.totalPlayouts > history.getData().playouts)
+	        {
+	            history.getData().winrate = stats.maxWinrate;
+	            history.getData().playouts = stats.totalPlayouts;
+	        }
         }
 
         // move to the first move
@@ -362,8 +367,13 @@ public class SGFParser {
 	            builder.append(String.format(";%s[%c%c]", stone, x, y));
 
 	            // Write the comment
-	            data.comment = formatComment(node);
-	            builder.append(String.format("C[%s]", data.comment));
+	            if (Lizzie.config.uiConfig.optBoolean("append-winrate-to-comment")) {
+		            // Append the Winrate to the comment of sgf
+	            	data.comment = formatComment(node);
+	            }
+	            if (data.comment != null) {
+	                builder.append(String.format("C[%s]", data.comment));
+	            }
 
 	        	if (node.numberOfChildren() > 1) {
 	        		// Variation
@@ -411,7 +421,7 @@ public class SGFParser {
         }
         
         // Playouts
-        playouts = getPlayoutsString(data.playouts);
+        playouts = Util.formatShorterNumber(data.playouts);
 
         // Winrate
         if(Lizzie.config.handicapInsteadOfWinrate) {
@@ -442,22 +452,4 @@ public class SGFParser {
         return newComment;
     }
 
-    /**
-     * Temp TODO
-     * @return a shorter, rounded string version of playouts. e.g. 345 -> 345, 1265 -> 1.3k, 44556 -> 45k, 133523 -> 134k, 1234567 -> 1.2m
-     */
-    private static String getPlayoutsString(int playouts) {
-        if (playouts >= 1_000_000) {
-            double playoutsDouble = (double) playouts / 100_000; // 1234567 -> 12.34567
-            return Math.round(playoutsDouble) / 10.0 + "m";
-        } else if (playouts >= 10_000) {
-            double playoutsDouble = (double) playouts / 1_000; // 13265 -> 13.265
-            return Math.round(playoutsDouble) + "k";
-        } else if (playouts >= 1_000) {
-            double playoutsDouble = (double) playouts / 100; // 1265 -> 12.65
-            return Math.round(playoutsDouble) / 10.0 + "k";
-        } else {
-            return String.valueOf(playouts);
-        }
-    }
 }
