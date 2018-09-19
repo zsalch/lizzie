@@ -464,44 +464,44 @@ public class Board implements LeelazListener {
     }
     // Save the move number
     public BoardHistoryNode saveMoveNumber() {
-    	BoardHistoryNode curNode = history.getCurrentHistoryNode();
+        BoardHistoryNode curNode = history.getCurrentHistoryNode();
         int curMoveNum = curNode.getData().moveNumber;
-	    if (curMoveNum > 0) {
-	        if (!BoardHistoryList.isMainTrunk(curNode)) {
-	        	// If in Branch, save the back routing
-	        	saveBackRouting(curNode);
-	        }
-        	goToMoveNumber(0);
-	    }
-	    saveNode = curNode;
-	    return curNode;
+        if (curMoveNum > 0) {
+            if (!BoardHistoryList.isMainTrunk(curNode)) {
+                // If in Branch, save the back routing
+                saveBackRouting(curNode);
+            }
+            goToMoveNumber(0);
+        }
+        saveNode = curNode;
+        return curNode;
     }
     // Save the back routing
     public void saveBackRouting(BoardHistoryNode node) {
-    	if (node != null && node.previous() != null) {
-    		node.previous().setFromBackChildren(node.previous().getNexts().indexOf(node));
-    		saveBackRouting(node.previous());
-    	}
-    	return;
+        if (node != null && node.previous() != null) {
+            node.previous().setFromBackChildren(node.previous().getNexts().indexOf(node));
+            saveBackRouting(node.previous());
+        }
+        return;
     }
     // Restore move number
     public void restoreMoveNumber() {
-    	restoreMoveNumber(saveNode);
+        restoreMoveNumber(saveNode);
     }
     // Restore move number by node
     public void restoreMoveNumber(BoardHistoryNode node) {
-    	if (node == null) {
-    		return;
-    	}
-    	int moveNumber = node.getData().moveNumber;
-    	if (moveNumber > 0) {
-	        if (BoardHistoryList.isMainTrunk(node)) {
-	        	goToMoveNumber(moveNumber);
-	        } else {
-	        	// If in Branch, restore by the back routing
-	        	goToMoveNumberByBack(moveNumber);
-	        }
-    	}
+        if (node == null) {
+            return;
+        }
+        int moveNumber = node.getData().moveNumber;
+        if (moveNumber > 0) {
+            if (BoardHistoryList.isMainTrunk(node)) {
+                goToMoveNumber(moveNumber);
+            } else {
+                // If in Branch, restore by the back routing
+                goToMoveNumberByBack(moveNumber);
+            }
+        }
     }
     // Go to move number by back routing when in branch
     public boolean goToMoveNumberByBack(int moveNumber) {
@@ -510,11 +510,11 @@ public class Board implements LeelazListener {
         for (int i = 0; i < Math.abs(delta); i++) {
             BoardHistoryNode curNode = history.getCurrentHistoryNode();
             if (curNode.numberOfChildren() > 1 && delta > 0) {
-            	nextMove(curNode.getFromBackChildren());
+                nextMove(curNode.getFromBackChildren());
             } else {
-	            if (!(delta > 0 ? nextMove() : previousMove())) {
-	                break;
-	            }
+                if (!(delta > 0 ? nextMove() : previousMove())) {
+                    break;
+                }
             }
             moved = true;
         }

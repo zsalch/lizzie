@@ -128,7 +128,7 @@ public class LizzieFrame extends JFrame {
 
         // Allow change font in the config
         if (!Lizzie.config.uiConfig.isNull("font-name")) {
-        	systemDefaultFontName = Lizzie.config.uiConfig.getString("font-name");
+            systemDefaultFontName = Lizzie.config.uiConfig.getString("font-name");
         }
 
         if (Lizzie.config.startMaximized) {
@@ -425,12 +425,12 @@ public class LizzieFrame extends JFrame {
 
                 if (Lizzie.config.showVariationGraph) {
                     drawVariationTreeContainer(backgroundG, vx, vy, vw, vh);
-                	// Draw the Comment of the Sgf
-                	int cHeight = drawCommnet(g, vx, vy, vw, vh, false);
+                    // Draw the Comment of the Sgf
+                    int cHeight = drawCommnet(g, vx, vy, vw, vh, false);
                     variationTree.draw(g, treex, treey, treew, treeh - cHeight);
                 } else {
-                	// Draw the Comment of the Sgf
-                	int cHeight = drawCommnet(g, vx, boardY, vw, vh, true);
+                    // Draw the Comment of the Sgf
+                    int cHeight = drawCommnet(g, vx, boardY, vw, vh, true);
                 }
                 if (Lizzie.config.showSubBoard) {
                     try {
@@ -508,13 +508,13 @@ public class LizzieFrame extends JFrame {
         FontMetrics fm = g.getFontMetrics(font);
         // Trim too long text when display switching prompt
         if (Lizzie.leelaz.isLoaded()) {
-        	int mainBoardX = (boardRenderer != null && boardRenderer.getLocation() != null) ? boardRenderer.getLocation().x : 0;
-	        if (mainBoardX > x) {
-		        ArrayList<String> list = (ArrayList<String>) WrapString.wrap(text, fm, mainBoardX - x);
-		        if (list != null && list.size() > 0) {
-		        	text = list.get(0);
-		        }
-	        }
+            int mainBoardX = (boardRenderer != null && boardRenderer.getLocation() != null) ? boardRenderer.getLocation().x : 0;
+            if (mainBoardX > x) {
+                ArrayList<String> list = (ArrayList<String>) WrapString.wrap(text, fm, mainBoardX - x);
+                if (list != null && list.size() > 0) {
+                    text = list.get(0);
+                }
+            }
         }
         int stringWidth = fm.stringWidth(text);
         int stringHeight = fm.getAscent() - fm.getDescent();
@@ -697,12 +697,12 @@ public class LizzieFrame extends JFrame {
 
         // Last move
         if (validLastWinrate && validWinrate) {
-        	String text;
+            String text;
             if(Lizzie.config.handicapInsteadOfWinrate) {
-            	text=String.format(": %.2f", Lizzie.leelaz.winrateToHandicap(100-curWR) - Lizzie.leelaz.winrateToHandicap(lastWR));
-        	} else {
+                text=String.format(": %.2f", Lizzie.leelaz.winrateToHandicap(100-curWR) - Lizzie.leelaz.winrateToHandicap(lastWR));
+            } else {
                 text=String.format(": %.1f%%", 100 - lastWR - curWR);
-        	}
+            }
 
             g.drawString(resourceBundle.getString("LizzieFrame.display.lastMove") +
                          text,
@@ -907,14 +907,14 @@ public class LizzieFrame extends JFrame {
     }
 
     public void setPlayers(String whitePlayer, String blackPlayer) {
-    	// Display engine command in title
-    	this.playerTitle = String.format("%s (%s [W] vs %s [B])", DEFAULT_TITLE,
+        // Display engine command in title
+        this.playerTitle = String.format("%s (%s [W] vs %s [B])", DEFAULT_TITLE,
                 whitePlayer, blackPlayer);
         setTitle(this.playerTitle + (Lizzie.leelaz.engineCommand() != null ? " - " + Lizzie.leelaz.engineCommand() : ""));
     }
 
     public void setEngineTitle(String engineCommand) {
-    	// Display engine command in title
+        // Display engine command in title
         setTitle((this.playerTitle != null ? this.playerTitle + " - " : "") + engineCommand);
     }
 
@@ -937,7 +937,7 @@ public class LizzieFrame extends JFrame {
     }
 
     public void resetTitle() {
-    	// Display engine command in title
+        // Display engine command in title
         setTitle(DEFAULT_TITLE + (Lizzie.leelaz.engineCommand() != null ? " - " + Lizzie.leelaz.engineCommand() : ""));
     }
 
@@ -979,10 +979,10 @@ public class LizzieFrame extends JFrame {
     public void increaseMaxAlpha(int k) {
         boardRenderer.increaseMaxAlpha(k);
     }
-    
+
     /**
      * Draw the Comment of the Sgf file
-     * 
+     *
      * @param g
      * @param x
      * @param y
@@ -992,53 +992,53 @@ public class LizzieFrame extends JFrame {
      * @return
      */
     private int drawCommnet(Graphics2D g, int x, int y, int w, int h, boolean full) {
-    	int cHeight = 0;
+        int cHeight = 0;
         String comment = (Lizzie.board.getHistory().getData() != null && Lizzie.board.getHistory().getData().comment != null) ? Lizzie.board.getHistory().getData().comment : "";
         if (comment != null && comment.trim().length() > 0) {
-        	double rate = full ? 1 : 0.1;
-        	cHeight = (int)(h * rate);
-	        int fontSize = (int)(Math.min(getWidth(), getHeight()) * 0.98 * 0.03);
-	        try {
-	        	fontSize = Lizzie.config.uiConfig.getInt("comment-font-size");
-	        } catch (JSONException e) {
-	        	if (fontSize < 16) {
-	        		fontSize = 16;
-	        	}
-	        }
-	        Font font = new Font(systemDefaultFontName, Font.PLAIN, fontSize);
-	        FontMetrics fm = g.getFontMetrics(font);
-	        int stringWidth = fm.stringWidth(comment);
-	        int stringHeight = fm.getHeight();
-	        int width = stringWidth;
-	        int height = stringHeight;
-	
-	        ArrayList<String> list = (ArrayList<String>) WrapString.wrap(comment, fm, (int)(w - height*0.9));
-	        if (list != null && list.size() > 0) {
-	        	if (!full) {
-		            if (list.size() * height > cHeight) {
-		            	cHeight = list.size() * height;
-		            	if (cHeight > (int)(h * 0.4)) {
-		            		cHeight = (int)(h * 0.4);
-		            	}
-		            }
-	        	}
-	            int ystart = full ? y : h - cHeight;
-	            // Draw background
-	            Color oriColor = g.getColor();
-	            g.setColor(new Color(0, 0, 0, 200));
-	            g.fillRect(x, ystart - height, w, cHeight + height * 2);
-	            g.setColor(Color.white);
-	            g.setFont(font);
-	            int i = 0;
-	            for (String s : list) {
-	                g.drawString(s, x + (int)(height * 0.2), ystart + height * (full?(i+1):i));
-	                i++;
-	            }
-	            g.setColor(oriColor);
+            double rate = full ? 1 : 0.1;
+            cHeight = (int)(h * rate);
+            int fontSize = (int)(Math.min(getWidth(), getHeight()) * 0.98 * 0.03);
+            try {
+                fontSize = Lizzie.config.uiConfig.getInt("comment-font-size");
+            } catch (JSONException e) {
+                if (fontSize < 16) {
+                    fontSize = 16;
+                }
+            }
+            Font font = new Font(systemDefaultFontName, Font.PLAIN, fontSize);
+            FontMetrics fm = g.getFontMetrics(font);
+            int stringWidth = fm.stringWidth(comment);
+            int stringHeight = fm.getHeight();
+            int width = stringWidth;
+            int height = stringHeight;
+
+            ArrayList<String> list = (ArrayList<String>) WrapString.wrap(comment, fm, (int)(w - height*0.9));
+            if (list != null && list.size() > 0) {
+                if (!full) {
+                    if (list.size() * height > cHeight) {
+                        cHeight = list.size() * height;
+                        if (cHeight > (int)(h * 0.4)) {
+                            cHeight = (int)(h * 0.4);
+                        }
+                    }
+                }
+                int ystart = full ? y : h - cHeight;
+                // Draw background
+                Color oriColor = g.getColor();
+                g.setColor(new Color(0, 0, 0, 200));
+                g.fillRect(x, ystart - height, w, cHeight + height * 2);
+                g.setColor(Color.white);
+                g.setFont(font);
+                int i = 0;
+                for (String s : list) {
+                    g.drawString(s, x + (int)(height * 0.2), ystart + height * (full?(i+1):i));
+                    i++;
+                }
+                g.setColor(oriColor);
                 cHeight = cHeight + height;
-	        } else {
-	        	cHeight = 0;
-	        }
+            } else {
+                cHeight = 0;
+            }
         }
         return cHeight;
     }

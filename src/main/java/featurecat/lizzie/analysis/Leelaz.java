@@ -62,7 +62,7 @@ public class Leelaz {
 
     private boolean isLoaded = false;
     private boolean isCheckingVersion;
-    
+
     // for Multiple Engine
     private String engineCommand = null;
     private List<String> commands = null;
@@ -111,12 +111,12 @@ public class Leelaz {
         startEngine(engineCommand);
         Lizzie.frame.refreshBackground();
     }
-    
+
     public void startEngine(String engineCommand) throws IOException {
-    	// Check engine command
-    	if (engineCommand == null || "".equals(engineCommand.trim())) {
-    		return;
-    	}
+        // Check engine command
+        if (engineCommand == null || "".equals(engineCommand.trim())) {
+            return;
+        }
 
         String startfolder = new File(Config.getBestDefaultLeelazPath()).getParent(); // todo make this a little more obvious/less bug-prone
 
@@ -127,26 +127,26 @@ public class Leelaz {
         }
 
         // create this as a list which gets passed into the processbuilder
-    	commands = Arrays.asList(engineCommand.split(" "));
+        commands = Arrays.asList(engineCommand.split(" "));
 
-    	// get weight name
-    	if (commands != null) {
-    		int weightIndex = commands.indexOf("--weights");
-    		if (weightIndex > -1) {
-    			currentWeight = commands.get(weightIndex+1);
-    		} else {
-    			weightIndex = commands.indexOf("-w");
-        		if (weightIndex > -1) {
-        			currentWeight = commands.get(weightIndex+1);
-        		}
-    		}
-    		if (currentWeight != null) {
-				String[] names = currentWeight.split("[\\\\|/]");
-				if (names != null && names.length > 1) {
-					currentWeight = names[names.length - 1];
-				}
-    		}
-    	}
+        // get weight name
+        if (commands != null) {
+            int weightIndex = commands.indexOf("--weights");
+            if (weightIndex > -1) {
+                currentWeight = commands.get(weightIndex+1);
+            } else {
+                weightIndex = commands.indexOf("-w");
+                if (weightIndex > -1) {
+                    currentWeight = commands.get(weightIndex+1);
+                }
+            }
+            if (currentWeight != null) {
+                String[] names = currentWeight.split("[\\\\|/]");
+                if (names != null && names.length > 1) {
+                    currentWeight = names[names.length - 1];
+                }
+            }
+        }
 
         // run leelaz
         ProcessBuilder processBuilder = new ProcessBuilder(commands);
@@ -163,40 +163,40 @@ public class Leelaz {
 
         // start a thread to continuously read Leelaz output
         //new Thread(this::read).start();
-		//can stop engine for switching weights
+        //can stop engine for switching weights
         executor = Executors.newSingleThreadScheduledExecutor();
         executor.execute(this::read);
     }
 
 
     public void restartEngine(String engineCommand, int index) throws IOException {
-    	if (engineCommand == null || "".equals(engineCommand.trim())) {
-    		return;
-    	}
-    	isSwitching = " Switching";
-    	this.engineCommand = engineCommand;
+        if (engineCommand == null || "".equals(engineCommand.trim())) {
+            return;
+        }
+        isSwitching = " Switching";
+        this.engineCommand = engineCommand;
         // stop the ponder
         if (Lizzie.leelaz.isPondering()) {
             Lizzie.leelaz.togglePonder();
         }
-    	normalQuit();
-    	startEngine(engineCommand);
-    	currentEngineNo = index;
-    	togglePonder();
+        normalQuit();
+        startEngine(engineCommand);
+        currentEngineNo = index;
+        togglePonder();
     }
-    
+
     public void normalQuit() {
-    	sendCommand("quit");
-    	executor.shutdown();
+        sendCommand("quit");
+        executor.shutdown();
         try {
             while (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-            	executor.shutdownNow();
+                executor.shutdownNow();
             }
             if (executor.awaitTermination(1, TimeUnit.SECONDS)) {
-            	shutdown();
+                shutdown();
             }
         } catch (InterruptedException e) {
-        	executor.shutdownNow();
+            executor.shutdownNow();
             Thread.currentThread().interrupt();
         }
     }
@@ -284,9 +284,9 @@ public class Leelaz {
                 // End of response
             } else if (line.startsWith("info")) {
                 isLoaded = true;
-				// Clear switching prompt
+                // Clear switching prompt
                 isSwitching = "";
-				// Display engine command in the title
+                // Display engine command in the title
                 if (Lizzie.frame != null) Lizzie.frame.setEngineTitle(this.engineCommand);
                 if (isResponseUpToDate()) {
                     // This should not be stale data when the command number match
@@ -378,7 +378,7 @@ public class Leelaz {
             System.out.println("Leelaz process ended.");
 
             shutdown();
-			// Do no exit for switching weights
+            // Do no exit for switching weights
             //System.exit(-1);
         } catch (IOException e) {
             e.printStackTrace();
@@ -646,20 +646,20 @@ public class Leelaz {
     public boolean isLoaded() {
         return isLoaded;
     }
-    
+
     public String currentWeight() {
-    	return currentWeight;
+        return currentWeight;
     }
-    
+
     public String isSwitching() {
-    	return isSwitching;
+        return isSwitching;
     }
-    
+
     public int currentEngineNo() {
-    	return currentEngineNo;
+        return currentEngineNo;
     }
-    
+
     public String engineCommand() {
-    	return this.engineCommand;
+        return this.engineCommand;
     }
 }

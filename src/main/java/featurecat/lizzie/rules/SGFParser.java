@@ -74,7 +74,7 @@ public class SGFParser {
         Map<Integer, Integer> subTreeStepMap = new HashMap<Integer, Integer>();
         // Comment of the AW/AB (Add White/Add Black) stone
         String awabComment = null;
-		// Previous Tag
+        // Previous Tag
         String prevTag = null;
         boolean inTag = false, isMultiGo = false, escaping = false;
         String tag = null;
@@ -88,7 +88,6 @@ public class SGFParser {
 
         String blackPlayer = "", whitePlayer = "";
 
-        PARSE_LOOP:
         // Suppoert unicode charactors (UTF-8)
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
@@ -104,12 +103,12 @@ public class SGFParser {
                     if (!inTag) {
                         subTreeDepth += 1;
                         // Initialize the step count
-                        subTreeStepMap.put(Integer.valueOf(subTreeDepth), Integer.valueOf(0));
+                        subTreeStepMap.put(subTreeDepth, 0);
                     } else {
-                    	if (i > 0) {
-                    	    // Allow the comment tag includes '('
-                    	    tagContentBuilder.append(c);
-                    	}
+                        if (i > 0) {
+                            // Allow the comment tag includes '('
+                            tagContentBuilder.append(c);
+                        }
                     }
                     break;
                 case ')':
@@ -154,8 +153,8 @@ public class SGFParser {
                         if (move == null) {
                             Lizzie.board.pass(Stone.BLACK);
                         } else {
-                        	// Save the step count
-                        	subTreeStepMap.put(Integer.valueOf(subTreeDepth), Integer.valueOf(subTreeStepMap.get(Integer.valueOf(subTreeDepth)).intValue() + 1));
+                            // Save the step count
+                            subTreeStepMap.put(Integer.valueOf(subTreeDepth), Integer.valueOf(subTreeStepMap.get(Integer.valueOf(subTreeDepth)).intValue() + 1));
                             Lizzie.board.place(move[0], move[1], Stone.BLACK);
                         }
                     } else if (tag.equals("W")) {
@@ -163,17 +162,17 @@ public class SGFParser {
                         if (move == null) {
                             Lizzie.board.pass(Stone.WHITE);
                         } else {
-                        	// Save the step count
-                        	subTreeStepMap.put(Integer.valueOf(subTreeDepth), Integer.valueOf(subTreeStepMap.get(Integer.valueOf(subTreeDepth)).intValue() + 1));
+                            // Save the step count
+                            subTreeStepMap.put(Integer.valueOf(subTreeDepth), Integer.valueOf(subTreeStepMap.get(Integer.valueOf(subTreeDepth)).intValue() + 1));
                             Lizzie.board.place(move[0], move[1], Stone.WHITE);
                         }
                     }  else if (tag.equals("C")) {
-                    	// Support comment
-                    	if ("AW".equals(prevTag) || "AB".equals(prevTag)) {
-                    		awabComment = tagContent;
-                    	} else {
-                    		Lizzie.board.comment(tagContent);
-                    	}
+                        // Support comment
+                        if ("AW".equals(prevTag) || "AB".equals(prevTag)) {
+                            awabComment = tagContent;
+                        } else {
+                            Lizzie.board.comment(tagContent);
+                        }
                     } else if (tag.equals("AB")) {
                         int[] move = convertSgfPosToCoord(tagContent);
                         if (move == null) {
@@ -233,7 +232,7 @@ public class SGFParser {
 
         // Set AW/AB Comment
         if (awabComment != null) {
-    		Lizzie.board.comment(awabComment);        	
+            Lizzie.board.comment(awabComment);
         }
 
         return true;
@@ -271,14 +270,14 @@ public class SGFParser {
         // For append the Winrate to the comment of sgf, maybe need to update the Winrate
         if (Lizzie.config.uiConfig.optBoolean("append-winrate-to-comment")) {
 
-        	// Update winrate
-	        Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
-	
-	        if (stats.maxWinrate >= 0 && stats.totalPlayouts > history.getData().playouts)
-	        {
-	            history.getData().winrate = stats.maxWinrate;
-	            history.getData().playouts = stats.totalPlayouts;
-	        }
+            // Update winrate
+            Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
+
+            if (stats.maxWinrate >= 0 && stats.totalPlayouts > history.getData().playouts)
+            {
+                history.getData().winrate = stats.maxWinrate;
+                history.getData().playouts = stats.totalPlayouts;
+            }
         }
 
         // move to the first move
@@ -301,7 +300,7 @@ public class SGFParser {
                 }
             }
         } else {
-        	// Process the AW/AB stone
+            // Process the AW/AB stone
             Stone[] stones = history.getStones();
             StringBuilder abStone = new StringBuilder();
             StringBuilder awStone = new StringBuilder();
@@ -316,24 +315,24 @@ public class SGFParser {
                     char y = (char) (corY + 'a');
 
                     if (stone.isBlack()) {
-                    	abStone.append(String.format("[%c%c]", x, y));
+                        abStone.append(String.format("[%c%c]", x, y));
                     } else {
-                    	awStone.append(String.format("[%c%c]", x, y));
+                        awStone.append(String.format("[%c%c]", x, y));
                     }
                 }
             }
             if (abStone.length() > 0) {
-            	builder.append("AB").append(abStone);
+                builder.append("AB").append(abStone);
             }
             if (awStone.length() > 0) {
-            	builder.append("AW").append(awStone);
+                builder.append("AW").append(awStone);
             }
         }
 
         // The AW/AB Comment
         if (history.getData().comment != null) {
-        	builder.append(String.format("C[%s]", history.getData().comment));
-    	}
+            builder.append(String.format("C[%s]", history.getData().comment));
+        }
 
         // replay moves, and convert them to tags.
         // *  format: ";B[xy]" or ";W[xy]"
@@ -354,39 +353,39 @@ public class SGFParser {
 
         if (node != null) {
 
-	        BoardData data = node.getData();
+            BoardData data = node.getData();
             String stone = "";
             if (Stone.BLACK.equals(data.lastMoveColor) || Stone.WHITE.equals(data.lastMoveColor)) {
 
-	            if (Stone.BLACK.equals(data.lastMoveColor)) stone = "B";
-	            else if (Stone.WHITE.equals(data.lastMoveColor)) stone = "W";
+                if (Stone.BLACK.equals(data.lastMoveColor)) stone = "B";
+                else if (Stone.WHITE.equals(data.lastMoveColor)) stone = "W";
 
-	            char x = data.lastMove == null ? 't' : (char) (data.lastMove[0] + 'a');
-	            char y = data.lastMove == null ? 't' : (char) (data.lastMove[1] + 'a');
+                char x = data.lastMove == null ? 't' : (char) (data.lastMove[0] + 'a');
+                char y = data.lastMove == null ? 't' : (char) (data.lastMove[1] + 'a');
 
-	            builder.append(String.format(";%s[%c%c]", stone, x, y));
+                builder.append(String.format(";%s[%c%c]", stone, x, y));
 
-	            // Write the comment
-	            if (Lizzie.config.uiConfig.optBoolean("append-winrate-to-comment")) {
-		            // Append the Winrate to the comment of sgf
-	            	data.comment = formatComment(node);
-	            }
-	            if (data.comment != null) {
-	                builder.append(String.format("C[%s]", data.comment));
-	            }
+                // Write the comment
+                if (Lizzie.config.uiConfig.optBoolean("append-winrate-to-comment")) {
+                    // Append the Winrate to the comment of sgf
+                    data.comment = formatComment(node);
+                }
+                if (data.comment != null) {
+                    builder.append(String.format("C[%s]", data.comment));
+                }
 
-	        	if (node.numberOfChildren() > 1) {
-	        		// Variation
-	        		for (BoardHistoryNode sub : node.getNexts()) {
-	            		builder.append("(");
-	        			builder.append(generateNode(board, writer, sub));
-	            		builder.append(")");
-	        		}
-	        	} else if (node.numberOfChildren() == 1) {
-	        		builder.append(generateNode(board, writer, node.next()));
-	        	} else {
-	        		return builder.toString();
-	        	}
+                if (node.numberOfChildren() > 1) {
+                    // Variation
+                    for (BoardHistoryNode sub : node.getNexts()) {
+                        builder.append("(");
+                        builder.append(generateNode(board, writer, sub));
+                        builder.append(")");
+                    }
+                } else if (node.numberOfChildren() == 1) {
+                    builder.append(generateNode(board, writer, node.next()));
+                } else {
+                    return builder.toString();
+                }
             }
         }
 
@@ -395,13 +394,13 @@ public class SGFParser {
 
     /**
      * Format Comment with (Weight/Playouts)Winrate(Last Move Rate)
-     * 
+     *
      */
     private static String formatComment(BoardHistoryNode node) {
-    	if (node == null) {
-    		return "";
-    	}
-    	BoardData data = node.getData();
+        if (node == null) {
+            return "";
+        }
+        BoardData data = node.getData();
         String engine = Lizzie.leelaz.currentWeight();
         String playouts = "";
         String curWinrate = "";
@@ -419,35 +418,35 @@ public class SGFParser {
         if (!validWinrate) {
             curWR = 100 - lastWR; // display last move's winrate for now (with color difference)
         }
-        
+
         // Playouts
         playouts = Util.formatShorterNumber(data.playouts);
 
         // Winrate
         if(Lizzie.config.handicapInsteadOfWinrate) {
-        	curWinrate = String.format("%.2f", Lizzie.leelaz.winrateToHandicap(100-curWR));
-    	} else {
-    		curWinrate = String.format("%.1f%%", 100 - curWR);
-    	}
+            curWinrate = String.format("%.2f", Lizzie.leelaz.winrateToHandicap(100-curWR));
+        } else {
+            curWinrate = String.format("%.1f%%", 100 - curWR);
+        }
 
         // Last move
         if (validLastWinrate && validWinrate) {
             if(Lizzie.config.handicapInsteadOfWinrate) {
-            	lastMoveWinrate = String.format("(%.2f)", Lizzie.leelaz.winrateToHandicap(100-curWR) - Lizzie.leelaz.winrateToHandicap(lastWR));
-        	} else {
-        		lastMoveWinrate = String.format("(%.1f%%)", 100 - lastWR - curWR);
-        	}
+                lastMoveWinrate = String.format("(%.2f)", Lizzie.leelaz.winrateToHandicap(100-curWR) - Lizzie.leelaz.winrateToHandicap(lastWR));
+            } else {
+                lastMoveWinrate = String.format("(%.1f%%)", 100 - lastWR - curWR);
+            }
         }
-        
+
         String newComment = String.format("(%s/%s)%s%s", engine, playouts, curWinrate, lastMoveWinrate);
 
         if (data.comment != null) {
-        	String winratePattern = "\\([^\\(\\)/]*\\/[0-9\\.]*[kmKM]*\\)[0-9\\.\\-]+%*\\(*[0-9\\.\\-]+%*\\)*";
+            String winratePattern = "\\([^\\(\\)/]*\\/[0-9\\.]*[kmKM]*\\)[0-9\\.\\-]+%*\\(*[0-9\\.\\-]+%*\\)*";
             if (data.comment.matches("(?s).*" + winratePattern + "(?s).*")) {
-            	newComment = data.comment.replaceAll(winratePattern, newComment);
-        	} else {
-        		newComment = String.format("%s %s", data.comment, newComment);
-        	}
+                newComment = data.comment.replaceAll(winratePattern, newComment);
+            } else {
+                newComment = String.format("%s %s", data.comment, newComment);
+            }
         }
         return newComment;
     }

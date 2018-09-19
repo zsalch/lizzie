@@ -177,18 +177,18 @@ public class BoardHistoryNode {
         }
     }
 
-	/**
-	 * @param fromBackChildren the fromBackChildren to set
-	 */
-	public void setFromBackChildren(int fromBackChildren) {
-		this.fromBackChildren = fromBackChildren;
-	}
+    /**
+     * @param fromBackChildren the fromBackChildren to set
+     */
+    public void setFromBackChildren(int fromBackChildren) {
+        this.fromBackChildren = fromBackChildren;
+    }
 
-	/**
-	 * @return the fromBackChildren
-	 */
-	public int getFromBackChildren() {
-		return fromBackChildren;
-	}
-	
+    /**
+     * @return the fromBackChildren
+     */
+    public int getFromBackChildren() {
+        return fromBackChildren;
+    }
+
 }

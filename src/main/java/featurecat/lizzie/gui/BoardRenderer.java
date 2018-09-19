@@ -69,11 +69,11 @@ public class BoardRenderer {
 
     public BoardRenderer(boolean isMainBoard) {
         uiConfig = Lizzie.config.config.getJSONObject("ui");
-		// Custome theme to allow use external image and config file
+        // Custome theme to allow use external image and config file
         if ("Custom".equals(uiConfig.getString("theme")) && !uiConfig.isNull("custom-theme")) {
-        	theme = new CustomTheme(uiConfig.getString("custom-theme"));
+            theme = new CustomTheme(uiConfig.getString("custom-theme"));
         } else {
-        	theme = ITheme.loadTheme(uiConfig.getString("theme"));
+            theme = ITheme.loadTheme(uiConfig.getString("theme"));
         }
         if (theme == null) {
             theme = new DefaultTheme();
@@ -611,14 +611,14 @@ public class BoardRenderer {
                         g.setColor(Color.BLACK);
                         if (branch != null && Lizzie.board.getData().blackToPlay)
                             g.setColor(Color.WHITE);
-                        
+
                         String text;
                         if (Lizzie.config.handicapInsteadOfWinrate) {
                             text=String.format("%.2f", Lizzie.leelaz.winrateToHandicap(move.winrate));
                         } else {
                             text=String.format("%.1f", roundedWinrate);
                         }
-                        
+
                         drawString(g, suggestionX, suggestionY, LizzieFrame.OpenSansSemiboldBase, Font.PLAIN, text, stoneRadius, stoneRadius * 1.5, 1);
                         drawString(g, suggestionX, suggestionY + stoneRadius * 2 / 5, LizzieFrame.OpenSansRegularBase, Util.formatShorterNumber(move.playouts), (float) (stoneRadius * 0.8), stoneRadius * 1.4);
                     }
@@ -772,7 +772,7 @@ public class BoardRenderer {
                 if (uiConfig.getBoolean("fancy-stones")) {
                     drawShadow(gShadow, centerX, centerY, false);
                     Image stone = theme.getBlackStone(new int[]{x, y});
-					// Enhance draw quality
+                    // Enhance draw quality
                     drawScaleSmoothImage(g, stone, centerX - stoneRadius, centerY - stoneRadius, stoneRadius * 2 + 1, stoneRadius * 2 + 1, null);
                 } else {
                     drawShadow(gShadow, centerX, centerY, true);
@@ -786,7 +786,7 @@ public class BoardRenderer {
                 if (uiConfig.getBoolean("fancy-stones")) {
                     drawShadow(gShadow, centerX, centerY, false);
                     Image stone = theme.getWhiteStone(new int[]{x, y});
-					// Enhance draw quality
+                    // Enhance draw quality
                     drawScaleSmoothImage(g, stone, centerX - stoneRadius, centerY - stoneRadius, stoneRadius * 2 + 1, stoneRadius * 2 + 1, null);
                 } else {
                     drawShadow(gShadow, centerX, centerY, true);
@@ -801,7 +801,7 @@ public class BoardRenderer {
                 if (uiConfig.getBoolean("fancy-stones")) {
                     drawShadow(gShadow, centerX, centerY, true);
                     Image stone = theme.getBlackStone(new int[]{x, y});
-					// Enhance draw quality
+                    // Enhance draw quality
                     drawScaleSmoothImage(g, stone, centerX - stoneRadius, centerY - stoneRadius, stoneRadius * 2 + 1, stoneRadius * 2 + 1, null);
                 } else {
                     drawShadow(gShadow, centerX, centerY, true);
@@ -814,7 +814,7 @@ public class BoardRenderer {
                 if (uiConfig.getBoolean("fancy-stones")) {
                     drawShadow(gShadow, centerX, centerY, true);
                     Image stone = theme.getWhiteStone(new int[]{x, y});
-					// Enhance draw quality
+                    // Enhance draw quality
                     drawScaleSmoothImage(g, stone, centerX - stoneRadius, centerY - stoneRadius, stoneRadius * 2 + 1, stoneRadius * 2 + 1, null);
                 } else {
                     drawShadow(gShadow, centerX, centerY, true);
@@ -833,18 +833,18 @@ public class BoardRenderer {
      * Draw scale smooth image, enhanced display quality
      */
     public void drawScaleSmoothImage(Graphics2D g, Image img, int x, int y, int width, int height, ImageObserver observer) {
-	    BufferedImage newstone = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-	    newstone.getGraphics().drawImage(img.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH), 0, 0, observer);
-	    g.drawImage(newstone, x, y, width, height, observer);
-	}
+        BufferedImage newstone = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        newstone.getGraphics().drawImage(img.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH), 0, 0, observer);
+        g.drawImage(newstone, x, y, width, height, observer);
+    }
 
     /**
      * Draw texture image
      */
     public void drawTextureImage(Graphics2D g, BufferedImage img, int x, int y, int width, int height) {
-	    TexturePaint paint = new TexturePaint(img, new Rectangle(0, 0, img.getWidth(), img.getHeight()));
-	    g.setPaint(paint);
-	    g.fill(new Rectangle(x, y, width, height));
+        TexturePaint paint = new TexturePaint(img, new Rectangle(0, 0, img.getWidth(), img.getHeight()));
+        g.setPaint(paint);
+        g.fill(new Rectangle(x, y, width, height));
     }
 
     /**

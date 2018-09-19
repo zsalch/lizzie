@@ -83,7 +83,7 @@ public class Util {
 
     /**
      * Format the number to shorter
-     * 
+     *
      * @return a shorter, rounded string version of playouts. e.g. 345 -> 345, 1265 -> 1.3k, 44556 -> 45k, 133523 -> 134k, 1234567 -> 1.2m
      */
     public static String formatShorterNumber(int playouts) {

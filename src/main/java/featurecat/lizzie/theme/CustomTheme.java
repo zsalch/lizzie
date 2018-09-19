@@ -16,15 +16,15 @@ public class CustomTheme implements ITheme {
     BufferedImage whiteStoneCached = null;
     BufferedImage boardCached = null;
     BufferedImage backgroundCached = null;
-    
+
     private String themeName = null;
     private String path = "theme/custom/";
     private DefaultTheme defaultTheme = null;
-    
+
     public CustomTheme(String themeName) {
-    	this.themeName = themeName;
-    	this.path += this.themeName;
-	}
+        this.themeName = themeName;
+        this.path += this.themeName;
+    }
 
     @Override
     public BufferedImage getBlackStone(int[] position) {
@@ -34,7 +34,7 @@ public class CustomTheme implements ITheme {
             } catch (IOException e) {
                 e.printStackTrace();
                 if (this.defaultTheme == null) {
-                	this.defaultTheme = new DefaultTheme();
+                    this.defaultTheme = new DefaultTheme();
                 }
                 blackStoneCached = this.defaultTheme.getBlackStone(position);
             }
@@ -50,7 +50,7 @@ public class CustomTheme implements ITheme {
             } catch (IOException e) {
                 e.printStackTrace();
                 if (this.defaultTheme == null) {
-                	this.defaultTheme = new DefaultTheme();
+                    this.defaultTheme = new DefaultTheme();
                 }
                 whiteStoneCached = this.defaultTheme.getWhiteStone(position);
             }
@@ -66,7 +66,7 @@ public class CustomTheme implements ITheme {
             } catch (IOException e) {
                 e.printStackTrace();
                 if (this.defaultTheme == null) {
-                	this.defaultTheme = new DefaultTheme();
+                    this.defaultTheme = new DefaultTheme();
                 }
                 boardCached = this.defaultTheme.getBoard();
             }
@@ -82,7 +82,7 @@ public class CustomTheme implements ITheme {
             } catch (IOException e) {
                 e.printStackTrace();
                 if (this.defaultTheme == null) {
-                	this.defaultTheme = new DefaultTheme();
+                    this.defaultTheme = new DefaultTheme();
                 }
                 backgroundCached = this.defaultTheme.getBackground();
             }
