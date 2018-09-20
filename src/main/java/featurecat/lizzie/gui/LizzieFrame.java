@@ -129,6 +129,7 @@ public class LizzieFrame extends JFrame {
         // Allow change font in the config
         if (!Lizzie.config.uiConfig.isNull("font-name")) {
             systemDefaultFontName = Lizzie.config.uiConfig.getString("font-name");
+            OpenSansRegularBase = new Font(systemDefaultFontName, Font.PLAIN, 12);
         }
 
         if (Lizzie.config.startMaximized) {
