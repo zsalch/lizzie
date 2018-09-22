@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -93,7 +95,55 @@ public class Util {
         char x = data.lastMove == null ? 't' : (char) (data.lastMove[0] + 'a');
         char y = data.lastMove == null ? 't' : (char) (data.lastMove[1] + 'a');
 
-        return String.format(";%s[%c%c]", stone, x, y);
+        String comment = "";
+        if (data.comment != null && data.comment.trim().length() > 0) {
+            comment = String.format("C[%s]", data.comment);
+        }
+        return String.format(";%s[%c%c]%s", stone, x, y, comment);
     }
 
+    public static String trimGameInfo(String sgf) {
+        String gameInfo = String.format("(?s).*AP\\[Lizzie: %s\\]",
+                Lizzie.lizzieVersion);
+        return sgf.replaceFirst(gameInfo, "(");
+    }
+
+    public static String[] splitAwAbSgf(String sgf) {
+        String[] ret = new String[2];
+        String regex = "(A[BW]{1}(\\[[a-z]{2}\\])+)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(sgf);
+        StringBuilder sb = new StringBuilder();
+        while (matcher.find()) {
+            sb.append(matcher.group(0));
+        }
+        ret[0] = sb.toString();
+        ret[1] = sgf.replaceAll(regex, "");
+        return ret;
+    }
+    
+    public static Stone[] convertStones(String awAb) {
+        Stone[] stones = new Stone[Board.BOARD_SIZE * Board.BOARD_SIZE];
+        for (int i = 0; i < stones.length; i++) {
+            stones[i] = Stone.EMPTY;
+        }
+        String regex = "(A[BW]{1})|(?<=\\[)([a-z]{2})(?=\\])";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(awAb);
+        StringBuilder sb = new StringBuilder();
+        Stone stone = Stone.EMPTY;
+        while (matcher.find()) {
+            String str = matcher.group(0);
+            if("AB".equals(str)) {
+                stone = Stone.BLACK;
+            } else if("AW".equals(str)) {
+                stone = Stone.WHITE;
+            } else {
+                int[] move = SGFParser.convertSgfPosToCoord(str);
+                int index = Board.getIndex(move[0], move[1]);
+                stones[index] = stone;
+            }
+        }
+        return stones;
+    }
 }
