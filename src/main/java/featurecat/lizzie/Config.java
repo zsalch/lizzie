@@ -15,6 +15,7 @@ public class Config {
     public boolean showMoveNumber = false;
     public boolean showWinrate = true;
     public boolean showVariationGraph = true;
+    public boolean showComment = false;
     public boolean showRawBoard = false;
     public boolean showCaptured = true;
     public boolean handicapInsteadOfWinrate = false;
@@ -140,6 +141,7 @@ public class Config {
         showBranch = uiConfig.getBoolean("show-leelaz-variation");
         showWinrate = uiConfig.getBoolean("show-winrate");
         showVariationGraph = uiConfig.getBoolean("show-variation-graph");
+        showComment = uiConfig.optBoolean("show-comment", false);
         showCaptured = uiConfig.getBoolean("show-captured");
         showBestMoves = uiConfig.getBoolean("show-best-moves");
         showNextMoves = uiConfig.getBoolean("show-next-moves");
@@ -186,6 +188,9 @@ public class Config {
     }
     public void toggleShowVariationGraph() {
         this.showVariationGraph = !this.showVariationGraph;
+    }
+    public void toggleShowComment() {
+        this.showComment = !this.showComment;
     }
     public void toggleShowBestMoves() {
         this.showBestMoves = !this.showBestMoves;

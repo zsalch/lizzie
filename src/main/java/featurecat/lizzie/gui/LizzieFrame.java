@@ -32,6 +32,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 
+import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
@@ -99,6 +100,12 @@ public class LizzieFrame extends JFrame {
 
     // Save the player title
     private String playerTitle = null;
+    // Display Comment
+    private JScrollPane scrollPane = null;
+    private JTextPane commentPane = null;
+    private BufferedImage commentImage = null;
+    private String cachedComment = null;
+    private Rectangle commentRect = null;
 
     static {
         // load fonts
@@ -136,6 +143,17 @@ public class LizzieFrame extends JFrame {
         if (Lizzie.config.startMaximized) {
             setExtendedState(Frame.MAXIMIZED_BOTH); // start maximized
         }
+
+        // Comment Pane
+        commentPane = new JTextPane();
+        commentPane.setEditable(false);
+        commentPane.setMargin(new Insets(5, 5, 5, 5));
+        commentPane.setBackground(new Color(0, 0, 0, 200));
+        commentPane.setForeground(Color.WHITE);
+        scrollPane = new JScrollPane();
+        scrollPane.setViewportView(commentPane);
+        scrollPane.setBorder(null);
+        scrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         setVisible(true);
 
@@ -427,12 +445,17 @@ public class LizzieFrame extends JFrame {
 
                 if (Lizzie.config.showVariationGraph) {
                     drawVariationTreeContainer(backgroundG, vx, vy, vw, vh);
-                    // Draw the Comment of the Sgf
-                    int cHeight = drawCommnet(g, vx, vy, vw, vh, false);
+                    int cHeight = 0;
+                    if (Lizzie.config.showComment) {
+                        // Draw the Comment of the Sgf
+                        cHeight = drawCommnet(g, vx, vy, vw, vh, false);
+                    }
                     variationTree.draw(g, treex, treey, treew, treeh - cHeight);
                 } else {
-                    // Draw the Comment of the Sgf
-                    int cHeight = drawCommnet(g, vx, boardY, vw, vh, true);
+                    if (Lizzie.config.showComment) {
+                        // Draw the Comment of the Sgf
+                        drawCommnet(g, vx, topInset, vw, vh - topInset + vy, true);
+                    }
                 }
                 if (Lizzie.config.showSubBoard) {
                     try {
@@ -895,6 +918,44 @@ public class LizzieFrame extends JFrame {
         }
     }
 
+    /**
+     * Process Comment Mouse Wheel Moved
+     * 
+     * @return true when process comment scroll
+     */
+    public boolean onMouseWheelMoved(MouseWheelEvent e) {
+        if (Lizzie.config.showComment && commentRect != null && commentRect.contains(e.getX(), e.getY())) {
+            scrollPane.dispatchEvent(e);
+            createCommentImage(true, 0, 0);
+            getGraphics().drawImage(commentImage, commentRect.x, commentRect.y, commentRect.width, commentRect.height, null);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Create comment cached image
+     * 
+     * @param forceRefresh
+     * @param w
+     * @param h
+     */
+    public void createCommentImage(boolean forceRefresh, int w, int h) {
+        if (forceRefresh || commentImage == null || scrollPane.getWidth() != w || scrollPane.getHeight() != h) {
+            if (w > 0 && h > 0) {
+                scrollPane.setSize(w, h);
+            }
+            commentImage = new BufferedImage(scrollPane.getWidth(), scrollPane.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = commentImage.createGraphics();
+            scrollPane.doLayout();
+            scrollPane.addNotify();
+            scrollPane.validate();
+            scrollPane.printAll(g2);
+            g2.dispose();
+        }
+    }
+
     private void autosaveMaybe() {
         int interval = Lizzie.config.config.getJSONObject("ui").getInt("autosave-interval-seconds") * 1000;
         long currentTime = System.currentTimeMillis();
@@ -994,54 +1055,24 @@ public class LizzieFrame extends JFrame {
      * @return
      */
     private int drawCommnet(Graphics2D g, int x, int y, int w, int h, boolean full) {
-        int cHeight = 0;
         String comment = (Lizzie.board.getHistory().getData() != null && Lizzie.board.getHistory().getData().comment != null) ? Lizzie.board.getHistory().getData().comment : "";
-        if (comment != null && comment.trim().length() > 0) {
-            double rate = full ? 1 : 0.1;
-            cHeight = (int)(h * rate);
-            int fontSize = (int)(Math.min(getWidth(), getHeight()) * 0.98 * 0.03);
-            try {
-                fontSize = Lizzie.config.uiConfig.getInt("comment-font-size");
-            } catch (JSONException e) {
-                if (fontSize < 16) {
-                    fontSize = 16;
-                }
-            }
-            Font font = new Font(systemDefaultFontName, Font.PLAIN, fontSize);
-            FontMetrics fm = g.getFontMetrics(font);
-            int stringWidth = fm.stringWidth(comment);
-            int stringHeight = fm.getHeight();
-            int width = stringWidth;
-            int height = stringHeight;
-
-            ArrayList<String> list = (ArrayList<String>) WrapString.wrap(comment, fm, (int)(w - height*0.9));
-            if (list != null && list.size() > 0) {
-                if (!full) {
-                    if (list.size() * height > cHeight) {
-                        cHeight = list.size() * height;
-                        if (cHeight > (int)(h * 0.4)) {
-                            cHeight = (int)(h * 0.4);
-                        }
-                    }
-                }
-                int ystart = full ? y : h - cHeight;
-                // Draw background
-                Color oriColor = g.getColor();
-                g.setColor(new Color(0, 0, 0, 200));
-                g.fillRect(x, ystart - height, w, cHeight + height * 2);
-                g.setColor(Color.white);
-                g.setFont(font);
-                int i = 0;
-                for (String s : list) {
-                    g.drawString(s, x + (int)(height * 0.2), ystart + height * (full?(i+1):i));
-                    i++;
-                }
-                g.setColor(oriColor);
-                cHeight = cHeight + height;
-            } else {
-                cHeight = 0;
+        int cHeight = full ? h : (int)(h*0.5);
+        int fontSize = (int)(Math.min(getWidth(), getHeight()) * 0.98 * 0.03);
+        try {
+            fontSize = Lizzie.config.uiConfig.getInt("comment-font-size");
+        } catch (JSONException e) {
+            if (fontSize < 16) {
+                fontSize = 16;
             }
         }
+        Font font = new Font(systemDefaultFontName, Font.PLAIN, fontSize);
+        commentPane.setFont(font);
+        commentPane.setText(comment);
+        commentPane.setSize(w, cHeight);
+        createCommentImage((comment != null && !comment.equals(this.cachedComment)) ? true : false, w, cHeight);
+        commentRect = new Rectangle(x, y + (h - cHeight), scrollPane.getWidth(), scrollPane.getHeight());
+        g.drawImage(commentImage, commentRect.x, commentRect.y, commentRect.width, commentRect.height, null);
+        cachedComment = comment;
         return cHeight;
     }
 }
