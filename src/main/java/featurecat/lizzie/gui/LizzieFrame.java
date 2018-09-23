@@ -13,7 +13,6 @@ import java.awt.RenderingHints;
 import com.jhlabs.image.GaussianFilter;
 import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.Util;
-import featurecat.lizzie.WrapString;
 import featurecat.lizzie.analysis.GameInfo;
 import featurecat.lizzie.analysis.Leelaz;
 import featurecat.lizzie.rules.Board;
@@ -535,10 +534,11 @@ public class LizzieFrame extends JFrame {
         if (Lizzie.leelaz.isLoaded()) {
             int mainBoardX = (boardRenderer != null && boardRenderer.getLocation() != null) ? boardRenderer.getLocation().x : 0;
             if (mainBoardX > x) {
-                ArrayList<String> list = (ArrayList<String>) WrapString.wrap(text, fm, mainBoardX - x);
-                if (list != null && list.size() > 0) {
-                    text = list.get(0);
-                }
+                //TODO
+//                ArrayList<String> list = (ArrayList<String>) WrapString.wrap(text, fm, mainBoardX - x);
+//                if (list != null && list.size() > 0) {
+//                    text = list.get(0);
+//                }
             }
         }
         int stringWidth = fm.stringWidth(text);
