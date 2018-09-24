@@ -85,7 +85,7 @@ public class Util {
             }
         }
     }
-    
+
     private static String formatMove(BoardData data) {
         String stone = "";
         if (Stone.BLACK.equals(data.lastMoveColor)) stone = "B";
@@ -121,7 +121,7 @@ public class Util {
         ret[1] = sgf.replaceAll(regex, "");
         return ret;
     }
-    
+
     public static Stone[] convertStones(String awAb) {
         Stone[] stones = new Stone[Board.BOARD_SIZE * Board.BOARD_SIZE];
         for (int i = 0; i < stones.length; i++) {

@@ -530,18 +530,15 @@ public class LizzieFrame extends JFrame {
     private void drawPonderingState(Graphics2D g, String text, int x, int y, double size) {
         Font font = new Font(systemDefaultFontName, Font.PLAIN, (int)(Math.max(getWidth(), getHeight()) * size));
         FontMetrics fm = g.getFontMetrics(font);
+        int stringWidth = fm.stringWidth(text);
         // Trim too long text when display switching prompt
         if (Lizzie.leelaz.isLoaded()) {
             int mainBoardX = (boardRenderer != null && boardRenderer.getLocation() != null) ? boardRenderer.getLocation().x : 0;
-            if (mainBoardX > x) {
-                //TODO
-//                ArrayList<String> list = (ArrayList<String>) WrapString.wrap(text, fm, mainBoardX - x);
-//                if (list != null && list.size() > 0) {
-//                    text = list.get(0);
-//                }
+            if ((mainBoardX > x) && stringWidth > (mainBoardX - x) ) {
+                text = Util.fitStringByWidth(text, fm, mainBoardX - x);
+                stringWidth = fm.stringWidth(text);
             }
         }
-        int stringWidth = fm.stringWidth(text);
         int stringHeight = fm.getAscent() - fm.getDescent();
         int width = stringWidth;
         int height = (int)(stringHeight * 1.2);
