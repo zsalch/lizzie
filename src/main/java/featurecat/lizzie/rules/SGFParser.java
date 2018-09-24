@@ -441,14 +441,14 @@ public class SGFParser {
             }
         }
 
-        String newComment = String.format("(%s/%s)%s%s", engine, playouts, curWinrate, lastMoveWinrate);
+        String newComment = String.format("%s: %s %s\n(%s/%s playouts)", !data.blackToPlay ? "Black" : "White", curWinrate, lastMoveWinrate, engine, playouts);
 
         if (data.comment != null) {
-            String winratePattern = "\\([^\\(\\)/]*\\/[0-9\\.]*[kmKM]*\\)[0-9\\.\\-]+%*\\(*[0-9\\.\\-]+%*\\)*";
+            String winratePattern = "(Black|White): [0-9\\.\\-]+%* \\(*[0-9\\.\\-]*%*\\)*\n\\([^\\(\\)/]*\\/[0-9\\.]*[kmKM]* playouts\\)";
             if (data.comment.matches("(?s).*" + winratePattern + "(?s).*")) {
                 newComment = data.comment.replaceAll(winratePattern, newComment);
             } else {
-                newComment = String.format("%s %s", data.comment, newComment);
+                newComment = String.format("%s\n\n%s", newComment, data.comment);
             }
         }
         return newComment;
