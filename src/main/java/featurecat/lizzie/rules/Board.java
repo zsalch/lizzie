@@ -12,6 +12,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Queue;
 import java.util.List;
+import java.util.Map;
 import org.json.JSONException;
 
 public class Board implements LeelazListener {
@@ -111,6 +112,35 @@ public class Board implements LeelazListener {
 
             if (history.getData() != null) {
                 history.getData().comment = comment;
+            }
+        }
+    }
+
+    /**
+     * Add a key and value to node
+     * 
+     * @param key
+     * @param value
+     */
+    public void addNodeProperty(String key, String value) {
+        synchronized (this) {
+
+            if (history.getData() != null) {
+                history.getData().addProperty(key, value);
+            }
+        }
+    }
+
+    /**
+     * Add a keys and values to node
+     * 
+     * @param map
+     */
+    public void addNodeProperties(Map<String, String> properties) {
+        synchronized (this) {
+
+            if (history.getData() != null) {
+                history.getData().addProperties(properties);
             }
         }
     }
