@@ -9,7 +9,9 @@ import featurecat.lizzie.analysis.Branch;
 import featurecat.lizzie.analysis.MoveData;
 import featurecat.lizzie.plugin.PluginManager;
 import featurecat.lizzie.rules.Board;
+import featurecat.lizzie.rules.BoardData;
 import featurecat.lizzie.rules.BoardHistoryNode;
+import featurecat.lizzie.rules.SGFParser;
 import featurecat.lizzie.rules.Stone;
 import featurecat.lizzie.rules.Zobrist;
 
@@ -126,6 +128,8 @@ public class BoardRenderer {
             if (Lizzie.config.showNextMoves) {
                 drawNextMoves(g);
             }
+            
+            drawStoneMark(g);
         }
 
         PluginManager.onDraw(g);
@@ -863,6 +867,42 @@ public class BoardRenderer {
         TexturePaint paint = new TexturePaint(img, new Rectangle(0, 0, img.getWidth(), img.getHeight()));
         g.setPaint(paint);
         g.fill(new Rectangle(x, y, width, height));
+    }
+
+    /**
+     * Draw stone marks
+     * 
+     * @param g
+     */
+    private void drawStoneMark(Graphics2D g) {
+
+        BoardData data = Lizzie.board.getHistory().getData();
+
+        data.getProperties().forEach((key, value) -> {
+            if ("TR".equals(key)) {
+                int[] move = SGFParser.convertSgfPosToCoord(value);
+                if (move != null) {
+                    if (Lizzie.board.getData().blackToPlay) {
+                        g.setColor(Color.WHITE);
+                    } else {
+                        g.setColor(Color.BLACK);
+                    }
+                    int moveX = x + scaledMargin + squareLength * move[0];
+                    int moveY = y + scaledMargin + squareLength * move[1];
+                    drawTriangle(g, moveX, moveY, stoneRadius + 1, (stoneRadius + 1)/2);
+                }
+            }
+        });
+    }
+
+    /**
+     * Draws the triangle of a circle centered at (centerX, centerY) with radius $radius$
+     */
+    private void drawTriangle(Graphics2D g, int centerX, int centerY, int radius, int offset) {
+        int wide = (int)((3.0 / 2.0) * (radius - offset)/Math.sqrt(3.0));
+        int x[] = {centerX, centerX - wide, centerX + wide};
+        int y[] = {centerY - radius/2, centerY + (radius - offset)/2, centerY + (radius - offset)/2};
+        g.drawPolygon(x, y, 3);
     }
 
     /**
