@@ -53,12 +53,7 @@ public class BoardData {
     public void addProperty(String key, String value) {
         if ("LB".equals(key) || "AB".equals(key) || "AW".equals(key) || "AE".equals(key)) {
             // Label and add/remove stones
-            String oriValue = properties.get(key);
-            if (oriValue == null) {
-                properties.put(key, value);
-            } else {
-                properties.put(key, oriValue + "," + value);
-            }
+            properties.merge(key, value, (old, val) -> old + "," + val);
         } else {
             properties.put(key, value);
         }
@@ -82,11 +77,7 @@ public class BoardData {
      * @return
      */
     public String optProperty(String key, String defaultValue) {
-        if (properties.get(key) == null) {
-            return defaultValue;
-        } else {
-            return properties.get(key);
-        }
+        return properties.getOrDefault(key, defaultValue);
     }
 
     /**
@@ -106,9 +97,106 @@ public class BoardData {
      */
     public void addProperties(Map<String, String> properties) {
         if (properties != null && properties.size() > 0) {
-            for (String key : properties.keySet()) {
-                addProperty(key, properties.get(key));
+            properties.forEach((key, value) -> addProperty(key, value));
+        }
+    }
+
+    /**
+     * Add the properties from string
+     * 
+     * @return
+     */
+    public void addProperties(String propsStr) {
+        if (propsStr != null) {
+            boolean inTag = false, escaping = false;
+            String tag = null;
+            StringBuilder tagBuilder = new StringBuilder();
+            StringBuilder tagContentBuilder = new StringBuilder();
+
+            for (int i = 0; i < propsStr.length(); i++) {
+                char c = propsStr.charAt(i);
+                if (escaping) {
+                    tagContentBuilder.append(c);
+                    escaping = false;
+                    continue;
+                }
+                switch (c) {
+                    case '(':
+                        if (inTag) {
+                            if (i > 0) {
+                                tagContentBuilder.append(c);
+                            }
+                        }
+                        break;
+                    case ')':
+                        if (inTag) {
+                            tagContentBuilder.append(c);
+                        }
+                        break;
+                    case '[':
+                        inTag = true;
+                        String tagTemp = tagBuilder.toString();
+                        if (!tagTemp.isEmpty()) {
+                            tag = tagTemp.replaceAll("[a-z]", "");
+                        }
+                        tagContentBuilder = new StringBuilder();
+                        break;
+                    case ']':
+                        inTag = false;
+                        tagBuilder = new StringBuilder();
+                        addProperty(tag, tagContentBuilder.toString());
+                        break;
+                    case ';':
+                        break;
+                    default:
+                        if (inTag) {
+                            if (c == '\\') {
+                                escaping = true;
+                                continue;
+                            }
+                            tagContentBuilder.append(c);
+                        } else {
+                            if (c != '\n' && c != '\r' && c != '\t' && c != ' ') {
+                                tagBuilder.append(c);
+                            }
+                        }
+                }
             }
         }
+    }
+
+    /**
+     * Get properties string
+     * 
+     * @return
+     */
+    public String propertiesString() {
+        StringBuilder sb = new StringBuilder();
+        if (properties != null) {
+            properties.forEach((key, value) -> sb.append(nodeString(key, value)));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Get node string
+     * 
+     * @param key
+     * @param value
+     * @return
+     */
+    public String nodeString(String key, String value) {
+        StringBuilder sb = new StringBuilder();
+        if ("LB".equals(key) || "AB".equals(key) || "AW".equals(key) || "AE".equals(key)) {
+            // Label and add/remove stones
+            sb.append(key);
+            String[] vals = value.split(",");
+            for (String val : vals) {
+                sb.append("[").append(val).append("]");
+            }
+        } else {
+            sb.append(key).append("[").append(value).append("]");
+        }
+        return sb.toString();
     }
 }

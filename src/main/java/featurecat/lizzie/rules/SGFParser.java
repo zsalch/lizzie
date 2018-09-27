@@ -74,8 +74,6 @@ public class SGFParser {
         Map<Integer, Integer> subTreeStepMap = new HashMap<Integer, Integer>();
         // Comment of the AW/AB (Add White/Add Black) stone
         String awabComment = null;
-        // Previous Tag
-        String prevTag = null;
         // Game properties
         Map<String, String> gameProperties = new HashMap<String, String>();
         boolean inTag = false, isMultiGo = false, escaping = false, moveStart = false;
@@ -202,7 +200,6 @@ public class SGFParser {
                             gameProperties.put(tag, tagContent);
                         }
                     }
-                    prevTag = tag;
                     break;
                 case ';':
                     break;
@@ -265,8 +262,9 @@ public class SGFParser {
 
         // add SGF header
         StringBuilder builder = new StringBuilder("(;");
-        if (handicap != 0) builder.append(String.format("HA[%s]", handicap));
-        builder.append(String.format("KM[%s]PW[%s]PB[%s]DT[%s]AP[Lizzie: %s]",
+        StringBuilder generalProps = new StringBuilder("");
+        if (handicap != 0) generalProps.append(String.format("HA[%s]", handicap));
+        generalProps.append(String.format("KM[%s]PW[%s]PB[%s]DT[%s]AP[Lizzie: %s]",
                 komi, playerWhite, playerBlack, date, Lizzie.lizzieVersion));
 
         // For append the Winrate to the comment of sgf, maybe need to update the Winrate
@@ -284,6 +282,10 @@ public class SGFParser {
 
         // move to the first move
         history.toStart();
+
+        // Game properties
+        history.getData().addProperties(generalProps.toString());
+        builder.append(history.getData().propertiesString());
 
         // add handicap stones to SGF
         if (handicap != 0) {
@@ -340,9 +342,8 @@ public class SGFParser {
         // *  format: ";B[xy]" or ";W[xy]"
         // *  with 'xy' = coordinates ; or 'tt' for pass.
 
-
         // Write variation tree
-        builder.append(generateNode(board, history.nextNode()));
+        builder.append(generateNode(board, history.getCurrentHistoryNode()));
 
         // close file
         builder.append(')');
@@ -369,6 +370,9 @@ public class SGFParser {
 
                 builder.append(String.format(";%s[%c%c]", stone, x, y));
 
+                // Node properties
+                builder.append(data.propertiesString());
+
                 // Write the comment
                 if (Lizzie.config.uiConfig.optBoolean("append-winrate-to-comment")) {
                     // Append the Winrate to the comment of sgf
@@ -377,19 +381,19 @@ public class SGFParser {
                 if (data.comment != null) {
                     builder.append(String.format("C[%s]", data.comment));
                 }
+            }
 
-                if (node.numberOfChildren() > 1) {
-                    // Variation
-                    for (BoardHistoryNode sub : node.getNexts()) {
-                        builder.append("(");
-                        builder.append(generateNode(board, sub));
-                        builder.append(")");
-                    }
-                } else if (node.numberOfChildren() == 1) {
-                    builder.append(generateNode(board, node.next()));
-                } else {
-                    return builder.toString();
+            if (node.numberOfChildren() > 1) {
+                // Variation
+                for (BoardHistoryNode sub : node.getNexts()) {
+                    builder.append("(");
+                    builder.append(generateNode(board, sub));
+                    builder.append(")");
                 }
+            } else if (node.numberOfChildren() == 1) {
+                builder.append(generateNode(board, node.next()));
+            } else {
+                return builder.toString();
             }
         }
 
