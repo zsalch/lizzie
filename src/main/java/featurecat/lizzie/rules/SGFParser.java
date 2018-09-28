@@ -200,7 +200,7 @@ public class SGFParser {
                             // Other SGF node properties
                             Lizzie.board.addNodeProperty(tag, tagContent);
                         } else {
-                            gameProperties.put(tag, tagContent);
+                            addProperty(gameProperties, tag, tagContent);
                         }
                     }
                     break;
@@ -478,5 +478,141 @@ public class SGFParser {
             }
         }
         return false;
+    }
+
+    /**
+     * Get a value with key, or the default if there is no such key
+     * 
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    public static String optProperty(Map<String, String> props, String key, String defaultValue) {
+        return props.getOrDefault(key, defaultValue);
+    }
+
+    /**
+     * Add a key and value
+     * 
+     * @param key
+     * @param value
+     */
+    public static void addProperty(Map<String, String> props, String key, String value) {
+        if (SGFParser.isListProperty(key)) {
+            // Label and add/remove stones
+            props.merge(key, value, (old, val) -> old + "," + val);
+        } else {
+            props.put(key, value);
+        }
+    }
+
+    /**
+     * Add the properties
+     * 
+     * @return
+     */
+    public static void addProperties(Map<String, String> props, Map<String, String> addProps) {
+        if (addProps != null && addProps.size() > 0) {
+            addProps.forEach((key, value) -> addProperty(props, key, value));
+        }
+    }
+
+    /**
+     * Add the properties from string
+     * 
+     * @return
+     */
+    public static void addProperties(Map<String, String> props, String propsStr) {
+        if (propsStr != null) {
+            boolean inTag = false, escaping = false;
+            String tag = null;
+            StringBuilder tagBuilder = new StringBuilder();
+            StringBuilder tagContentBuilder = new StringBuilder();
+
+            for (int i = 0; i < propsStr.length(); i++) {
+                char c = propsStr.charAt(i);
+                if (escaping) {
+                    tagContentBuilder.append(c);
+                    escaping = false;
+                    continue;
+                }
+                switch (c) {
+                    case '(':
+                        if (inTag) {
+                            if (i > 0) {
+                                tagContentBuilder.append(c);
+                            }
+                        }
+                        break;
+                    case ')':
+                        if (inTag) {
+                            tagContentBuilder.append(c);
+                        }
+                        break;
+                    case '[':
+                        inTag = true;
+                        String tagTemp = tagBuilder.toString();
+                        if (!tagTemp.isEmpty()) {
+                            tag = tagTemp.replaceAll("[a-z]", "");
+                        }
+                        tagContentBuilder = new StringBuilder();
+                        break;
+                    case ']':
+                        inTag = false;
+                        tagBuilder = new StringBuilder();
+                        addProperty(props, tag, tagContentBuilder.toString());
+                        break;
+                    case ';':
+                        break;
+                    default:
+                        if (inTag) {
+                            if (c == '\\') {
+                                escaping = true;
+                                continue;
+                            }
+                            tagContentBuilder.append(c);
+                        } else {
+                            if (c != '\n' && c != '\r' && c != '\t' && c != ' ') {
+                                tagBuilder.append(c);
+                            }
+                        }
+                }
+            }
+        }
+    }
+
+    /**
+     * Get properties string
+     * 
+     * @return
+     */
+    public static String propertiesString(Map<String, String> props) {
+        StringBuilder sb = new StringBuilder();
+        if (props != null) {
+            props.forEach((key, value) -> sb.append(nodeString(key, value)));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Get node string
+     * 
+     * @param key
+     * @param value
+     * @return
+     */
+    public static String nodeString(String key, String value) {
+        StringBuilder sb = new StringBuilder();
+        if (SGFParser.isListProperty(key)) {
+            // Label and add/remove stones
+            sb.append(key);
+            String[] vals = value.split(",");
+            for (String val : vals) {
+                sb.append("[").append(val).append("]");
+            }
+        } else {
+            sb.append(key).append("[").append(value).append("]");
+        }
+        return sb.toString();
     }
 }
