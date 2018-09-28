@@ -17,6 +17,9 @@ import java.text.SimpleDateFormat;
 public class SGFParser {
     private static final SimpleDateFormat SGF_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
+    private static final String[] listProps = new String[] { "LB", "CR", "SQ", "MA", "TR", "AB", "AW", "AE"};
+    private static final String[] markupProps = new String[] { "LB", "CR", "SQ", "MA", "TR"};
+
     public static boolean load(String filename) throws IOException {
         // Clear the board
         Lizzie.board.clear();
@@ -459,4 +462,21 @@ public class SGFParser {
         return newComment;
     }
 
+    public static boolean isListProperty(String key) {
+        for(String k : listProps) {
+            if(k.equals(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isMarkupProperty(String key) {
+        for(String k : markupProps) {
+            if(k.equals(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

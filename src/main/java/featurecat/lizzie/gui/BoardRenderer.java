@@ -20,6 +20,7 @@ import java.awt.font.TextAttribute;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,7 +130,7 @@ public class BoardRenderer {
                 drawNextMoves(g);
             }
             
-            drawStoneMark(g);
+            drawStoneMarkup(g);
         }
 
         PluginManager.onDraw(g);
@@ -870,26 +871,38 @@ public class BoardRenderer {
     }
 
     /**
-     * Draw stone marks
+     * Draw stone Markups
      * 
      * @param g
      */
-    private void drawStoneMark(Graphics2D g) {
+    private void drawStoneMarkup(Graphics2D g) {
 
         BoardData data = Lizzie.board.getHistory().getData();
 
         data.getProperties().forEach((key, value) -> {
-            if ("TR".equals(key)) {
-                int[] move = SGFParser.convertSgfPosToCoord(value);
-                if (move != null) {
-                    if (Lizzie.board.getData().blackToPlay) {
-                        g.setColor(Color.WHITE);
-                    } else {
-                        g.setColor(Color.BLACK);
+            if (SGFParser.isListProperty(key)) {
+                String[] labels = value.split(",");
+                for (String label : labels) {
+                    String[] moves = label.split(":");
+                    int[] move = SGFParser.convertSgfPosToCoord(moves[0]);
+                    if (move != null) {
+                        int[] lastMove = branch == null ? Lizzie.board.getLastMove() : branch.data.lastMove;
+                        if (!Arrays.equals(move, lastMove)) {
+                            int moveX = x + scaledMargin + squareLength * move[0];
+                            int moveY = y + scaledMargin + squareLength * move[1];
+                            g.setColor(Lizzie.board.getStones()[Board.getIndex(move[0], move[1])].isBlack() ? Color.WHITE : Color.BLACK);
+                            if ("LB".equals(key) && moves.length > 1) {
+                                // Label
+                                drawString(g, moveX, moveY, LizzieFrame.OpenSansRegularBase, moves[1], (float) (stoneRadius * 1.4), (int) (stoneRadius * 1.4));
+                            } else if ("TR".equals(key)) {
+                                // Triangle
+                                drawTriangle(g, moveX, moveY, (stoneRadius + 1)*2/3);
+                            } else if ("SQ".equals(key)) {
+                                // Square
+                                drawSquare(g, moveX, moveY, (stoneRadius + 1)/2);
+                            }
+                        }
                     }
-                    int moveX = x + scaledMargin + squareLength * move[0];
-                    int moveY = y + scaledMargin + squareLength * move[1];
-                    drawTriangle(g, moveX, moveY, stoneRadius + 1, (stoneRadius + 1)/2);
                 }
             }
         });
@@ -898,11 +911,20 @@ public class BoardRenderer {
     /**
      * Draws the triangle of a circle centered at (centerX, centerY) with radius $radius$
      */
-    private void drawTriangle(Graphics2D g, int centerX, int centerY, int radius, int offset) {
-        int wide = (int)((3.0 / 2.0) * (radius - offset)/Math.sqrt(3.0));
-        int x[] = {centerX, centerX - wide, centerX + wide};
-        int y[] = {centerY - radius/2, centerY + (radius - offset)/2, centerY + (radius - offset)/2};
+    private void drawTriangle(Graphics2D g, int centerX, int centerY, int radius) {
+        int offset = (int)(3.0/2.0*radius/Math.sqrt(3.0));
+        int x[] = {centerX, centerX - offset, centerX + offset};
+        int y[] = {centerY - radius, centerY + radius/2, centerY + radius/2};
         g.drawPolygon(x, y, 3);
+    }
+
+    /**
+     * Draws the square of a circle centered at (centerX, centerY) with radius $radius$
+     */
+    private void drawSquare(Graphics2D g, int centerX, int centerY, int radius) {
+        int x[] = {centerX - radius, centerX + radius, centerX + radius, centerX - radius};
+        int y[] = {centerY - radius, centerY - radius, centerY + radius, centerY + radius};
+        g.drawPolygon(x, y, 4);
     }
 
     /**

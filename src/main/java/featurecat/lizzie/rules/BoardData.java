@@ -51,7 +51,7 @@ public class BoardData {
      * @param value
      */
     public void addProperty(String key, String value) {
-        if ("LB".equals(key) || "AB".equals(key) || "AW".equals(key) || "AE".equals(key)) {
+        if (SGFParser.isListProperty(key)) {
             // Label and add/remove stones
             properties.merge(key, value, (old, val) -> old + "," + val);
         } else {
@@ -187,7 +187,7 @@ public class BoardData {
      */
     public String nodeString(String key, String value) {
         StringBuilder sb = new StringBuilder();
-        if ("LB".equals(key) || "AB".equals(key) || "AW".equals(key) || "AE".equals(key)) {
+        if (SGFParser.isListProperty(key)) {
             // Label and add/remove stones
             sb.append(key);
             String[] vals = value.split(",");
