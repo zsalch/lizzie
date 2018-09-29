@@ -900,6 +900,12 @@ public class BoardRenderer {
                             } else if ("SQ".equals(key)) {
                                 // Square
                                 drawSquare(g, moveX, moveY, (stoneRadius + 1)/2);
+                            } else if ("CR".equals(key)) {
+                                // Circle
+                                drawCircle(g, moveX, moveY, stoneRadius*2/3);
+                            } else if ("MA".equals(key)) {
+                                // Mark (X)
+                                drawMarkX(g, moveX, moveY, (stoneRadius + 1)/2);
                             }
                         }
                     }
@@ -922,9 +928,15 @@ public class BoardRenderer {
      * Draws the square of a circle centered at (centerX, centerY) with radius $radius$
      */
     private void drawSquare(Graphics2D g, int centerX, int centerY, int radius) {
-        int x[] = {centerX - radius, centerX + radius, centerX + radius, centerX - radius};
-        int y[] = {centerY - radius, centerY - radius, centerY + radius, centerY + radius};
-        g.drawPolygon(x, y, 4);
+        g.drawRect(centerX - radius, centerY - radius, radius * 2, radius * 2);
+    }
+
+    /**
+     * Draws the mark(X) of a circle centered at (centerX, centerY) with radius $radius$
+     */
+    private void drawMarkX(Graphics2D g, int centerX, int centerY, int radius) {
+        g.drawLine(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
+        g.drawLine(centerX - radius, centerY + radius, centerX + radius, centerY - radius);
     }
 
     /**
