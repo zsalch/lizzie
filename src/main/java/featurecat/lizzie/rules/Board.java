@@ -117,6 +117,85 @@ public class Board implements LeelazListener {
     }
 
     /**
+     * The move number. Thread safe
+     * @param moveNumber the move number of stone
+     */
+    public void moveNumber(int moveNumber) {
+        synchronized (this) {
+            BoardData data = history.getData();
+            if (data != null) {
+                data.moveNumber = moveNumber;
+                if (data.lastMove != null) {
+                    int[] moveNumberList = history.getMoveNumberList();
+                    moveNumberList[Board.getIndex(data.lastMove[0], data.lastMove[1])] = moveNumber;
+                    BoardHistoryNode node = history.getCurrentHistoryNode().previous();
+                    while (node != null) {
+                        BoardData nodeData = node.getData();
+                        if (nodeData != null && nodeData.lastMove != null && nodeData.moveNumber >= moveNumber && moveNumber > 0) {
+                            moveNumber = (moveNumber > 1) ? moveNumber - 1 : 0;
+                            moveNumberList[Board.getIndex(nodeData.lastMove[0], nodeData.lastMove[1])] = moveNumber;
+                        }
+                        node = node.previous();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Add a stone onto the board representation. Thread safe
+     *
+     * @param x     x coordinate
+     * @param y     y coordinate
+     * @param color the type of stone to place
+     */
+    public void addStone(int x, int y, Stone color) {
+        synchronized (this) {
+
+            if (!isValid(x, y) || history.getStones()[getIndex(x, y)] != Stone.EMPTY)
+                return;
+
+            Stone[] stones = history.getData().stones;
+            Zobrist zobrist = history.getData().zobrist;
+
+            // set the stone at (x, y) to color
+            stones[getIndex(x, y)] = color;
+            zobrist.toggleStone(x, y, color);
+
+            Lizzie.frame.repaint();
+        }
+    }
+
+
+    /**
+     * Remove a stone onto the board representation. Thread safe
+     *
+     * @param x     x coordinate
+     * @param y     y coordinate
+     * @param color the type of stone to place
+     */
+    public void removeStone(int x, int y, Stone color) {
+        synchronized (this) {
+
+            if (!isValid(x, y) || history.getStones()[getIndex(x, y)] == Stone.EMPTY)
+                return;
+
+            BoardData data = history.getData();
+            Stone[] stones = data.stones;
+            Zobrist zobrist = data.zobrist;
+
+            // set the stone at (x, y) to empty
+            Stone oriColor = stones[getIndex(x, y)];
+            stones[getIndex(x, y)] = Stone.EMPTY;
+            zobrist.toggleStone(x, y, oriColor);
+            data.moveNumber = 0;
+            data.moveNumberList[Board.getIndex(x, y)] = 0;
+
+            Lizzie.frame.repaint();
+        }
+    }
+
+    /**
      * Add a key and value to node
      * 
      * @param key
