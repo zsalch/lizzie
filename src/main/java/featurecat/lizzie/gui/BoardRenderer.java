@@ -891,6 +891,7 @@ public class BoardRenderer {
                             int moveX = x + scaledMargin + squareLength * move[0];
                             int moveY = y + scaledMargin + squareLength * move[1];
                             g.setColor(Lizzie.board.getStones()[Board.getIndex(move[0], move[1])].isBlack() ? Color.WHITE : Color.BLACK);
+                            g.setStroke(new BasicStroke(2));
                             if ("LB".equals(key) && moves.length > 1) {
                                 // Label
                                 drawString(g, moveX, moveY, LizzieFrame.OpenSansRegularBase, moves[1], (float) (stoneRadius * 1.4), (int) (stoneRadius * 1.4));
