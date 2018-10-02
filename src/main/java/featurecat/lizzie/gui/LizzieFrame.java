@@ -134,8 +134,8 @@ public class LizzieFrame extends JFrame {
         setSize(windowSize.getInt(0), windowSize.getInt(1)); // use config file window size
 
         // Allow change font in the config
-        if (!Lizzie.config.uiConfig.isNull("font-name")) {
-            systemDefaultFontName = Lizzie.config.uiConfig.getString("font-name");
+        if (boardRenderer.theme.getFontName() != null) {
+            systemDefaultFontName = boardRenderer.theme.getFontName();
             OpenSansRegularBase = new Font(systemDefaultFontName, Font.PLAIN, 12);
             OpenSansSemiboldBase = new Font(systemDefaultFontName, Font.BOLD, 12);
         }

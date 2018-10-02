@@ -1,0 +1,7 @@
+{
+  "background-image" : "background.png",
+  "board-image" : "board.png",
+  "black-stone-image" : "black.png",
+  "white-stone-image" : "white.png",
+  "font-name": "Wawati SC"
+}

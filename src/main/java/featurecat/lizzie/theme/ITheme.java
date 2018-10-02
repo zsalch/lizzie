@@ -48,4 +48,6 @@ public interface ITheme {
     BufferedImage getBoard();
 
     BufferedImage getBackground();
+
+    String getFontName();
 }

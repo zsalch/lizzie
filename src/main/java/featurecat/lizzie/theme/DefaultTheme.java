@@ -63,4 +63,12 @@ public class DefaultTheme implements ITheme {
         }
         return backgroundCached;
     }
+
+    /**
+     * Use default font
+     */
+    @Override
+    public String getFontName() {
+        return null;
+    }
 }
