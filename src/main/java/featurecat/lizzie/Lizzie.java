@@ -97,7 +97,7 @@ public class Lizzie {
     }
 
     /**
-     * Switch the Engine
+     * Switch the Engine by index number
      * @param index engine index
      */
     public static void switchEngine(int index) {
@@ -114,7 +114,7 @@ public class Lizzie {
                 index = -1;
             }
         }
-        if (index < 0 || commandLine == null || commandLine.trim().length() == 0 || index == Lizzie.leelaz.currentEngineNo()) {
+        if (index < 0 || commandLine == null || commandLine.trim().isEmpty() || index == Lizzie.leelaz.currentEngineN()) {
             return;
         }
 

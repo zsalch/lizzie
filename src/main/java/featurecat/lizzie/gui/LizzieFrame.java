@@ -427,7 +427,8 @@ public class LizzieFrame extends JFrame {
                 if (Lizzie.config.showStatus) {
                     // Display switching prompt
                     drawPonderingState(g, resourceBundle.getString("LizzieFrame.display.pondering") +
-                            (Lizzie.leelaz.isPondering()?resourceBundle.getString("LizzieFrame.display.on"):resourceBundle.getString("LizzieFrame.display.off")) + " " + Lizzie.leelaz.currentWeight() + Lizzie.leelaz.isSwitching(),
+                            (Lizzie.leelaz.isPondering()?resourceBundle.getString("LizzieFrame.display.on"):resourceBundle.getString("LizzieFrame.display.off")) +
+                            " " + Lizzie.leelaz.currentWeight() + (Lizzie.leelaz.switching() ? resourceBundle.getString("LizzieFrame.prompt.switching") : ""),
                             ponderingX, ponderingY, ponderingSize);
                 }
 
@@ -532,11 +533,11 @@ public class LizzieFrame extends JFrame {
         Font font = new Font(systemDefaultFontName, Font.PLAIN, (int)(Math.max(getWidth(), getHeight()) * size));
         FontMetrics fm = g.getFontMetrics(font);
         int stringWidth = fm.stringWidth(text);
-        // Trim too long text when display switching prompt
+        // Truncate too long text when display switching prompt
         if (Lizzie.leelaz.isLoaded()) {
             int mainBoardX = (boardRenderer != null && boardRenderer.getLocation() != null) ? boardRenderer.getLocation().x : 0;
             if ((mainBoardX > x) && stringWidth > (mainBoardX - x) ) {
-                text = Util.fitStringByWidth(text, fm, mainBoardX - x);
+                text = Util.truncateStringByWidth(text, fm, mainBoardX - x);
                 stringWidth = fm.stringWidth(text);
             }
         }

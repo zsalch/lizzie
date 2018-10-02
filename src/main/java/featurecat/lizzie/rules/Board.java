@@ -144,7 +144,7 @@ public class Board implements LeelazListener {
     }
 
     /**
-     * The move number. Thread safe
+     * Update the move number. Thread safe
      * @param moveNumber the move number of stone
      */
     public void moveNumber(int moveNumber) {
@@ -586,6 +586,8 @@ public class Board implements LeelazListener {
 
     /**
      * Goes to the next coordinate, thread safe
+     * @param fromBackChildren by back children branch
+     * @return true when has next variation
      */
     public boolean nextMove(int fromBackChildren) {
         synchronized (this) {
@@ -598,33 +600,44 @@ public class Board implements LeelazListener {
             return nextVariation(fromBackChildren);
         }
     }
-    // Save the move number
-    public BoardHistoryNode saveMoveNumber() {
+
+    /**
+     *  Save the move number for restore
+     *  If in the branch, save the back routing from children
+     */
+    public void saveMoveNumber() {
         BoardHistoryNode curNode = history.getCurrentHistoryNode();
         int curMoveNum = curNode.getData().moveNumber;
         if (curMoveNum > 0) {
             if (!BoardHistoryList.isMainTrunk(curNode)) {
-                // If in Branch, save the back routing
+                // If in branch, save the back routing from children
                 saveBackRouting(curNode);
             }
             goToMoveNumber(0);
         }
         saveNode = curNode;
-        return curNode;
     }
-    // Save the back routing
+
+    /**
+     *  Save the back routing from children
+     */
     public void saveBackRouting(BoardHistoryNode node) {
         if (node != null && node.previous() != null) {
             node.previous().setFromBackChildren(node.previous().getNexts().indexOf(node));
             saveBackRouting(node.previous());
         }
-        return;
     }
-    // Restore move number
+
+    /**
+     *  Restore move number by saved node
+     */
     public void restoreMoveNumber() {
         restoreMoveNumber(saveNode);
     }
-    // Restore move number by node
+
+    /**
+     *  Restore move number by node
+     */
     public void restoreMoveNumber(BoardHistoryNode node) {
         if (node == null) {
             return;
@@ -635,14 +648,16 @@ public class Board implements LeelazListener {
                 goToMoveNumber(moveNumber);
             } else {
                 // If in Branch, restore by the back routing
-                goToMoveNumberByBack(moveNumber);
+                goToMoveNumberByBackChildren(moveNumber);
             }
         }
     }
-    // Go to move number by back routing when in branch
-    public boolean goToMoveNumberByBack(int moveNumber) {
+
+    /**
+     *  Go to move number by back routing from children when in branch
+     */
+    public void goToMoveNumberByBackChildren(int moveNumber) {
         int delta = moveNumber - history.getMoveNumber();
-        boolean moved = false;
         for (int i = 0; i < Math.abs(delta); i++) {
             BoardHistoryNode curNode = history.getCurrentHistoryNode();
             if (curNode.numberOfChildren() > 1 && delta > 0) {
@@ -652,9 +667,7 @@ public class Board implements LeelazListener {
                     break;
                 }
             }
-            moved = true;
         }
-        return moved;
     }
 
     public boolean goToMoveNumber(int moveNumber) {

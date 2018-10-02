@@ -68,8 +68,8 @@ public class Leelaz {
     private List<String> commands = null;
     private JSONObject config = null;
     private String currentWeight = null;
-    private String isSwitching = "";
-    private int currentEngineNo = -1;
+    private boolean switching = false;
+    private int currentEngineN = -1;
     private ScheduledExecutorService executor = null;
 
     // dynamic komi and opponent komi as reported by dynamic-komi version of leelaz
@@ -106,15 +106,15 @@ public class Leelaz {
         // substitute in the weights file
         engineCommand = engineCommand.replaceAll("%network-file", config.getString("network-file"));
 
-        // Init current engine no and start engine
-        currentEngineNo = 0;
+        // Initialize current engine number and start engine
+        currentEngineN = 0;
         startEngine(engineCommand);
         Lizzie.frame.refreshBackground();
     }
 
     public void startEngine(String engineCommand) throws IOException {
         // Check engine command
-        if (engineCommand == null || "".equals(engineCommand.trim())) {
+        if (engineCommand == null || engineCommand.trim().isEmpty()) {
             return;
         }
 
@@ -168,12 +168,11 @@ public class Leelaz {
         executor.execute(this::read);
     }
 
-
     public void restartEngine(String engineCommand, int index) throws IOException {
-        if (engineCommand == null || "".equals(engineCommand.trim())) {
+        if (engineCommand == null || engineCommand.trim().isEmpty()) {
             return;
         }
-        isSwitching = " Switching";
+        switching = true;
         this.engineCommand = engineCommand;
         // stop the ponder
         if (Lizzie.leelaz.isPondering()) {
@@ -181,7 +180,7 @@ public class Leelaz {
         }
         normalQuit();
         startEngine(engineCommand);
-        currentEngineNo = index;
+        currentEngineN = index;
         togglePonder();
     }
 
@@ -285,7 +284,7 @@ public class Leelaz {
             } else if (line.startsWith("info")) {
                 isLoaded = true;
                 // Clear switching prompt
-                isSwitching = "";
+                switching = false;
                 // Display engine command in the title
                 if (Lizzie.frame != null) Lizzie.frame.setEngineTitle(this.engineCommand);
                 if (isResponseUpToDate()) {
@@ -651,12 +650,12 @@ public class Leelaz {
         return currentWeight;
     }
 
-    public String isSwitching() {
-        return isSwitching;
+    public boolean switching() {
+        return switching;
     }
 
-    public int currentEngineNo() {
-        return currentEngineNo;
+    public int currentEngineN() {
+        return currentEngineN;
     }
 
     public String engineCommand() {

@@ -103,19 +103,19 @@ public class Util {
     }
 
     /**
-     * Fit the too long text by width
+     * Truncate text that is too long for the given width
      * 
      * @param line
      * @param fm
      * @param fitWidth
      * @return fitted
      */
-    public static String fitStringByWidth(String line, FontMetrics fm, int fitWidth) {
+    public static String truncateStringByWidth(String line, FontMetrics fm, int fitWidth) {
         if (line == null || line.length() == 0) {
             return "";
         }
         int width = fm.stringWidth(line);
-        if (width  > fitWidth) {
+        if (width > fitWidth) {
             int guess = line.length() * fitWidth / width;
             String before = line.substring(0, guess).trim();
             width = fm.stringWidth(before);
