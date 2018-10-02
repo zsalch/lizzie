@@ -72,6 +72,16 @@ public class SGFParser {
         } else {
             return false;
         }
+
+        // Determine the SZ property
+        Pattern szPattern = Pattern.compile("(?s).*?SZ\\[(\\d+)\\](?s).*");
+        Matcher szMatcher = szPattern.matcher(value);
+        if (szMatcher.matches()) {
+            Lizzie.board.reopen(Integer.parseInt(szMatcher.group(1)));
+        } else {
+            Lizzie.board.reopen(0);
+        }
+
         int subTreeDepth = 0;
         // Save the variation step count
         Map<Integer, Integer> subTreeStepMap = new HashMap<Integer, Integer>();

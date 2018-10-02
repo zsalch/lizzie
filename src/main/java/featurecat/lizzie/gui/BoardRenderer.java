@@ -178,7 +178,10 @@ public class BoardRenderer {
         if (cachedBackgroundImage == null || cachedBackgroundImage.getWidth() != Lizzie.frame.getWidth() ||
                 cachedBackgroundImage.getHeight() != Lizzie.frame.getHeight() ||
                 cachedX != x || cachedY != y ||
-                cachedBackgroundImageHasCoordinatesEnabled != showCoordinates()) {
+                cachedBackgroundImageHasCoordinatesEnabled != showCoordinates() ||
+                Lizzie.board.isForceRefresh()) {
+
+            Lizzie.board.setForceRefresh(false);
 
             cachedBackgroundImage = new BufferedImage(Lizzie.frame.getWidth(), Lizzie.frame.getHeight(),
                     BufferedImage.TYPE_INT_ARGB);

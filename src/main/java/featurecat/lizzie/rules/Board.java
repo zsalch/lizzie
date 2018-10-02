@@ -16,7 +16,7 @@ import java.util.Map;
 import org.json.JSONException;
 
 public class Board implements LeelazListener {
-    public static final int BOARD_SIZE = Lizzie.config.config.getJSONObject("ui").optInt("board-size", 19);
+    public static int BOARD_SIZE = Lizzie.config.config.getJSONObject("ui").optInt("board-size", 19);
     private final static String alphabet = "ABCDEFGHJKLMNOPQRST";
 
     private BoardHistoryList history;
@@ -29,6 +29,9 @@ public class Board implements LeelazListener {
 
     // Save the node for restore move when in the branch
     private BoardHistoryNode saveNode = null;
+
+    // Force refresh board
+    private boolean forceRefresh = false;
 
     public Board() {
         initialize();
@@ -101,6 +104,30 @@ public class Board implements LeelazListener {
      */
     public static boolean isValid(int x, int y) {
         return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
+    }
+
+    /**
+     * Open board again when the SZ property is setup by sgf
+     * 
+     * @param size
+     */
+    public void reopen(int size) {
+        if (size == 0) {
+            size = 19;
+        }
+        if (size != BOARD_SIZE) {
+            BOARD_SIZE = (size == 19 || size == 13 || size == 9) ? size : 19;
+            initialize();
+            forceRefresh = true;
+        }
+    }
+
+    public boolean isForceRefresh() {
+        return forceRefresh;
+    }
+
+    public void setForceRefresh(boolean forceRefresh) {
+        this.forceRefresh = forceRefresh;
     }
 
     /**
