@@ -130,20 +130,16 @@ public class Leelaz {
         commands = Arrays.asList(engineCommand.split(" "));
 
         // get weight name
-        if (commands != null) {
-            int weightIndex = commands.indexOf("--weights");
-            if (weightIndex > -1) {
-                currentWeight = commands.get(weightIndex+1);
-            } else {
-                weightIndex = commands.indexOf("-w");
-                if (weightIndex > -1) {
-                    currentWeight = commands.get(weightIndex+1);
-                }
-            }
-            if (currentWeight != null) {
-                String[] names = currentWeight.split("[\\\\|/]");
-                if (names != null && names.length > 1) {
-                    currentWeight = names[names.length - 1];
+        if (engineCommand != null) {
+            Pattern wPattern = Pattern.compile("(?s).*?(--weights |-w )([^ ]+)(?s).*");
+            Matcher wMatcher = wPattern.matcher(engineCommand);
+            if (wMatcher.matches()) {
+                currentWeight = wMatcher.group(2);
+                if (currentWeight != null) {
+                    String[] names = currentWeight.split("[\\\\|/]");
+                    if (names != null && names.length > 1) {
+                        currentWeight = names[names.length - 1];
+                    }
                 }
             }
         }
@@ -286,7 +282,7 @@ public class Leelaz {
                 // Clear switching prompt
                 switching = false;
                 // Display engine command in the title
-                if (Lizzie.frame != null) Lizzie.frame.setEngineTitle(this.engineCommand);
+                if (Lizzie.frame != null) Lizzie.frame.updateTitle();
                 if (isResponseUpToDate()) {
                     // This should not be stale data when the command number match
                     parseInfo(line.substring(5));

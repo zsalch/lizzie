@@ -969,15 +969,15 @@ public class LizzieFrame extends JFrame {
     }
 
     public void setPlayers(String whitePlayer, String blackPlayer) {
-        // Display engine command in title
-        this.playerTitle = String.format("%s (%s [W] vs %s [B])", DEFAULT_TITLE,
-                whitePlayer, blackPlayer);
-        setTitle(this.playerTitle + (Lizzie.leelaz.engineCommand() != null ? " - " + Lizzie.leelaz.engineCommand() : ""));
+        this.playerTitle = String.format("(%s [W] vs %s [B])", whitePlayer, blackPlayer);
+        this.updateTitle();
     }
 
-    public void setEngineTitle(String engineCommand) {
-        // Display engine command in title
-        setTitle((this.playerTitle != null ? this.playerTitle + " - " : "") + engineCommand);
+    public void updateTitle() {
+        StringBuilder sb = new StringBuilder(DEFAULT_TITLE);
+        sb.append(this.playerTitle != null ? " " + this.playerTitle.trim() : "");
+        sb.append(Lizzie.leelaz.engineCommand() != null ? " [" + Lizzie.leelaz.engineCommand() + "]" : "");
+        setTitle(sb.toString());
     }
 
     private void setDisplayedBranchLength(int n) {
@@ -999,8 +999,8 @@ public class LizzieFrame extends JFrame {
     }
 
     public void resetTitle() {
-        // Display engine command in title
-        setTitle(DEFAULT_TITLE + (Lizzie.leelaz.engineCommand() != null ? " - " + Lizzie.leelaz.engineCommand() : ""));
+        this.playerTitle = null;
+        this.updateTitle();
     }
 
     public void copySgf() {
