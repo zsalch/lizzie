@@ -435,7 +435,10 @@ public class SGFParser {
     }
 
     /**
-     * Format Comment with (Weight/Playouts)Winrate(Last Move Rate)
+     * Format Comment with following format:
+     * Move <move number>
+     * <Winrate> (<Last Move Rate Difference>)
+     * (<Weight name> / <Playouts>)
      *
      */
     private static String formatComment(BoardHistoryNode node) {
@@ -480,10 +483,10 @@ public class SGFParser {
             }
         }
 
-        String newComment = String.format("%s: %s %s\n(%s/%s playouts)", !data.blackToPlay ? "Black" : "White", curWinrate, lastMoveWinrate, engine, playouts);
+        String newComment = String.format("Move %d\n%s %s\n(%s / %s playouts)", data.moveNumber, curWinrate, lastMoveWinrate, engine, playouts);
 
         if (data.comment != null) {
-            String winratePattern = "(Black|White): [0-9\\.\\-]+%* \\(*[0-9\\.\\-]*%*\\)*\n\\([^\\(\\)/]*\\/[0-9\\.]*[kmKM]* playouts\\)";
+            String winratePattern = "Move [0-9]+\n[0-9\\.\\-]+%* \\(*[0-9\\.\\-]*%*\\)*\n\\([^\\(\\)/]* \\/ [0-9\\.]*[kmKM]* playouts\\)";
             if (data.comment.matches("(?s).*" + winratePattern + "(?s).*")) {
                 newComment = data.comment.replaceAll(winratePattern, newComment);
             } else {
