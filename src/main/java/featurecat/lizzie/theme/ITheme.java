@@ -1,5 +1,6 @@
 package featurecat.lizzie.theme;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
@@ -49,5 +50,31 @@ public interface ITheme {
 
     BufferedImage getBackground();
 
-    String getFontName();
+    /**
+     * Allow user specify the font name
+     */
+    default String getFontName() {
+        return null;
+    }
+
+    /**
+     * Use solid current stone indicator
+     */
+    default boolean solidStoneIndicator() {
+        return false;
+    }
+
+    /**
+     * The background color of the comment panel
+     */
+    default Color commentBackgroundColor() {
+        return new Color(0, 0, 0, 200);
+    }
+
+    /**
+     * The font color of the comment
+     */
+    default Color commentFontColor() {
+        return Color.WHITE;
+    }
 }

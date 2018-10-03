@@ -148,8 +148,8 @@ public class LizzieFrame extends JFrame {
         commentPane = new JTextPane();
         commentPane.setEditable(false);
         commentPane.setMargin(new Insets(5, 5, 5, 5));
-        commentPane.setBackground(new Color(0, 0, 0, 200));
-        commentPane.setForeground(Color.WHITE);
+        commentPane.setBackground(boardRenderer.theme.commentBackgroundColor());
+        commentPane.setForeground(boardRenderer.theme.commentFontColor());
         scrollPane = new JScrollPane();
         scrollPane.setViewportView(commentPane);
         scrollPane.setBorder(null);
@@ -449,13 +449,13 @@ public class LizzieFrame extends JFrame {
                     int cHeight = 0;
                     if (Lizzie.config.showComment) {
                         // Draw the Comment of the Sgf
-                        cHeight = drawCommnet(g, vx, vy, vw, vh, false);
+                        cHeight = drawComment(g, vx, vy, vw, vh, false);
                     }
                     variationTree.draw(g, treex, treey, treew, treeh - cHeight);
                 } else {
                     if (Lizzie.config.showComment) {
                         // Draw the Comment of the Sgf
-                        drawCommnet(g, vx, topInset, vw, vh - topInset + vy, true);
+                        drawComment(g, vx, topInset, vw, vh - topInset + vy, true);
                     }
                 }
                 if (Lizzie.config.showSubBoard) {
@@ -1053,7 +1053,7 @@ public class LizzieFrame extends JFrame {
      * @param full
      * @return
      */
-    private int drawCommnet(Graphics2D g, int x, int y, int w, int h, boolean full) {
+    private int drawComment(Graphics2D g, int x, int y, int w, int h, boolean full) {
         String comment = (Lizzie.board.getHistory().getData() != null && Lizzie.board.getHistory().getData().comment != null) ? Lizzie.board.getHistory().getData().comment : "";
         int cHeight = full ? h : (int)(h*0.5);
         int fontSize = (int)(Math.min(getWidth(), getHeight()) * 0.98 * 0.03);

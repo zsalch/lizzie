@@ -1,11 +1,13 @@
 package featurecat.lizzie.theme;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -98,6 +100,41 @@ public class CustomTheme implements ITheme {
     @Override
     public String getFontName() {
         return config.optString("font-name", null);
+    }
+
+    /**
+     * Use solid current stone indicator
+     */
+    @Override
+    public boolean solidStoneIndicator() {
+        return config.optBoolean("solid-stone-indicator");
+    }
+
+    /**
+     * The background color of the comment panel
+     * @return
+     */
+    @Override
+    public Color commentBackgroundColor() {
+        JSONArray color = config.optJSONArray("comment-background-color");
+        if (color != null) {
+            return new Color(color.getInt(0), color.getInt(1), color.getInt(2), color.getInt(3));
+        } else {
+            return getDefaltTheme().commentBackgroundColor();
+        }
+    }
+
+    /**
+     * The font color of the comment
+     */
+    @Override
+    public Color commentFontColor() {
+        JSONArray color = config.optJSONArray("comment-font-color");
+        if (color != null) {
+            return new Color(color.getInt(0), color.getInt(1), color.getInt(2), color.getInt(3));
+        } else {
+            return getDefaltTheme().commentFontColor();
+        }
     }
 
     /**

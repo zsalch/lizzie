@@ -475,8 +475,12 @@ public class BoardRenderer {
                 // set color to the opposite color of whatever is on the board
                 g.setColor(Lizzie.board.getStones()[Board.getIndex(lastMove[0], lastMove[1])].isWhite() ?
                         Color.BLACK : Color.WHITE);
-                // Use a solid circle instead of
-                fillCircle(g, stoneX, stoneY, (int)(lastMoveMarkerRadius * 0.65));
+                if (theme.solidStoneIndicator()) {
+                    // Use a solid circle instead of
+                    fillCircle(g, stoneX, stoneY, (int)(lastMoveMarkerRadius * 0.65));
+                } else {
+                    drawCircle(g, stoneX, stoneY, lastMoveMarkerRadius);
+                }
             } else if (lastMove == null && Lizzie.board.getData().moveNumber != 0 && !Lizzie.board.inScoreMode()) {
                 g.setColor(Lizzie.board.getData().blackToPlay ? new Color(255, 255, 255, 150) : new Color(0, 0, 0, 150));
                 g.fillOval(x + boardLength / 2 - 4 * stoneRadius, y + boardLength / 2 - 4 * stoneRadius, stoneRadius * 8, stoneRadius * 8);
