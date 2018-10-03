@@ -920,9 +920,9 @@ public class LizzieFrame extends JFrame {
     /**
      * Process Comment Mouse Wheel Moved
      * 
-     * @return true when process comment scroll
+     * @return true when the scroll event was processed by this method
      */
-    public boolean onMouseWheelMoved(MouseWheelEvent e) {
+    public boolean processCommentMouseWheelMoved(MouseWheelEvent e) {
         if (Lizzie.config.showComment && commentRect != null && commentRect.contains(e.getX(), e.getY())) {
             scrollPane.dispatchEvent(e);
             createCommentImage(true, 0, 0);
