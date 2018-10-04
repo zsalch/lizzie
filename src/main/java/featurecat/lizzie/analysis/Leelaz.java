@@ -239,15 +239,11 @@ public class Leelaz {
     }
 
     private void parseInfo(String line) {
-
         bestMoves = new ArrayList<>();
         String[] variations = line.split(" info ");
         for (String var : variations) {
-            bestMoves.add(new MoveData(var));
+            bestMoves.add(MoveData.fromInfo(var));
         }
-        // Not actually necessary to sort with current version of LZ (0.15)
-        // but not guaranteed to be ordered in the future
-        Collections.sort(bestMoves);
     }
 
     /**
@@ -293,6 +289,14 @@ public class Leelaz {
                         togglePonder();
                     }
                 }
+            } else if (line.contains(" -> ")) {
+                isLoaded = true;
+                if (isResponseUpToDate() || isThinking && !isPondering && Lizzie.frame.isPlayingAgainstLeelaz) {
+                    bestMoves.add(MoveData.fromSummary(line));
+                    notifyBestMoveListeners();
+                    if (Lizzie.frame != null)
+                        Lizzie.frame.repaint();
+                }
             } else if (line.startsWith("play")) {
                 // In lz-genmove_analyze
                 if (Lizzie.frame.isPlayingAgainstLeelaz) {
@@ -313,6 +317,7 @@ public class Leelaz {
 
 
                 if (isSettingHandicap) {
+                    bestMoves = new ArrayList<>();
                     for (int i = 1; i < params.length; i++) {
                         int[] coordinates = Lizzie.board.convertNameToCoordinates(params[i]);
                         Lizzie.board.getHistory().setStone(coordinates, Stone.BLACK);
@@ -321,6 +326,7 @@ public class Leelaz {
                 } else if (isThinking && !isPondering) {
                     if (Lizzie.frame.isPlayingAgainstLeelaz) {
                         Lizzie.board.place(params[1]);
+                        togglePonder();
                         isThinking = false;
                     }
                 } else if (isCheckingVersion) {
@@ -347,7 +353,7 @@ public class Leelaz {
         if (line.length() > 0 && Character.isLetter(line.charAt(0)) && !line.startsWith("pass")) {
             if (!(Lizzie.frame != null && Lizzie.frame.isPlayingAgainstLeelaz && Lizzie.frame.playerIsBlack != Lizzie.board.getData().blackToPlay)) {
                 try {
-                    bestMovesTemp.add(new MoveData(line));
+                    bestMovesTemp.add(MoveData.fromInfo(line));
                 } catch (ArrayIndexOutOfBoundsException e) {
                     // this is very rare but is possible. ignore
                 }
