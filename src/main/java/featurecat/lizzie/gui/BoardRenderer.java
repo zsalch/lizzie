@@ -25,9 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import featurecat.lizzie.theme.CustomTheme;
-import featurecat.lizzie.theme.DefaultTheme;
-import featurecat.lizzie.theme.ITheme;
+import featurecat.lizzie.theme.Theme;
 
 public class BoardRenderer {
     private static final double MARGIN = 0.03; // percentage of the boardLength to offset before drawing black lines
@@ -59,7 +57,7 @@ public class BoardRenderer {
 
     private boolean lastInScoreMode = false;
 
-    public ITheme theme;
+    public Theme theme;
     public List<String> variation;
 
     // special values of displayedBranchLength
@@ -75,15 +73,8 @@ public class BoardRenderer {
 
     public BoardRenderer(boolean isMainBoard) {
         uiConfig = Lizzie.config.config.getJSONObject("ui");
-        // Custome theme to allow use external image and config file
-        if ("Custom".equals(uiConfig.getString("theme")) && !uiConfig.isNull("custom-theme")) {
-            theme = new CustomTheme(uiConfig.getString("custom-theme"));
-        } else {
-            theme = ITheme.loadTheme(uiConfig.getString("theme"));
-        }
-        if (theme == null) {
-            theme = new DefaultTheme();
-        }
+        // The theme to allow use external image and config file
+        theme = new Theme(uiConfig.optString("theme"));
         uiPersist = Lizzie.config.persisted.getJSONObject("ui-persist");
         try {
             maxAlpha = uiPersist.getInt("max-alpha");

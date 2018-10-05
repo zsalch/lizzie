@@ -13,10 +13,10 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 /**
- * Custom Theme
+ * Theme
  * Allow to load the external image & theme config
  */
-public class CustomTheme implements ITheme {
+public class Theme {
     BufferedImage blackStoneCached = null;
     BufferedImage whiteStoneCached = null;
     BufferedImage boardCached = null;
@@ -24,12 +24,11 @@ public class CustomTheme implements ITheme {
 
     private String themeName = null;
     private String configFile = "theme.txt";
-    private String pathPrefix = "theme" + File.separator + "custom";
+    private String pathPrefix = "theme";
     private String path = null;
     private JSONObject config = new JSONObject();
-    private DefaultTheme defaultTheme = null;
 
-    public CustomTheme(String themeName) {
+    public Theme(String themeName) {
         this.themeName = themeName;
         this.path = this.pathPrefix + File.separator + this.themeName;
         File file = new File(this.path + File.separator + this.configFile);
@@ -46,49 +45,62 @@ public class CustomTheme implements ITheme {
         }
     }
 
-    @Override
     public BufferedImage getBlackStone(int[] position) {
         if (blackStoneCached == null) {
             try {
                 blackStoneCached = ImageIO.read(new File(this.path + File.separator + config.optString("black-stone-image", "black.png")));
             } catch (IOException e) {
-                blackStoneCached = getDefaltTheme().getBlackStone(position);
+                try {
+                    blackStoneCached = ImageIO.read(getClass().getResourceAsStream("/assets/black0.png"));
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
         }
         return blackStoneCached;
     }
 
-    @Override
     public BufferedImage getWhiteStone(int[] position) {
         if (whiteStoneCached == null) {
             try {
                 whiteStoneCached = ImageIO.read(new File(this.path + File.separator + config.optString("white-stone-image", "white.png")));
             } catch (IOException e) {
-                whiteStoneCached = getDefaltTheme().getWhiteStone(position);
+                try {
+                    whiteStoneCached = ImageIO.read(getClass().getResourceAsStream("/assets/white0.png"));
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
         }
         return whiteStoneCached;
     }
 
-    @Override
     public BufferedImage getBoard() {
         if (boardCached == null) {
             try {
                 boardCached = ImageIO.read(new File(this.path + File.separator + config.optString("board-image", "board.png")));
             } catch (IOException e) {
-                boardCached = getDefaltTheme().getBoard();
+                try {
+                    boardCached = ImageIO.read(getClass().getResourceAsStream("/assets/board.png"));
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
         }
         return boardCached;
     }
 
-    @Override
     public BufferedImage getBackground() {
         if (backgroundCached == null) {
             try {
                 backgroundCached = ImageIO.read(new File(this.path + File.separator + config.optString("background-image", "background.png")));
             } catch (IOException e) {
-                backgroundCached = getDefaltTheme().getBackground();
+
+                try {
+                    backgroundCached = ImageIO.read(getClass().getResourceAsStream("/assets/background.jpg"));
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
         }
         return backgroundCached;
@@ -97,7 +109,6 @@ public class CustomTheme implements ITheme {
     /**
      * Use custom font
      */
-    @Override
     public String getFontName() {
         return config.optString("font-name", null);
     }
@@ -105,7 +116,6 @@ public class CustomTheme implements ITheme {
     /**
      * Use solid current stone indicator
      */
-    @Override
     public boolean solidStoneIndicator() {
         return config.optBoolean("solid-stone-indicator");
     }
@@ -114,36 +124,24 @@ public class CustomTheme implements ITheme {
      * The background color of the comment panel
      * @return
      */
-    @Override
     public Color commentBackgroundColor() {
         JSONArray color = config.optJSONArray("comment-background-color");
         if (color != null) {
             return new Color(color.getInt(0), color.getInt(1), color.getInt(2), color.getInt(3));
         } else {
-            return getDefaltTheme().commentBackgroundColor();
+            return new Color(0, 0, 0, 200);
         }
     }
 
     /**
      * The font color of the comment
      */
-    @Override
     public Color commentFontColor() {
         JSONArray color = config.optJSONArray("comment-font-color");
         if (color != null) {
             return new Color(color.getInt(0), color.getInt(1), color.getInt(2), color.getInt(3));
         } else {
-            return getDefaltTheme().commentFontColor();
+            return Color.WHITE;
         }
-    }
-
-    /**
-     * Get a default theme
-     */
-    private DefaultTheme getDefaltTheme() {
-        if (this.defaultTheme == null) {
-            this.defaultTheme = new DefaultTheme();
-        }
-        return this.defaultTheme;
     }
 }
