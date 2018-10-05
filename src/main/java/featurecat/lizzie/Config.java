@@ -14,6 +14,10 @@ public class Config {
 
     public boolean showMoveNumber = false;
     public boolean showWinrate = true;
+    public boolean showWinrateBlunderBar = false;
+    public int minimumWinrateBlunderBarWidth = 3;
+    public boolean weightedDisplayBlunderBarHeight = false;
+    public boolean dynamicWinrateGraphWidth = false;
     public boolean showVariationGraph = true;
     public boolean showComment = false;
     public int commentFontSize = 0;
@@ -141,6 +145,10 @@ public class Config {
         showStatus = uiConfig.getBoolean("show-status");
         showBranch = uiConfig.getBoolean("show-leelaz-variation");
         showWinrate = uiConfig.getBoolean("show-winrate");
+        showWinrateBlunderBar = uiConfig.optBoolean("show-winrate-blunder-bar", false);
+        minimumWinrateBlunderBarWidth = uiConfig.optInt("minimum-winrate-blunder-bar-width", 3);
+        weightedDisplayBlunderBarHeight = uiConfig.optBoolean("weighted-display-blunder-bar-height", false);
+        dynamicWinrateGraphWidth = uiConfig.optBoolean("dynamic-winrate-graph-width", false);
         showVariationGraph = uiConfig.getBoolean("show-variation-graph");
         showComment = uiConfig.optBoolean("show-comment", false);
         commentFontSize = uiConfig.optInt("comment-font-size", 0);

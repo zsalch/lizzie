@@ -13,6 +13,7 @@ public class WinrateGraph {
     private int DOT_RADIUS = 6;
     private int[] origParams = {0, 0, 0, 0};
     private int[] params = {0, 0, 0, 0, 0};
+    private int numMovesOfPlayed = 0;
 
     public void draw(Graphics2D g, int posx, int posy, int width, int height)
     {
@@ -55,9 +56,18 @@ public class WinrateGraph {
 
         g.setColor(Color.white);
         int winRateGridLines = Lizzie.frame.winRateGridLines;
+        int midline = 0;
+        int midy = 0;
+        if (Lizzie.config.showWinrateBlunderBar) {
+            midline = (int)Math.ceil(winRateGridLines/2.0);
+            midy = posy + height/2;
+        }
         for (int i = 1; i <= winRateGridLines; i++) {
             double percent = i * 100.0 / (winRateGridLines + 1);
             int y = posy + height - (int) (height * convertWinrate(percent) / 100);
+            if (Lizzie.config.showWinrateBlunderBar && i == midline) {
+                midy = y;
+            }
             g.drawLine(posx, y, posx + width, y);
         }
 
@@ -91,6 +101,9 @@ public class WinrateGraph {
         boolean inFirstPath = true;
         int movenum = node.getData().moveNumber - 1;
         int lastOkMove = -1;
+        if (Lizzie.config.dynamicWinrateGraphWidth && this.numMovesOfPlayed > 0) {
+            numMoves = this.numMovesOfPlayed;
+        }
 
         while (node.previous() != null)
         {
@@ -98,6 +111,10 @@ public class WinrateGraph {
             int playouts = node.getData().playouts;
             if (node == curMove)
             {
+                if (Lizzie.config.dynamicWinrateGraphWidth && node.getData().moveNumber - 1 > this.numMovesOfPlayed) {
+                    this.numMovesOfPlayed = node.getData().moveNumber - 1;
+                    numMoves = this.numMovesOfPlayed;
+                }
                 Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
                 double bwr = stats.maxWinrate;
                 if (bwr >= 0 && stats.totalPlayouts > playouts) {
@@ -143,6 +160,28 @@ public class WinrateGraph {
                             posy + height - (int) (convertWinrate(lastWr) * height / 100),
                             posx + (movenum * width / numMoves),
                             posy + height - (int) (convertWinrate(wr) * height / 100));
+
+                    if (Lizzie.config.showWinrateBlunderBar) {
+                        g.setColor(new Color(255, 0, 0, 150));
+                        double lastMoveRate = convertWinrate(lastWr) - convertWinrate(wr);
+                        int lastHeight = 0;
+                        if (Lizzie.config.weightedDisplayBlunderBarHeight) {
+                            // Weighted display: <= 50% will use 75% of height, >= 50% will use 25% of height
+                            if (Math.abs(lastMoveRate) <= 50) {
+                                lastHeight = Math.abs((int) (lastMoveRate) * height * 3 / 400);
+                            } else {
+                                lastHeight = height / 4 + Math.abs((int) (Math.abs(lastMoveRate)) * height / 400);
+                            }
+                        } else {
+                            lastHeight = Math.abs((int) (lastMoveRate) * height / 200);
+                        }
+                        int lastWidth = Math.abs((movenum - lastOkMove) * width / numMoves);
+                        int rectWidth = Math.max(lastWidth / 10, Lizzie.config.minimumWinrateBlunderBarWidth);
+                        g.fillRect(posx + (movenum * width / numMoves) + (lastWidth - rectWidth)/2,
+                                midy + (!node.getData().blackToPlay && lastMoveRate > 0 ? lastHeight*-1 : 0),
+                                rectWidth,
+                                lastHeight);
+                    }
                 }
 
                 if (node == curMove)
@@ -222,5 +261,12 @@ public class WinrateGraph {
         } else {
             return -1;
         }
+    }
+
+    /**
+     * Clears winrate status from empty board.
+     */
+    public void clear() {
+        this.numMovesOfPlayed = 0;
     }
 }
