@@ -46,6 +46,8 @@ public class BoardRenderer {
     private int cachedX, cachedY;
 
     private BufferedImage cachedStonesImage = null;
+    private BufferedImage cachedBoardImage = null;
+    private BufferedImage cachedWallpaperImage = null;
     private BufferedImage cachedStonesShadowImage = null;
     private Zobrist cachedZhash = new Zobrist(); // defaults to an empty board
 
@@ -92,7 +94,7 @@ public class BoardRenderer {
         setupSizeParameters();
 
 //        Stopwatch timer = new Stopwatch();
-        drawBackground(g);
+        drawGoban(g);
 //        timer.lap("background");
         drawStones();
 //        timer.lap("stones");
@@ -164,7 +166,7 @@ public class BoardRenderer {
     /**
      * Draw the green background and go board with lines. We cache the image for a performance boost.
      */
-    private void drawBackground(Graphics2D g0) {
+    private void drawGoban(Graphics2D g0) {
         // draw the cached background image if frame size changes
         if (cachedBackgroundImage == null || cachedBackgroundImage.getWidth() != Lizzie.frame.getWidth() ||
                 cachedBackgroundImage.getHeight() != Lizzie.frame.getHeight() ||
@@ -662,10 +664,11 @@ public class BoardRenderer {
     private void drawWoodenBoard(Graphics2D g) {
         if (uiConfig.getBoolean("fancy-board")) {
             // fancy version
+            if  (cachedBoardImage == null) {
+                cachedBoardImage = theme.getBoard();
+            }
             int shadowRadius = (int) (boardLength * MARGIN / 6);
-            BufferedImage boardImage = theme.getBoard();
-            // Support seamless texture
-            drawTextureImage(g, boardImage == null ? theme.getBoard() : boardImage, x - 2 * shadowRadius, y - 2 * shadowRadius, boardLength + 4 * shadowRadius, boardLength + 4 * shadowRadius);
+            drawTextureImage(g, cachedBoardImage, x - 2 * shadowRadius, y - 2 * shadowRadius, boardLength + 4 * shadowRadius, boardLength + 4 * shadowRadius);
 
             g.setStroke(new BasicStroke(shadowRadius * 2));
             // draw border
@@ -777,9 +780,8 @@ public class BoardRenderer {
             boolean isGhost = (color == Stone.BLACK_GHOST || color == Stone.WHITE_GHOST);
             if (uiConfig.getBoolean("fancy-stones")) {
                 drawShadow(gShadow, centerX, centerY, isGhost);
-                Image stone = isBlack ? theme.getBlackStone(new int[]{x, y}) : theme.getWhiteStone(new int[]{x, y});
                 int size = stoneRadius * 2 + 1;
-                g.drawImage(getScaleStone(stone, isBlack, size, size), centerX - stoneRadius, centerY - stoneRadius, size, size, null);
+                g.drawImage(getScaleStone(isBlack, size), centerX - stoneRadius, centerY - stoneRadius, size, size, null);
             } else {
                 drawShadow(gShadow, centerX, centerY, true);
                 g.setColor(isBlack ? (isGhost ? new Color(0, 0, 0) : Color.BLACK) : (isGhost ? new Color(255, 255, 255) : Color.WHITE));
@@ -795,12 +797,13 @@ public class BoardRenderer {
     /**
      * Get scaled stone, if cached then return cached
      */
-    public BufferedImage getScaleStone(Image img, boolean isBlack, int width, int height) {
+    public BufferedImage getScaleStone(boolean isBlack, int size) {
         BufferedImage stone = isBlack ? cachedBlackStoneImage : cachedWhiteStoneImage;
-        if (stone == null || stone.getWidth() != width || stone.getHeight() != height) {
-            stone = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        if (stone == null) {
+            stone = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2 = stone.createGraphics();
-            g2.drawImage(img.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
+            Image img = isBlack ? theme.getBlackStone(new int[]{x, y}) : theme.getWhiteStone(new int[]{x, y});
+            g2.drawImage(img.getScaledInstance(size, size, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
             g2.dispose();
             if (isBlack) {
                 cachedBlackStoneImage = stone;
@@ -809,6 +812,13 @@ public class BoardRenderer {
             }
         }
         return stone;
+    }
+
+    public BufferedImage getWallpaper() {
+      if (cachedWallpaperImage == null) {
+          cachedWallpaperImage = theme.getBackground();
+      }
+      return cachedWallpaperImage;
     }
 
     /**
