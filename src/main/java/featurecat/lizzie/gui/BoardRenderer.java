@@ -799,7 +799,7 @@ public class BoardRenderer {
      */
     public BufferedImage getScaleStone(boolean isBlack, int size) {
         BufferedImage stone = isBlack ? cachedBlackStoneImage : cachedWhiteStoneImage;
-        if (stone == null) {
+        if (stone == null || stone.getWidth() != size || stone.getHeight() != size) {
             stone = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2 = stone.createGraphics();
             Image img = isBlack ? theme.getBlackStone(new int[]{x, y}) : theme.getWhiteStone(new int[]{x, y});
