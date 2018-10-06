@@ -417,6 +417,41 @@ public class LizzieFrame extends JFrame {
                 subBoardWidth = spaceW;
                 subBoardHeight = ponderingY - subBoardY;
                 subBoardLength = Math.min(subBoardWidth, subBoardHeight);
+            } else if (Lizzie.config.largeWinrate) {
+                boardX = getWidth() - maxSize - panelMargin;
+                int spaceW = boardX - panelMargin;
+                int spaceH = getHeight() - topInset;
+                int panelW = spaceW / 2;
+                int panelH = spaceH / 4;
+                capx = 0;
+                capy = topInset + panelH + panelMargin / 2;
+                capw = spaceW;
+                caph = (int) ((ponderingY - topInset - panelH) * 0.15);
+                statx = 0;
+                staty = capy + caph;
+                statw = spaceW;
+                stath = caph;
+                grx = statx;
+                gry = staty + stath;
+                grw = statw;
+                grh = ponderingY - gry;
+                contx = statx;
+                conty = staty;
+                contw = statw;
+                conth = stath + grh;
+                vx = panelW;
+                vy = 0;
+                vw = panelW;
+                vh = topInset + panelH;
+                treex = vx;
+                treey = vy;
+                treew = vw + 1;
+                treeh = vh;
+                subBoardX = 0;
+                subBoardY = topInset-1;
+                subBoardWidth = panelW;
+                subBoardHeight = topInset + panelH;
+                subBoardLength = Math.min(subBoardWidth, subBoardHeight);
             }
 
             // initialize
@@ -825,7 +860,7 @@ public class LizzieFrame extends JFrame {
 
         // Draw captures
         String bval, wval;
-        setPanelFont(g, (float) (width * 0.06));
+        setPanelFont(g, (float) (height * 0.18));
         if (Lizzie.board.inScoreMode())
         {
             double score[] = Lizzie.board.getScore(Lizzie.board.scoreStones());

@@ -14,6 +14,8 @@ public class Config {
 
     public boolean showMoveNumber = false;
     public boolean showWinrate = true;
+    public boolean largeWinrate = false;
+    public float winrateStrokeWidth = 3;
     public boolean showWinrateBlunderBar = false;
     public int minimumWinrateBlunderBarWidth = 3;
     public boolean weightedDisplayBlunderBarHeight = false;
@@ -145,6 +147,8 @@ public class Config {
         showStatus = uiConfig.getBoolean("show-status");
         showBranch = uiConfig.getBoolean("show-leelaz-variation");
         showWinrate = uiConfig.getBoolean("show-winrate");
+        largeWinrate = uiConfig.optBoolean("large-winrate", false);
+        winrateStrokeWidth = uiConfig.optFloat("winrate-stroke-width", 3);
         showWinrateBlunderBar = uiConfig.optBoolean("show-winrate-blunder-bar", false);
         minimumWinrateBlunderBarWidth = uiConfig.optInt("minimum-winrate-blunder-bar-width", 3);
         weightedDisplayBlunderBarHeight = uiConfig.optBoolean("weighted-display-blunder-bar-height", false);
@@ -195,6 +199,9 @@ public class Config {
     }
     public void toggleShowWinrate() {
         this.showWinrate = !this.showWinrate;
+    }
+    public void toggleLargeWinrate() {
+        this.largeWinrate = !this.largeWinrate;
     }
     public void toggleShowVariationGraph() {
         this.showVariationGraph = !this.showVariationGraph;
