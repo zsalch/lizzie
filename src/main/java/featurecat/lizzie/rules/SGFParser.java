@@ -4,7 +4,6 @@ import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.Util;
 import featurecat.lizzie.analysis.GameInfo;
 import featurecat.lizzie.analysis.Leelaz;
-import featurecat.lizzie.plugin.PluginManager;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -480,11 +479,9 @@ public class SGFParser {
     // Last move
     if (validLastWinrate && validWinrate) {
       if (Lizzie.config.handicapInsteadOfWinrate) {
-        lastMoveWinrate =
-            String.format(
-                "(%.2f)",
-                Lizzie.leelaz.winrateToHandicap(100 - curWR)
-                    - Lizzie.leelaz.winrateToHandicap(lastWR));
+          double currHandicapedWR = Lizzie.leelaz.winrateToHandicap(100 - curWR);
+          double lastHandicapedWR = Lizzie.leelaz.winrateToHandicap(lastWR);
+          lastMoveWinrate = String.format(": %.2f", currHandicapedWR - lastHandicapedWR);
       } else {
         lastMoveWinrate = String.format("(%.1f%%)", 100 - lastWR - curWR);
       }
