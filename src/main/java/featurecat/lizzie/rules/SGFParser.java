@@ -479,9 +479,9 @@ public class SGFParser {
     // Last move
     if (validLastWinrate && validWinrate) {
       if (Lizzie.config.handicapInsteadOfWinrate) {
-          double currHandicapedWR = Lizzie.leelaz.winrateToHandicap(100 - curWR);
-          double lastHandicapedWR = Lizzie.leelaz.winrateToHandicap(lastWR);
-          lastMoveWinrate = String.format(": %.2f", currHandicapedWR - lastHandicapedWR);
+        double currHandicapedWR = Lizzie.leelaz.winrateToHandicap(100 - curWR);
+        double lastHandicapedWR = Lizzie.leelaz.winrateToHandicap(lastWR);
+        lastMoveWinrate = String.format(": %.2f", currHandicapedWR - lastHandicapedWR);
       } else {
         lastMoveWinrate = String.format("(%.1f%%)", 100 - lastWR - curWR);
       }
