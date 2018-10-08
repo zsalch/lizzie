@@ -1,6 +1,5 @@
 package featurecat.lizzie.analysis;
 
-import featurecat.lizzie.Config;
 import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.Util;
 import featurecat.lizzie.rules.Stone;
@@ -21,7 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * an interface with leelaz.exe go engine. Can be adapted for GTP, but is specifically designed for
+ * An interface with leelaz go engine. Can be adapted for GTP, but is specifically designed for
  * GCP's Leela Zero. leelaz is modified to output information as it ponders see
  * www.github.com/gcp/leela-zero
  */
@@ -65,6 +64,7 @@ public class Leelaz {
   private String engineCommand = null;
   private List<String> commands = null;
   private JSONObject config = null;
+  private String currentWeightFile = null;
   private String currentWeight = null;
   private boolean switching = false;
   private int currentEngineN = -1;
@@ -115,17 +115,6 @@ public class Leelaz {
       return;
     }
 
-    String startfolder =
-        new File(Config.getBestDefaultLeelazPath())
-            .getParent(); // todo make this a little more obvious/less bug-prone
-
-    // Check if network file is present
-    File wf = new File(startfolder + '/' + config.getString("network-file"));
-    if (!wf.exists()) {
-      JOptionPane.showMessageDialog(
-          null, resourceBundle.getString("LizzieFrame.display.network-missing"));
-    }
-
     // create this as a list which gets passed into the processbuilder
     commands = Arrays.asList(engineCommand.split(" "));
 
@@ -134,19 +123,41 @@ public class Leelaz {
       Pattern wPattern = Pattern.compile("(?s).*?(--weights |-w )([^ ]+)(?s).*");
       Matcher wMatcher = wPattern.matcher(engineCommand);
       if (wMatcher.matches()) {
-        currentWeight = wMatcher.group(2);
-        if (currentWeight != null) {
-          String[] names = currentWeight.split("[\\\\|/]");
+        currentWeightFile = wMatcher.group(2);
+        if (currentWeightFile != null) {
+          String[] names = currentWeightFile.split("[\\\\|/]");
           if (names != null && names.length > 1) {
             currentWeight = names[names.length - 1];
+          } else {
+            currentWeight = currentWeightFile;
           }
         }
       }
     }
 
+    // Check if engine is present
+    File startfolder = new File(config.optString("engine-start-location", "."));
+    File lef = startfolder.toPath().resolve(new File(commands.get(0)).toPath()).toFile();
+    if (!lef.exists()) {
+      JOptionPane.showMessageDialog(
+          null,
+          resourceBundle.getString("LizzieFrame.display.leelaz-missing"),
+          "Lizzie - Error!",
+          JOptionPane.ERROR_MESSAGE);
+      throw new IOException("engine not present");
+    }
+
+    // Check if network file is present
+    File wf = startfolder.toPath().resolve(new File(currentWeightFile).toPath()).toFile();
+    if (!wf.exists()) {
+      JOptionPane.showMessageDialog(
+          null, resourceBundle.getString("LizzieFrame.display.network-missing"));
+      throw new IOException("network-file not present");
+    }
+
     // run leelaz
     ProcessBuilder processBuilder = new ProcessBuilder(commands);
-    processBuilder.directory(new File(startfolder));
+    processBuilder.directory(startfolder);
     processBuilder.redirectErrorStream(true);
     process = processBuilder.start();
 
@@ -494,7 +505,7 @@ public class Leelaz {
     }
   }
 
-  /** this initializes leelaz's pondering mode at its current position */
+  /** This initializes leelaz's pondering mode at its current position */
   private void ponder() {
     isPondering = true;
     startPonderTime = System.currentTimeMillis();
@@ -503,9 +514,8 @@ public class Leelaz {
             + Lizzie.config
                 .config
                 .getJSONObject("leelaz")
-                .getInt(
-                    "analyze-update-interval-centisec")); // until it responds to this, incoming
-                                                          // ponder results are obsolete
+                .getInt("analyze-update-interval-centisec")); // until it responds to this, incoming
+    // ponder results are obsolete
   }
 
   public void togglePonder() {
@@ -563,23 +573,12 @@ public class Leelaz {
       final List<MoveData> moves = new ArrayList<MoveData>(bestMoves);
 
       // get the total number of playouts in moves
-      stats.totalPlayouts =
-          moves
-              .stream()
-              .reduce(
-                  0,
-                  (Integer result, MoveData move) -> result + move.playouts,
-                  (Integer a, Integer b) -> a + b);
+      int totalPlayouts = moves.stream().mapToInt(move -> move.playouts).sum();
+      stats.totalPlayouts = totalPlayouts;
 
       // set maxWinrate to the weighted average winrate of moves
       stats.maxWinrate =
-          moves
-              .stream()
-              .reduce(
-                  0d,
-                  (Double result, MoveData move) ->
-                      result + move.winrate * move.playouts / stats.totalPlayouts,
-                  (Double a, Double b) -> a + b);
+          moves.stream().mapToDouble(move -> move.winrate * move.playouts / totalPlayouts).sum();
     }
 
     return stats;

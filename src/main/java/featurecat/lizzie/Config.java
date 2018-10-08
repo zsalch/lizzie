@@ -110,17 +110,7 @@ public class Config {
 
     // Check engine configs
     JSONObject leelaz = config.getJSONObject("leelaz");
-    // Check if the engine program exists.
-    String enginePath = leelaz.optString("engine-program", getBestDefaultLeelazPath());
-    if (!Files.exists(Paths.get(enginePath))
-        && !Files.exists(Paths.get(enginePath + ".exe" /* For windows */))) {
-      // FIXME: I don't know how to handle it properly.. Possibly showing a warning dialog may be a
-      // good idea?
-      leelaz.put("engine-program", "./leelaz");
-      madeCorrections = true;
-    }
-
-    // Similar checks for startup directory. It should exist and should be a directory.
+    // Checks for startup directory. It should exist and should be a directory.
     String engineStartLocation = getBestDefaultLeelazPath();
     if (!(Files.exists(Paths.get(engineStartLocation))
         && Files.isDirectory(Paths.get(engineStartLocation)))) {
@@ -284,7 +274,6 @@ public class Config {
     JSONObject ui = new JSONObject();
 
     ui.put("board-color", new JSONArray("[217, 152, 77]"));
-    ui.put("theme", "DefaultTheme");
     ui.put("shadows-enabled", true);
     ui.put("fancy-stones", true);
     ui.put("fancy-board", true);

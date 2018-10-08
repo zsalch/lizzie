@@ -81,7 +81,7 @@ public class LizzieFrame extends JFrame {
 
   private final BufferStrategy bs;
 
-  public int[] mouseHoverCoordinate;
+  public int[] mouseOverCoordinate;
   public boolean showControls = false;
   public boolean showCoordinates = false;
   public boolean isPlayingAgainstLeelaz = false;
@@ -95,6 +95,7 @@ public class LizzieFrame extends JFrame {
 
   // Save the player title
   private String playerTitle = null;
+
   // Display Comment
   private JScrollPane scrollPane = null;
   private JTextPane commentPane = null;
@@ -487,32 +488,19 @@ public class LizzieFrame extends JFrame {
 
       if (Lizzie.leelaz != null && Lizzie.leelaz.isLoaded()) {
         if (Lizzie.config.showStatus) {
-          // Display switching prompt
-          drawPonderingState(
-              g,
-              resourceBundle.getString("LizzieFrame.display.pondering")
-                  + (Lizzie.leelaz.isPondering()
-                      ? resourceBundle.getString("LizzieFrame.display.on")
-                      : resourceBundle.getString("LizzieFrame.display.off"))
-                  + " "
-                  + Lizzie.leelaz.currentWeight()
-                  + (Lizzie.leelaz.switching()
-                      ? resourceBundle.getString("LizzieFrame.prompt.switching")
-                      : ""),
-              ponderingX,
-              ponderingY,
-              ponderingSize);
+          String pondKey = "LizzieFrame.display." + (Lizzie.leelaz.isPondering() ? "on" : "off");
+          String pondText = resourceBundle.getString("LizzieFrame.display.pondering") + resourceBundle.getString(pondKey);
+          String switchText = resourceBundle.getString("LizzieFrame.prompt.switching");
+          String weightText = Lizzie.leelaz.currentWeight();
+          String text = pondText + " " + weightText + (Lizzie.leelaz.switching() ? switchText : "");
+          drawPonderingState(g, text, ponderingX, ponderingY, ponderingSize);
         }
 
-        if (Lizzie.config.showDynamicKomi && Lizzie.leelaz.getDynamicKomi() != null) {
-          drawPonderingState(
-              g,
-              resourceBundle.getString("LizzieFrame.display.dynamic-komi"),
-              dynamicKomiLabelX,
-              dynamicKomiLabelY,
-              dynamicKomiSize);
-          drawPonderingState(
-              g, Lizzie.leelaz.getDynamicKomi(), dynamicKomiX, dynamicKomiY, dynamicKomiSize);
+        String dynamicKomi = Lizzie.leelaz.getDynamicKomi();
+        if (Lizzie.config.showDynamicKomi && dynamicKomi != null) {
+          String text = resourceBundle.getString("LizzieFrame.display.dynamic-komi");
+          drawPonderingState(g, text, dynamicKomiLabelX, dynamicKomiLabelY, dynamicKomiSize);
+          drawPonderingState(g, dynamicKomi, dynamicKomiX, dynamicKomiY, dynamicKomiSize);
         }
 
         // Todo: Make board move over when there is no space beside the board
@@ -536,6 +524,7 @@ public class LizzieFrame extends JFrame {
             drawComment(g, vx, topInset, vw, vh - topInset + vy, true);
           }
         }
+
         if (Lizzie.config.showSubBoard) {
           try {
             subBoardRenderer.setLocation(subBoardX, subBoardY);
@@ -546,12 +535,8 @@ public class LizzieFrame extends JFrame {
           }
         }
       } else if (Lizzie.config.showStatus) {
-        drawPonderingState(
-            g,
-            resourceBundle.getString("LizzieFrame.display.loading"),
-            loadingX,
-            loadingY,
-            loadingSize);
+        String loadingText = resourceBundle.getString("LizzieFrame.display.loading");
+        drawPonderingState(g, loadingText, loadingX, loadingY, loadingSize);
       }
 
       if (Lizzie.config.showCaptured) drawCaptured(g, capx, capy, capw, caph);
@@ -611,9 +596,8 @@ public class LizzieFrame extends JFrame {
   }
 
   private void drawPonderingState(Graphics2D g, String text, int x, int y, double size) {
-    Font font =
-        new Font(
-            systemDefaultFontName, Font.PLAIN, (int) (Math.max(getWidth(), getHeight()) * size));
+    int fontSize = (int) (Math.max(getWidth(), getHeight()) * size);
+    Font font = new Font(systemDefaultFontName, Font.PLAIN, fontSize);
     FontMetrics fm = g.getFontMetrics(font);
     int stringWidth = fm.stringWidth(text);
     // Truncate too long text when display switching prompt
@@ -679,17 +663,12 @@ public class LizzieFrame extends JFrame {
     int maxSize = Math.min(getWidth(), getHeight());
     Font font = new Font(systemDefaultFontName, Font.PLAIN, (int) (maxSize * 0.034));
     g.setFont(font);
+
     FontMetrics metrics = g.getFontMetrics(font);
-    int maxCommandWidth =
-        commandsToShow
-            .stream()
-            .reduce(
-                0,
-                (Integer i, String command) -> Math.max(i, metrics.stringWidth(command)),
-                (Integer a, Integer b) -> Math.max(a, b));
+    int maxCmdWidth = commandsToShow.stream().mapToInt(c -> metrics.stringWidth(c)).max().orElse(0);
     int lineHeight = (int) (font.getSize() * 1.15);
 
-    int boxWidth = Util.clamp((int) (maxCommandWidth * 1.4), 0, getWidth());
+    int boxWidth = Util.clamp((int) (maxCmdWidth * 1.4), 0, getWidth());
     int boxHeight = Util.clamp(commandsToShow.size() * lineHeight, 0, getHeight());
 
     int commandsX = Util.clamp(getWidth() / 2 - boxWidth / 2, 0, getWidth());
@@ -832,11 +811,9 @@ public class LizzieFrame extends JFrame {
     if (validLastWinrate && validWinrate) {
       String text;
       if (Lizzie.config.handicapInsteadOfWinrate) {
-        text =
-            String.format(
-                ": %.2f",
-                Lizzie.leelaz.winrateToHandicap(100 - curWR)
-                    - Lizzie.leelaz.winrateToHandicap(lastWR));
+        double currHandicapedWR = Lizzie.leelaz.winrateToHandicap(100 - curWR);
+        double lastHandicapedWR = Lizzie.leelaz.winrateToHandicap(lastWR);
+        text = String.format(": %.2f", currHandicapedWR - lastHandicapedWR);
       } else {
         text = String.format(": %.1f%%", 100 - lastWR - curWR);
       }
@@ -1017,16 +994,17 @@ public class LizzieFrame extends JFrame {
   }
 
   public void onMouseMoved(int x, int y) {
-    int[] newMouseHoverCoordinate = boardRenderer.convertScreenToCoordinates(x, y);
-    if (mouseHoverCoordinate != null
-        && newMouseHoverCoordinate != null
-        && (mouseHoverCoordinate[0] != newMouseHoverCoordinate[0]
-            || mouseHoverCoordinate[1] != newMouseHoverCoordinate[1])) {
-      mouseHoverCoordinate = newMouseHoverCoordinate;
+    int[] c = boardRenderer.convertScreenToCoordinates(x, y);
+    if (c != null && !isMouseOver(c[0], c[1])) {
       repaint();
-    } else {
-      mouseHoverCoordinate = newMouseHoverCoordinate;
     }
+    mouseOverCoordinate = c;
+  }
+
+  public boolean isMouseOver(int x, int y) {
+    return mouseOverCoordinate != null
+        && mouseOverCoordinate[0] == x
+        && mouseOverCoordinate[1] == y;
   }
 
   public void onMouseDragged(int x, int y) {

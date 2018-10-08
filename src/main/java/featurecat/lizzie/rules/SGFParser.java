@@ -42,7 +42,6 @@ public class SGFParser {
     }
 
     boolean returnValue = parse(value);
-    PluginManager.onSgfLoaded();
     return returnValue;
   }
 
@@ -296,8 +295,8 @@ public class SGFParser {
     // collect game info
     BoardHistoryList history = board.getHistory().shallowCopy();
     GameInfo gameInfo = history.getGameInfo();
-    String playerBlack = gameInfo.getPlayerBlack();
-    String playerWhite = gameInfo.getPlayerWhite();
+    String playerB = gameInfo.getPlayerBlack();
+    String playerW = gameInfo.getPlayerWhite();
     Double komi = gameInfo.getKomi();
     Integer handicap = gameInfo.getHandicap();
     String date = SGF_DATE_FORMAT.format(gameInfo.getDate());
@@ -309,7 +308,7 @@ public class SGFParser {
     generalProps.append(
         String.format(
             "KM[%s]PW[%s]PB[%s]DT[%s]AP[Lizzie: %s]",
-            komi, playerWhite, playerBlack, date, Lizzie.lizzieVersion));
+            komi, playerW, playerB, date, Lizzie.lizzieVersion));
 
     // For append the Winrate to the comment of sgf, maybe need to update the Winrate
     if (Lizzie.config.uiConfig.optBoolean("append-winrate-to-comment")) {

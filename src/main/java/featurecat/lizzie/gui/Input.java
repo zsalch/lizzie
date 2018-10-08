@@ -3,7 +3,6 @@ package featurecat.lizzie.gui;
 import static java.awt.event.KeyEvent.*;
 
 import featurecat.lizzie.Lizzie;
-import featurecat.lizzie.plugin.PluginManager;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -13,20 +12,14 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 
   @Override
   public void mousePressed(MouseEvent e) {
-    PluginManager.onMousePressed(e);
-    int x = e.getX();
-    int y = e.getY();
-
-    if (e.getButton() == MouseEvent.BUTTON1) // left mouse click
-    Lizzie.frame.onClicked(x, y);
-    else if (e.getButton() == MouseEvent.BUTTON3) // right mouse click
+    if (e.getButton() == MouseEvent.BUTTON1) // left click
+    Lizzie.frame.onClicked(e.getX(), e.getY());
+    else if (e.getButton() == MouseEvent.BUTTON3) // right click
     undo();
   }
 
   @Override
-  public void mouseReleased(MouseEvent e) {
-    PluginManager.onMouseReleased(e);
-  }
+  public void mouseReleased(MouseEvent e) {}
 
   @Override
   public void mouseEntered(MouseEvent e) {}
@@ -36,19 +29,12 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 
   @Override
   public void mouseDragged(MouseEvent e) {
-    int x = e.getX();
-    int y = e.getY();
-
-    Lizzie.frame.onMouseDragged(x, y);
+    Lizzie.frame.onMouseDragged(e.getX(), e.getY());
   }
 
   @Override
   public void mouseMoved(MouseEvent e) {
-    PluginManager.onMouseMoved(e);
-    int x = e.getX();
-    int y = e.getY();
-
-    Lizzie.frame.onMouseMoved(x, y);
+    Lizzie.frame.onMouseMoved(e.getX(), e.getY());
   }
 
   @Override
@@ -155,9 +141,6 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 
   @Override
   public void keyPressed(KeyEvent e) {
-
-    PluginManager.onKeyPressed(e);
-
     // If any controls key is pressed, let's disable analysis mode.
     // This is probably the user attempting to exit analysis mode.
     boolean shouldDisableAnalysis = true;
@@ -214,8 +197,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         if (Lizzie.frame.isPlayingAgainstLeelaz) {
           Lizzie.frame.isPlayingAgainstLeelaz = false;
           // It seems does not need
-          //                    Lizzie.leelaz.togglePonder(); // we must toggle twice for it to
-          // restart pondering
+          // Lizzie.leelaz.togglePonder(); // we must toggle twice for it to restart pondering
           Lizzie.leelaz.isThinking = false;
         }
         Lizzie.leelaz.togglePonder();
@@ -393,7 +375,6 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 
   @Override
   public void keyReleased(KeyEvent e) {
-    PluginManager.onKeyReleased(e);
     switch (e.getKeyCode()) {
       case VK_X:
         if (wasPonderingWhenControlsShown) Lizzie.leelaz.togglePonder();

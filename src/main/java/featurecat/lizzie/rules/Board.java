@@ -38,28 +38,17 @@ public class Board implements LeelazListener {
   /** Initialize the board completely */
   private void initialize() {
     Stone[] stones = new Stone[BOARD_SIZE * BOARD_SIZE];
-    for (int i = 0; i < stones.length; i++) stones[i] = Stone.EMPTY;
-
-    boolean blackToPlay = true;
-    int[] lastMove = null;
+    for (int i = 0; i < stones.length; i++) {
+      stones[i] = Stone.EMPTY;
+    }
 
     capturedStones = null;
     scoreMode = false;
 
-    history =
-        new BoardHistoryList(
-            new BoardData(
-                stones,
-                lastMove,
-                Stone.EMPTY,
-                blackToPlay,
-                new Zobrist(),
-                0,
-                new int[BOARD_SIZE * BOARD_SIZE],
-                0,
-                0,
-                50,
-                0));
+    int[] boardArray = new int[BOARD_SIZE * BOARD_SIZE];
+    BoardData boardData =
+        new BoardData(stones, null, Stone.EMPTY, true, new Zobrist(), 0, boardArray, 0, 0, 50, 0);
+    history = new BoardHistoryList(boardData);
   }
 
   /**
@@ -87,7 +76,7 @@ public class Board implements LeelazListener {
     }
     // coordinates take the form C16 A19 Q5 K10 etc. I is not used.
     int x = alphabet.indexOf(namedCoordinate.charAt(0));
-    int y = Integer.parseInt(namedCoordinate.substring(1)) - 1;
+    int y = BOARD_SIZE - Integer.parseInt(namedCoordinate.substring(1));
     return new int[] {x, y};
   }
 
@@ -100,7 +89,7 @@ public class Board implements LeelazListener {
    */
   public static String convertCoordinatesToName(int x, int y) {
     // coordinates take the form C16 A19 Q5 K10 etc. I is not used.
-    return alphabet.charAt(x) + "" + (y + 1);
+    return alphabet.charAt(x) + "" + (BOARD_SIZE - y);
   }
 
   /**
@@ -1019,6 +1008,7 @@ public class Board implements LeelazListener {
       if (inScoreMode()) setScoreMode(false);
       // Update win rate statistics
       Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
+
       if (stats.totalPlayouts >= history.getData().playouts) {
         history.getData().winrate = stats.maxWinrate;
         history.getData().playouts = stats.totalPlayouts;

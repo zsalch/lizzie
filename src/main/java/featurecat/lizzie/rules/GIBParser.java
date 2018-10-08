@@ -1,7 +1,6 @@
 package featurecat.lizzie.rules;
 
 import featurecat.lizzie.Lizzie;
-import featurecat.lizzie.plugin.PluginManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,7 +34,6 @@ public class GIBParser {
     }
 
     boolean returnValue = parse(value);
-    PluginManager.onSgfLoaded();
     return returnValue;
   }
 
