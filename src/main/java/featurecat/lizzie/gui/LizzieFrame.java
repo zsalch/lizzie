@@ -617,6 +617,10 @@ public class LizzieFrame extends JFrame {
         stringWidth = fm.stringWidth(text);
       }
     }
+    // Do nothing when no text
+    if (stringWidth <= 0) {
+      return;
+    }
     int stringHeight = fm.getAscent() - fm.getDescent();
     int width = stringWidth;
     int height = (int) (stringHeight * 1.2);
