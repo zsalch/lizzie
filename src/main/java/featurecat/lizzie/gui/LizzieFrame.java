@@ -387,19 +387,20 @@ public class LizzieFrame extends JFrame {
       // pondering message
       double ponderingSize = .02;
       int ponderingX = leftInset;
-      int ponderingY = height - bottomInset - (int)(maxSize * 0.033) - (int)(maxBound * ponderingSize);
+      int ponderingY =
+          height - bottomInset - (int) (maxSize * 0.033) - (int) (maxBound * ponderingSize);
 
       // dynamic komi
       double dynamicKomiSize = .02;
       int dynamicKomiX = leftInset;
-      int dynamicKomiY = ponderingY - (int)(maxBound * dynamicKomiSize);
+      int dynamicKomiY = ponderingY - (int) (maxBound * dynamicKomiSize);
       int dynamicKomiLabelX = leftInset;
-      int dynamicKomiLabelY = dynamicKomiY -  (int)(maxBound * dynamicKomiSize );
+      int dynamicKomiLabelY = dynamicKomiY - (int) (maxBound * dynamicKomiSize);
 
       // loading message;
       double loadingSize = 0.03;
       int loadingX = ponderingX;
-      int loadingY = ponderingY - (int)(maxBound * (loadingSize - ponderingSize));
+      int loadingY = ponderingY - (int) (maxBound * (loadingSize - ponderingSize));
 
       // subboard
       int subBoardX = grx;
@@ -470,13 +471,13 @@ public class LizzieFrame extends JFrame {
         // Portrait mode
         if (Lizzie.config.showLargeSubBoard()) {
           // board
-          maxSize = (int)(maxSize * 0.8);
+          maxSize = (int) (maxSize * 0.8);
           boardY = height - maxSize - bottomInset;
           int spaceW = width - leftInset - rightInset;
           int spaceH = boardY - panelMargin;
           int panelW = spaceW / 2;
           int panelH = spaceH / 2;
-          boardX = (spaceW - maxSize)/2 + leftInset;
+          boardX = (spaceW - maxSize) / 2 + leftInset;
 
           // captured stones
           capw = panelW / 2;
@@ -503,13 +504,13 @@ public class LizzieFrame extends JFrame {
           ponderingY = height;
         } else if (Lizzie.config.showLargeWinrate()) {
           // board
-          maxSize = (int)(maxSize * 0.8);
+          maxSize = (int) (maxSize * 0.8);
           boardY = height - maxSize - bottomInset;
           int spaceW = width - leftInset - rightInset;
           int spaceH = boardY - panelMargin;
           int panelW = spaceW / 2;
           int panelH = spaceH / 2;
-          boardX = (spaceW - maxSize)/2 + leftInset;
+          boardX = (spaceW - maxSize) / 2 + leftInset;
 
           // captured stones
           capw = panelW / 2;
@@ -522,7 +523,7 @@ public class LizzieFrame extends JFrame {
           // winrate graph
           gry = staty + stath;
           grw = spaceW;
-          grh = boardY - capy -caph - 1;
+          grh = boardY - capy - caph - 1;
           // variation tree container
           vx = statx + statw;
           vy = capy;
@@ -1332,8 +1333,7 @@ public class LizzieFrame extends JFrame {
     commentPane.setText(comment);
     commentPane.setSize(w, h);
     createCommentImage(comment != null && !comment.equals(this.cachedComment), w, h);
-    commentRect =
-        new Rectangle(x, y, scrollPane.getWidth(), scrollPane.getHeight());
+    commentRect = new Rectangle(x, y, scrollPane.getWidth(), scrollPane.getHeight());
     g.drawImage(
         commentImage, commentRect.x, commentRect.y, commentRect.width, commentRect.height, null);
     cachedComment = comment;
