@@ -226,6 +226,10 @@ public class Config {
     return showSubBoard && largeSubBoard;
   }
 
+  public boolean showLargeWinrate() {
+    return showWinrate && largeWinrate;
+  }
+
   /**
    * Scans the current directory as well as the current PATH to find a reasonable default leelaz
    * binary.
