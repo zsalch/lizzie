@@ -353,7 +353,7 @@ public class LizzieFrame extends JFrame {
 
       // board
       int maxSize = (int) (Math.min(width, height - topInset) * 0.98);
-      maxSize = Math.max(maxSize, Board.BOARD_SIZE + 5); // don't let maxWidth become too small
+      maxSize = Math.max(maxSize, Board.boardSize + 5); // don't let maxWidth become too small
       int boardX = (width - maxSize) / 2;
       int boardY = topInset + (height - topInset - maxSize) / 2 + 3;
 
