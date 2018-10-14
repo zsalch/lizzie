@@ -173,11 +173,7 @@ public class SGFParser {
               Lizzie.board.pass(color);
             } else {
               boolean newBranch = (subTreeStepMap.get(subTreeDepth) == 1);
-              Lizzie.board.place(
-                  move[0],
-                  move[1],
-                  color,
-                  newBranch);
+              Lizzie.board.place(move[0], move[1], color, newBranch);
             }
           } else if (tag.equals("C")) {
             // Support comment
@@ -197,8 +193,7 @@ public class SGFParser {
                 addPassForAwAb = false;
               }
               if (move != null) {
-                Lizzie.board.addStone(
-                    move[0], move[1], color);
+                Lizzie.board.addStone(move[0], move[1], color);
               }
             } else {
               if (move == null) {

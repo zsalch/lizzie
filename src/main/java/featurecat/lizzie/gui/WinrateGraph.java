@@ -70,20 +70,20 @@ public class WinrateGraph {
     int winRateGridLines = Lizzie.frame.winRateGridLines;
     int midline = 0;
     int midy = 0;
-    if (Lizzie.config.showWinrateBlunderBar) {
+    if (Lizzie.config.showBlunderBar) {
       midline = (int) Math.ceil(winRateGridLines / 2.0);
       midy = posy + height / 2;
     }
     for (int i = 1; i <= winRateGridLines; i++) {
       double percent = i * 100.0 / (winRateGridLines + 1);
       int y = posy + height - (int) (height * convertWinrate(percent) / 100);
-      if (Lizzie.config.showWinrateBlunderBar && i == midline) {
+      if (Lizzie.config.showBlunderBar && i == midline) {
         midy = y;
       }
       g.drawLine(posx, y, posx + width, y);
     }
 
-    g.setColor(Lizzie.frame.theme.winrateLineColor());
+    g.setColor(Lizzie.config.winrateLineColor);
     g.setStroke(new BasicStroke(Lizzie.config.winrateStrokeWidth));
 
     BoardHistoryNode topOfVariation = null;
@@ -157,16 +157,16 @@ public class WinrateGraph {
           wr = lastWr;
         }
 
-        if (lastNodeOk) g.setColor(Lizzie.frame.theme.winrateLineColor());
-        else g.setColor(Lizzie.frame.theme.winrateMissLineColor());
+        if (lastNodeOk) g.setColor(Lizzie.config.winrateLineColor);
+        else g.setColor(Lizzie.config.winrateMissLineColor);
 
         if (lastOkMove > 0) {
-          if (Lizzie.config.showWinrateBlunderBar) {
+          if (Lizzie.config.showBlunderBar) {
             Color lineColor = g.getColor();
-            g.setColor(Lizzie.frame.theme.blunderBarColor());
+            g.setColor(Lizzie.config.blunderBarColor);
             double lastMoveRate = convertWinrate(lastWr) - convertWinrate(wr);
             int lastHeight = 0;
-            if (Lizzie.config.weightedDisplayBlunderBarHeight) {
+            if (Lizzie.config.weightedBlunderBarHeight) {
               // Weighted display: <= 50% will use 75% of height, >= 50% will use 25% of height
               if (Math.abs(lastMoveRate) <= 50) {
                 lastHeight = Math.abs((int) (lastMoveRate) * height * 3 / 400);
@@ -177,7 +177,7 @@ public class WinrateGraph {
               lastHeight = Math.abs((int) (lastMoveRate) * height / 200);
             }
             int lastWidth = Math.abs((movenum - lastOkMove) * width / numMoves);
-            int rectWidth = Math.max(lastWidth / 10, Lizzie.config.minimumWinrateBlunderBarWidth);
+            int rectWidth = Math.max(lastWidth / 10, Lizzie.config.minimumBlunderBarWidth);
             g.fillRect(
                 posx + (movenum * width / numMoves) + (lastWidth - rectWidth) / 2,
                 midy + (!node.getData().blackToPlay && lastMoveRate > 0 ? lastHeight * -1 : 0),
@@ -193,7 +193,7 @@ public class WinrateGraph {
         }
 
         if (node == curMove) {
-          g.setColor(Lizzie.frame.theme.winrateLineColor());
+          g.setColor(Lizzie.config.winrateLineColor);
           g.fillOval(
               posx + (movenum * width / numMoves) - DOT_RADIUS,
               posy + height - (int) (convertWinrate(wr) * height / 100) - DOT_RADIUS,
