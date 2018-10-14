@@ -6,6 +6,7 @@ import featurecat.lizzie.analysis.GameInfo;
 import featurecat.lizzie.analysis.Leelaz;
 import java.io.*;
 import java.text.SimpleDateFormat;
+import static java.util.Arrays.asList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -503,21 +504,11 @@ public class SGFParser {
   }
 
   public static boolean isListProperty(String key) {
-    for (String k : listProps) {
-      if (k.equals(key)) {
-        return true;
-      }
-    }
-    return false;
+    return asList(listProps).contains(key);
   }
 
   public static boolean isMarkupProperty(String key) {
-    for (String k : markupProps) {
-      if (k.equals(key)) {
-        return true;
-      }
-    }
-    return false;
+    return asList(markupProps).contains(key);
   }
 
   /**
