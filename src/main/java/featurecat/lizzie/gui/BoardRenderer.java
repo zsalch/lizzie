@@ -8,7 +8,6 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 
 import featurecat.lizzie.Lizzie;
-import featurecat.lizzie.Util;
 import featurecat.lizzie.analysis.Branch;
 import featurecat.lizzie.analysis.MoveData;
 import featurecat.lizzie.rules.Board;
@@ -391,6 +390,7 @@ public class BoardRenderer {
 
     for (int i = 0; i < Board.boardSize; i++) {
       for (int j = 0; j < Board.boardSize; j++) {
+        // Display latest stone for ghost dead stone
         // if (Lizzie.board.getData().stones[Board.getIndex(i, j)] != Stone.EMPTY) continue;
         if (branch.data.moveNumberList[Board.getIndex(i, j)] > maxBranchMoves()) continue;
 
@@ -651,7 +651,7 @@ public class BoardRenderer {
                 suggestionX,
                 suggestionY + stoneRadius * 2 / 5,
                 LizzieFrame.uiFont,
-                Util.formatShorterNumber(move.playouts),
+                Lizzie.frame.getPlayoutsString(move.playouts),
                 (float) (stoneRadius * 0.8),
                 stoneRadius * 1.4);
           }

@@ -1,12 +1,12 @@
 package featurecat.lizzie.rules;
 
+import static java.util.Arrays.asList;
+
 import featurecat.lizzie.Lizzie;
-import featurecat.lizzie.Util;
 import featurecat.lizzie.analysis.GameInfo;
 import featurecat.lizzie.analysis.Leelaz;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import static java.util.Arrays.asList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -466,7 +466,7 @@ public class SGFParser {
     }
 
     // Playouts
-    playouts = Util.formatShorterNumber(data.playouts);
+    playouts = Lizzie.frame.getPlayoutsString(data.playouts);
 
     // Winrate
     if (Lizzie.config.handicapInsteadOfWinrate) {
