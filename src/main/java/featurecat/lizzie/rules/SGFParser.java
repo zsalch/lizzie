@@ -308,12 +308,11 @@ public class SGFParser {
             "KM[%s]PW[%s]PB[%s]DT[%s]AP[Lizzie: %s]",
             komi, playerW, playerB, date, Lizzie.lizzieVersion));
 
-    // For append the Winrate to the comment of sgf, maybe need to update the Winrate
-    if (Lizzie.config.uiConfig.optBoolean("append-winrate-to-comment")) {
+    // For append the winrate to the comment of sgf, maybe need to update the Winrate
+    if (Lizzie.config.appendWinrateToComment) {
 
       // Update winrate
       Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
-
       if (stats.maxWinrate >= 0 && stats.totalPlayouts > history.getData().playouts) {
         history.getData().winrate = stats.maxWinrate;
         history.getData().playouts = stats.totalPlayouts;
@@ -411,11 +410,12 @@ public class SGFParser {
         // Node properties
         builder.append(data.propertiesString());
 
-        // Write the comment
-        if (Lizzie.config.uiConfig.optBoolean("append-winrate-to-comment")) {
-          // Append the Winrate to the comment of sgf
+        if (Lizzie.config.appendWinrateToComment) {
+          // Append the winrate to the comment of sgf
           data.comment = formatComment(node);
         }
+
+        // Write the comment
         if (data.comment != null) {
           builder.append(String.format("C[%s]", data.comment));
         }
@@ -439,7 +439,7 @@ public class SGFParser {
   }
 
   /**
-   * Format Comment with following format: Move <move number> <Winrate> (<Last Move Rate
+   * Format Comment with following format: Move <Move number> <Winrate> (<Last Move Rate
    * Difference>) (<Weight name> / <Playouts>)
    */
   private static String formatComment(BoardHistoryNode node) {
@@ -448,59 +448,53 @@ public class SGFParser {
     }
     BoardData data = node.getData();
     String engine = Lizzie.leelaz.currentWeight();
-    String playouts = "";
-    String curWinrate = "";
-    String lastMoveWinrate = "";
-
-    double lastWR = 50; // winrate the previous move
-    boolean validLastWinrate = false; // whether it was actually calculated
-    BoardData lastNode = node.previous().getData();
-    if (lastNode != null && lastNode.playouts > 0) {
-      lastWR = lastNode.winrate;
-      validLastWinrate = true;
-    }
-    double curWR = data.winrate; // winrate on this move
-    boolean validWinrate = (data.playouts > 0); // and whether it was actually calculated
-    if (!validWinrate) {
-      curWR = 100 - lastWR; // display last move's winrate for now (with color difference)
-    }
 
     // Playouts
-    playouts = Lizzie.frame.getPlayoutsString(data.playouts);
+    String playouts = Lizzie.frame.getPlayoutsString(data.playouts);
 
-    // Winrate
+    // Last winrate
+    BoardData lastNode = node.previous().getData();
+    boolean validLastWinrate = (lastNode != null && lastNode.playouts > 0);
+    double lastWR = validLastWinrate ? lastNode.winrate : 50;
+
+    // Current winrate
+    boolean validWinrate = (data.playouts > 0);
+    double curWR = validWinrate ? data.winrate : 100 - lastWR;
+    String curWinrate = "";
     if (Lizzie.config.handicapInsteadOfWinrate) {
-      curWinrate = String.format("%.2f", Lizzie.leelaz.winrateToHandicap(100 - curWR));
+      curWinrate = String.format("%.2f", Leelaz.winrateToHandicap(100 - curWR));
     } else {
       curWinrate = String.format("%.1f%%", 100 - curWR);
     }
 
-    // Last move
+    // Last move difference winrate
+    String lastMoveDiff = "";
     if (validLastWinrate && validWinrate) {
       if (Lizzie.config.handicapInsteadOfWinrate) {
-        double currHandicapedWR = Lizzie.leelaz.winrateToHandicap(100 - curWR);
-        double lastHandicapedWR = Lizzie.leelaz.winrateToHandicap(lastWR);
-        lastMoveWinrate = String.format(": %.2f", currHandicapedWR - lastHandicapedWR);
+        double currHandicapedWR = Leelaz.winrateToHandicap(100 - curWR);
+        double lastHandicapedWR = Leelaz.winrateToHandicap(lastWR);
+        lastMoveDiff = String.format(": %.2f", currHandicapedWR - lastHandicapedWR);
       } else {
-        lastMoveWinrate = String.format("(%.1f%%)", 100 - lastWR - curWR);
+        lastMoveDiff = String.format("(%.1f%%)", 100 - lastWR - curWR);
       }
     }
 
-    String newComment =
-        String.format(
-            "Move %d\n%s %s\n(%s / %s playouts)",
-            data.moveNumber, curWinrate, lastMoveWinrate, engine, playouts);
+    // Format:
+    // Move <Move number> <Winrate> (<Last Move Rate Difference>)
+    // (<Weight name> / <Playouts>)
+    String wf = "Move %d\n%s %s\n(%s / %s playouts)";
+    String nc = String.format(wf, data.moveNumber, curWinrate, lastMoveDiff, engine, playouts);
 
     if (data.comment != null) {
-      String winratePattern =
+      String wp =
           "Move [0-9]+\n[0-9\\.\\-]+%* \\(*[0-9\\.\\-]*%*\\)*\n\\([^\\(\\)/]* \\/ [0-9\\.]*[kmKM]* playouts\\)";
-      if (data.comment.matches("(?s).*" + winratePattern + "(?s).*")) {
-        newComment = data.comment.replaceAll(winratePattern, newComment);
+      if (data.comment.matches("(?s).*" + wp + "(?s).*")) {
+        nc = data.comment.replaceAll(wp, nc);
       } else {
-        newComment = String.format("%s\n\n%s", newComment, data.comment);
+        nc = String.format("%s\n\n%s", nc, data.comment);
       }
     }
-    return newComment;
+    return nc;
   }
 
   public static boolean isListProperty(String key) {
