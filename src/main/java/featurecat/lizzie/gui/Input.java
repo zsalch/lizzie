@@ -336,7 +336,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         break;
 
       case VK_PERIOD:
-        if (Lizzie.board.getHistory().getNext() == null) {
+        if (!Lizzie.board.getHistory().getNext().isPresent()) {
           Lizzie.board.setScoreMode(!Lizzie.board.inScoreMode());
         }
         break;

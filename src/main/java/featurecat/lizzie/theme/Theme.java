@@ -22,14 +22,15 @@ public class Theme {
   BufferedImage backgroundCached = null;
 
   private String configFile = "theme.txt";
-  private String pathPrefix = "theme";
+  private String pathPrefix = "theme" + separator;
   private String path = null;
   private JSONObject config = new JSONObject();
   private JSONObject uiConfig = null;
 
   public Theme(JSONObject uiConfig) {
     this.uiConfig = uiConfig;
-    this.path = this.pathPrefix + separator + uiConfig.optString("theme") + separator;
+    String themeName = uiConfig.optString("theme");
+    this.path = this.pathPrefix + (themeName.isEmpty() ? "" : themeName + separator);
     File file = new File(this.path + this.configFile);
     if (file.canRead()) {
       FileInputStream fp;
@@ -171,7 +172,7 @@ public class Theme {
       image = ImageIO.read(new File(p));
     } catch (IOException e) {
       try {
-        p = uiConfig.optString(key, defaultValue);
+        p = this.pathPrefix + uiConfig.optString(key, defaultValue);
         image = ImageIO.read(new File(p));
       } catch (IOException e1) {
         try {
