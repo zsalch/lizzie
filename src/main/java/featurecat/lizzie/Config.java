@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.json.*;
 
 public class Config {
@@ -57,6 +58,8 @@ public class Config {
   public Color blunderBarColor = null;
   public boolean solidStoneIndicator = false;
   public boolean appendWinrateToComment = false;
+  public Color commentNodeColor = null;
+  public List<Map<Integer, Color>> blunderNodeColors;
 
   private JSONObject loadAndMergeConfig(
       JSONObject defaultCfg, String fileName, boolean needValidation) throws IOException {
@@ -172,6 +175,8 @@ public class Config {
     winrateMissLineColor = theme.winrateMissLineColor();
     blunderBarColor = theme.blunderBarColor();
     solidStoneIndicator = theme.solidStoneIndicator();
+    commentNodeColor = theme.commentNodeColor();
+    blunderNodeColors = theme.blunderNodeColors();
   }
 
   // Modifies config by adding in values from default_config that are missing.

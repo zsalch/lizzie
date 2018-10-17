@@ -7,6 +7,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
 import org.json.JSONArray;
@@ -130,6 +136,11 @@ public class Theme {
     return getColorByKey("comment-font-color", Color.WHITE);
   }
 
+  /** The color of the node with the comment */
+  public Color commentNodeColor() {
+    return getColorByKey("comment-node-color", Color.BLUE.brighter());
+  }
+
   /** The color of the winrate line */
   public Color winrateLineColor() {
     return getColorByKey("winrate-line-color", Color.green);
@@ -143,6 +154,28 @@ public class Theme {
   /** The color of the blunder bar */
   public Color blunderBarColor() {
     return getColorByKey("blunder-bar-color", new Color(255, 0, 0, 150));
+  }
+
+  /** The color list of the blunder node */
+  public List<Map<Integer, Color>> blunderNodeColors() {
+    List<Map<Integer, Color>> list = new ArrayList<Map<Integer, Color>>();
+    String key = "blunder-node-colors";
+    JSONArray array = config.optJSONArray(key);
+    if (array == null) {
+      array = uiConfig.optJSONArray(key);
+    }
+    if (array != null) {
+      array.forEach(a -> {
+        Integer i = ((JSONArray) a).getInt(0);
+        Color c = array2Color(((JSONArray) a).getJSONArray(1), null);
+        if (c != null) {
+          Map<Integer, Color> m = new HashMap<Integer, Color>();
+          m.put(i, c);
+          list.add(m);
+        }
+      });
+    }
+    return list;
   }
 
   private Color getColorByKey(String key, Color defaultColor) {

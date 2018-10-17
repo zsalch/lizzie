@@ -1,0 +1,18 @@
+{
+  "background-image" : "background.png",
+  "board-image" : "board.png",
+  "black-stone-image" : "black.png",
+  "white-stone-image" : "white.png",
+  "font-name": "Wawati SC",
+  "ui-font-name": "Wawati SC",
+  "winrate-font-name": "Wawati SC Bold",
+  "shadow-size": 100,
+  "solid-stone-indicator": true,
+  "winrate-stroke-width": 5,
+  "minimum-blunder-bar-width": 6,
+  "comment-background-color": [0, 0, 0, 200],
+  "comment-font-color": [0, 255, 0, 200],
+  "winrate-line-color": [255, 255, 0, 200],
+  "winrate-miss-line-color": [0, 255, 255, 200],
+  "blunder-bar-color": [255, 255, 255, 200]
+}
