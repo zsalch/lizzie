@@ -656,9 +656,9 @@ public class Board implements LeelazListener {
     for (int i = 0; i < stones.length; i++) {
       Stone stone = stones[i];
       if (stone.isBlack() || stone.isWhite()) {
-        int corY = i % Board.boardSize;
-        int corX = (i - corY) / Board.boardSize;
-        place(corY, corX, stone);
+        int y = i % Board.boardSize;
+        int x = (i - y) / Board.boardSize;
+        Lizzie.leelaz.playMove(stone, convertCoordinatesToName(x, y));
       }
     }
     int moveNumber = node.getData().moveNumber;
