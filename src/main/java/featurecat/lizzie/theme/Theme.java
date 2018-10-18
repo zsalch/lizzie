@@ -167,7 +167,7 @@ public class Theme {
     array.ifPresent(
         m -> {
           blunderWinrateThresholds = Optional.of(new ArrayList<Double>());
-          m.forEach(a -> blunderWinrateThresholds.get().add((Double) a));
+          m.forEach(a -> blunderWinrateThresholds.get().add((Double) a*1.0));
         });
     return blunderWinrateThresholds;
   }
@@ -185,7 +185,7 @@ public class Theme {
           IntStream.range(0, a.length())
               .forEach(
                   i -> {
-                    Color color = array2Color(((JSONArray) a.get(i)).getJSONArray(0), null);
+                    Color color = array2Color((JSONArray) a.get(i), null);
                     blunderWinrateThresholds.map(l -> l.get(i)).map(t -> map.get().put(t, color));
                   });
         });

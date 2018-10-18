@@ -1404,4 +1404,16 @@ public class LizzieFrame extends JFrame {
       return 0;
     }
   }
+
+  public Color getBlunderNodeColor(BoardHistoryNode node) {
+    double diffWinrate = lastWinrateDiff(node);
+    Optional<Double> st =
+        Lizzie.config.blunderWinrateThresholds.flatMap(
+            l -> l.stream().filter(t -> (diffWinrate >= 0 ? t <= diffWinrate :  t >= diffWinrate)).reduce((f, s) -> s));
+    if (st.isPresent()) {
+      return Lizzie.config.blunderNodeColors.map(m -> m.get(st.get())).get();
+    } else {
+      return Color.WHITE;
+    }
+  }
 }

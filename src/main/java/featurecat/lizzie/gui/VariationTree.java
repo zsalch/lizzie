@@ -5,6 +5,7 @@ import featurecat.lizzie.rules.BoardHistoryNode;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class VariationTree {
 
@@ -101,9 +102,10 @@ public class VariationTree {
       if (cur == curMove) {
         g.setColor(Color.green.brighter().brighter());
       }
+      g.setColor(Lizzie.frame.getBlunderNodeColor(cur));
       g.fillOval(curposx, posy, DOT_DIAM, DOT_DIAM);
       g.setColor(Color.BLACK);
-      g.drawOval(curposx, posy, DOT_DIAM, DOT_DIAM);
+//      g.drawOval(curposx, posy, DOT_DIAM, DOT_DIAM);
       g.setColor(curcolor);
       g.drawLine(
           curposx + dotoffset, posy - 1, curposx + dotoffset, posy - YSPACING + 2 * dotoffset + 2);
@@ -167,13 +169,5 @@ public class VariationTree {
       curposy -= YSPACING;
     }
     drawTree(g, posx + xoffset, curposy, 0, posy + height, node, 0, true);
-  }
-
-  public Color getBlunderNodeColor(BoardHistoryNode node) {
-    double diffWinrate = Lizzie.frame.lastWinrateDiff(node);
-    Optional<Double> st =
-        Lizzie.config.blunderWinrateThresholds.map(
-            l -> l.stream().filter(t -> t <= diffWinrate).findFirst().get());
-    return Lizzie.config.blunderNodeColors.map(m -> m.get(st.get())).get();
   }
 }
