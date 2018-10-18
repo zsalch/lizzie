@@ -6,7 +6,6 @@ import featurecat.lizzie.rules.Board;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
-
 import javax.swing.*;
 import org.json.JSONArray;
 
@@ -86,7 +85,8 @@ public class Lizzie {
       commandLine = Lizzie.config.leelazConfig.getString("engine-command");
       commandLine = commandLine.replaceAll("%network-file", networkFile);
     } else {
-      Optional<JSONArray> enginesOpt = Optional.ofNullable(Lizzie.config.leelazConfig.optJSONArray("engine-command-list"));
+      Optional<JSONArray> enginesOpt =
+          Optional.ofNullable(Lizzie.config.leelazConfig.optJSONArray("engine-command-list"));
       if (enginesOpt.map(e -> e.length() < index).orElse(true)) {
         return;
       }

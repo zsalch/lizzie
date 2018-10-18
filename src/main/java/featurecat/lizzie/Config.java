@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.json.*;
 
 public class Config {
@@ -59,7 +60,8 @@ public class Config {
   public boolean solidStoneIndicator = false;
   public boolean appendWinrateToComment = false;
   public Color commentNodeColor = null;
-  public List<Map<Integer, Color>> blunderNodeColors;
+  public Optional<List<Double>> blunderWinrateThresholds;
+  public Optional<Map<Double, Color>> blunderNodeColors;
 
   private JSONObject loadAndMergeConfig(
       JSONObject defaultCfg, String fileName, boolean needValidation) throws IOException {
@@ -176,6 +178,7 @@ public class Config {
     blunderBarColor = theme.blunderBarColor();
     solidStoneIndicator = theme.solidStoneIndicator();
     commentNodeColor = theme.commentNodeColor();
+    blunderWinrateThresholds = theme.blunderWinrateThresholds();
     blunderNodeColors = theme.blunderNodeColors();
   }
 

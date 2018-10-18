@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
 import org.json.JSONArray;
@@ -32,6 +32,7 @@ public class Theme {
   private String path = null;
   private JSONObject config = new JSONObject();
   private JSONObject uiConfig = null;
+  private Optional<List<Double>> blunderWinrateThresholds = Optional.empty();
 
   public Theme(JSONObject uiConfig) {
     this.uiConfig = uiConfig;
@@ -156,26 +157,39 @@ public class Theme {
     return getColorByKey("blunder-bar-color", new Color(255, 0, 0, 150));
   }
 
+  /** The threshold list of the blunder winrate */
+  public Optional<List<Double>> blunderWinrateThresholds() {
+    String key = "blunder-winrate-thresholds";
+    Optional<JSONArray> array = Optional.ofNullable(config.optJSONArray(key));
+    if (!array.isPresent()) {
+      array = Optional.ofNullable(uiConfig.optJSONArray(key));
+    }
+    array.ifPresent(
+        m -> {
+          blunderWinrateThresholds = Optional.of(new ArrayList<Double>());
+          m.forEach(a -> blunderWinrateThresholds.get().add((Double) a));
+        });
+    return blunderWinrateThresholds;
+  }
+
   /** The color list of the blunder node */
-  public List<Map<Integer, Color>> blunderNodeColors() {
-    List<Map<Integer, Color>> list = new ArrayList<Map<Integer, Color>>();
+  public Optional<Map<Double, Color>> blunderNodeColors() {
+    Optional<Map<Double, Color>> map = Optional.of(new HashMap<Double, Color>());
     String key = "blunder-node-colors";
-    JSONArray array = config.optJSONArray(key);
-    if (array == null) {
-      array = uiConfig.optJSONArray(key);
+    Optional<JSONArray> array = Optional.ofNullable(config.optJSONArray(key));
+    if (!array.isPresent()) {
+      array = Optional.ofNullable(uiConfig.optJSONArray(key));
     }
-    if (array != null) {
-      array.forEach(a -> {
-        Integer i = ((JSONArray) a).getInt(0);
-        Color c = array2Color(((JSONArray) a).getJSONArray(1), null);
-        if (c != null) {
-          Map<Integer, Color> m = new HashMap<Integer, Color>();
-          m.put(i, c);
-          list.add(m);
-        }
-      });
-    }
-    return list;
+    array.ifPresent(
+        a -> {
+          IntStream.range(0, a.length())
+              .forEach(
+                  i -> {
+                    Color color = array2Color(((JSONArray) a.get(i)).getJSONArray(0), null);
+                    blunderWinrateThresholds.map(l -> l.get(i)).map(t -> map.get().put(t, color));
+                  });
+        });
+    return map;
   }
 
   private Color getColorByKey(String key, Color defaultColor) {

@@ -12,6 +12,7 @@ import featurecat.lizzie.analysis.GameInfo;
 import featurecat.lizzie.analysis.Leelaz;
 import featurecat.lizzie.rules.Board;
 import featurecat.lizzie.rules.BoardData;
+import featurecat.lizzie.rules.BoardHistoryNode;
 import featurecat.lizzie.rules.GIBParser;
 import featurecat.lizzie.rules.SGFParser;
 import java.awt.*;
@@ -1382,5 +1383,25 @@ public class LizzieFrame extends JFrame {
         commentRect.height,
         null);
     cachedComment = comment;
+  }
+
+  public double lastWinrateDiff(BoardHistoryNode node) {
+
+    // Last winrate
+    BoardData lastData = node.previous().get().getData();
+    boolean validLastWinrate = (lastData != null && lastData.playouts > 0);
+    double lastWR = validLastWinrate ? lastData.winrate : 50;
+
+    // Current winrate
+    BoardData data = node.getData();
+    boolean validWinrate = (data.playouts > 0);
+    double curWR = validWinrate ? data.winrate : 100 - lastWR;
+
+    // Last move difference winrate
+    if (validLastWinrate && validWinrate) {
+      return 100 - lastWR - curWR;
+    } else {
+      return 0;
+    }
   }
 }

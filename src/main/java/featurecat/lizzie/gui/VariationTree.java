@@ -168,4 +168,12 @@ public class VariationTree {
     }
     drawTree(g, posx + xoffset, curposy, 0, posy + height, node, 0, true);
   }
+
+  public Color getBlunderNodeColor(BoardHistoryNode node) {
+    double diffWinrate = Lizzie.frame.lastWinrateDiff(node);
+    Optional<Double> st =
+        Lizzie.config.blunderWinrateThresholds.map(
+            l -> l.stream().filter(t -> t <= diffWinrate).findFirst().get());
+    return Lizzie.config.blunderNodeColors.map(m -> m.get(st.get())).get();
+  }
 }
