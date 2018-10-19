@@ -12,6 +12,7 @@ public class VariationTree {
   private int YSPACING;
   private int XSPACING;
   private int DOT_DIAM = 11; // Should be odd number
+  private int CENTER_DIAM = 5;
 
   private ArrayList<Integer> laneUsageList;
   private BoardHistoryNode curMove;
@@ -99,13 +100,12 @@ public class VariationTree {
     while (cur.next().isPresent() && posy + YSPACING < maxposy) {
       posy += YSPACING;
       cur = cur.next().get();
-      if (cur == curMove) {
-        g.setColor(Color.green.brighter().brighter());
-      }
       g.setColor(Lizzie.frame.getBlunderNodeColor(cur));
       g.fillOval(curposx, posy, DOT_DIAM, DOT_DIAM);
-      g.setColor(Color.BLACK);
-//      g.drawOval(curposx, posy, DOT_DIAM, DOT_DIAM);
+      if (cur == curMove) {
+        g.setColor(Color.BLACK);
+        g.fillOval(curposx + (DOT_DIAM - CENTER_DIAM)/2, posy + (DOT_DIAM - CENTER_DIAM)/2, CENTER_DIAM, CENTER_DIAM);
+      }
       g.setColor(curcolor);
       g.drawLine(
           curposx + dotoffset, posy - 1, curposx + dotoffset, posy - YSPACING + 2 * dotoffset + 2);
