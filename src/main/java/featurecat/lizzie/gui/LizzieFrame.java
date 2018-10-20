@@ -1223,7 +1223,7 @@ public class LizzieFrame extends JFrame {
   public boolean processCommentMouseWheelMoved(MouseWheelEvent e) {
     if (Lizzie.config.showComment && commentRect.contains(e.getX(), e.getY())) {
       scrollPane.dispatchEvent(e);
-      createCommentImage(true, 0, 0);
+      createCommentImage(true, commentRect.width, commentRect.height);
       getGraphics()
           .drawImage(
               cachedCommentImage,
