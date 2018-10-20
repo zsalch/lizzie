@@ -5,7 +5,6 @@ import featurecat.lizzie.rules.BoardHistoryNode;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class VariationTree {
 
@@ -82,13 +81,17 @@ public class VariationTree {
 
     // Draw all the nodes and lines in this lane (not variations)
     Color curcolor = g.getColor();
-    if (startNode == curMove) {
-      g.setColor(Color.green.brighter().brighter());
-    }
     if (startNode.previous().isPresent()) {
+      g.setColor(Lizzie.frame.getBlunderNodeColor(cur));
       g.fillOval(curposx, posy, DOT_DIAM, DOT_DIAM);
-      g.setColor(Color.BLACK);
-      g.drawOval(curposx, posy, DOT_DIAM, DOT_DIAM);
+      if (startNode == curMove) {
+        g.setColor(Color.BLACK);
+        g.fillOval(
+            curposx + (DOT_DIAM - CENTER_DIAM) / 2,
+            posy + (DOT_DIAM - CENTER_DIAM) / 2,
+            CENTER_DIAM,
+            CENTER_DIAM);
+      }
     } else {
       g.fillRect(curposx, posy, DOT_DIAM, DOT_DIAM);
       g.setColor(Color.BLACK);
@@ -104,7 +107,11 @@ public class VariationTree {
       g.fillOval(curposx, posy, DOT_DIAM, DOT_DIAM);
       if (cur == curMove) {
         g.setColor(Color.BLACK);
-        g.fillOval(curposx + (DOT_DIAM - CENTER_DIAM)/2, posy + (DOT_DIAM - CENTER_DIAM)/2, CENTER_DIAM, CENTER_DIAM);
+        g.fillOval(
+            curposx + (DOT_DIAM - CENTER_DIAM) / 2,
+            posy + (DOT_DIAM - CENTER_DIAM) / 2,
+            CENTER_DIAM,
+            CENTER_DIAM);
       }
       g.setColor(curcolor);
       g.drawLine(
