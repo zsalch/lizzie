@@ -16,6 +16,7 @@ import org.json.*;
 public class Config {
 
   public boolean showMoveNumber = false;
+  public int onlyLastMoveNumber = 0;
   public boolean showWinrate = true;
   public boolean largeWinrate = false;
   public boolean showBlunderBar = true;
@@ -145,6 +146,7 @@ public class Config {
     theme = new Theme(uiConfig);
 
     showMoveNumber = uiConfig.getBoolean("show-move-number");
+    onlyLastMoveNumber = uiConfig.optInt("only-last-move-number", 9999);
     showStatus = uiConfig.getBoolean("show-status");
     showBranch = uiConfig.getBoolean("show-leelaz-variation");
     showWinrate = uiConfig.getBoolean("show-winrate");
@@ -208,7 +210,16 @@ public class Config {
   }
 
   public void toggleShowMoveNumber() {
-    this.showMoveNumber = !this.showMoveNumber;
+    if (this.showMoveNumber && uiConfig.has("only-last-move-number")) {
+      if (this.onlyLastMoveNumber == 9999) {
+        this.onlyLastMoveNumber = uiConfig.optInt("only-last-move-number", 9999);
+      } else {
+        this.showMoveNumber = !this.showMoveNumber;
+        this.onlyLastMoveNumber = 9999;
+      }
+    } else {
+      this.showMoveNumber = !this.showMoveNumber;
+    }
   }
 
   public void toggleShowBranch() {
