@@ -12,6 +12,7 @@ public class VariationTree {
   private int XSPACING;
   private int DOT_DIAM = 11; // Should be odd number
   private int CENTER_DIAM = 5;
+  private int RING_DIAM = 15;
 
   private ArrayList<Integer> laneUsageList;
   private BoardHistoryNode curMove;
@@ -82,6 +83,14 @@ public class VariationTree {
     // Draw all the nodes and lines in this lane (not variations)
     Color curcolor = g.getColor();
     if (startNode.previous().isPresent()) {
+      if (!cur.getData().comment.isEmpty()) {
+        g.setColor(Lizzie.config.commentNodeColor);
+        g.fillOval(
+            curposx + (DOT_DIAM - RING_DIAM) / 2,
+            posy + (DOT_DIAM - RING_DIAM) / 2,
+            RING_DIAM,
+            RING_DIAM);
+      }
       g.setColor(Lizzie.frame.getBlunderNodeColor(cur));
       g.fillOval(curposx, posy, DOT_DIAM, DOT_DIAM);
       if (startNode == curMove) {
@@ -103,6 +112,14 @@ public class VariationTree {
     while (cur.next().isPresent() && posy + YSPACING < maxposy) {
       posy += YSPACING;
       cur = cur.next().get();
+      if (!cur.getData().comment.isEmpty()) {
+        g.setColor(Lizzie.config.commentNodeColor);
+        g.fillOval(
+            curposx + (DOT_DIAM - RING_DIAM) / 2,
+            posy + (DOT_DIAM - RING_DIAM) / 2,
+            RING_DIAM,
+            RING_DIAM);
+      }
       g.setColor(Lizzie.frame.getBlunderNodeColor(cur));
       g.fillOval(curposx, posy, DOT_DIAM, DOT_DIAM);
       if (cur == curMove) {
