@@ -347,7 +347,6 @@ public class BoardHistoryNode {
     return Optional.empty();
   }
 
-
   public int getNextNodeWithCommentMoves() {
     BoardHistoryNode node = this;
     int moves = 0;
@@ -375,5 +374,4 @@ public class BoardHistoryNode {
     }
     return moves;
   }
-
 }
