@@ -91,6 +91,7 @@ public class SGFParser {
         escaping = false,
         moveStart = false,
         addPassForAwAb = true;
+    boolean inProp = false;
     String tag = "";
     StringBuilder tagBuilder = new StringBuilder();
     StringBuilder tagContentBuilder = new StringBuilder();
@@ -141,25 +142,31 @@ public class SGFParser {
           }
           break;
         case '[':
-          if (subTreeDepth > 1 && !isMultiGo) {
-            break;
+          if (!inProp) {
+            inProp = true;
+            if (subTreeDepth > 1 && !isMultiGo) {
+              break;
+            }
+            inTag = true;
+            String tagTemp = tagBuilder.toString();
+            if (!tagTemp.isEmpty()) {
+              // Ignore small letters in tags for the long format Smart-Go file.
+              // (ex) "PlayerBlack" ==> "PB"
+              // It is the default format of mgt, an old SGF tool.
+              // (Mgt is still supported in Debian and Ubuntu.)
+              tag = tagTemp.replaceAll("[a-z]", "");
+            }
+            tagContentBuilder = new StringBuilder();
+          } else {
+            tagContentBuilder.append(c);
           }
-          inTag = true;
-          String tagTemp = tagBuilder.toString();
-          if (!tagTemp.isEmpty()) {
-            // Ignore small letters in tags for the long format Smart-Go file.
-            // (ex) "PlayerBlack" ==> "PB"
-            // It is the default format of mgt, an old SGF tool.
-            // (Mgt is still supported in Debian and Ubuntu.)
-            tag = tagTemp.replaceAll("[a-z]", "");
-          }
-          tagContentBuilder = new StringBuilder();
           break;
         case ']':
           if (subTreeDepth > 1 && !isMultiGo) {
             break;
           }
           inTag = false;
+          inProp = false;
           tagBuilder = new StringBuilder();
           String tagContent = tagContentBuilder.toString();
           // We got tag, we can parse this tag now.
