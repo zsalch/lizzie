@@ -380,12 +380,6 @@ public class LizzieFrame extends JFrame {
       int statw = capw;
       int stath = maxSize / 10;
 
-      // winrate graph
-      int grx = statx;
-      int gry = staty + stath;
-      int grw = statw;
-      int grh = maxSize / 2;
-
       // variation tree container
       int vx = boardX + maxSize + panelMargin;
       int vy = 0;
@@ -411,11 +405,17 @@ public class LizzieFrame extends JFrame {
       int loadingY = ponderingY - (int) (maxBound * (loadingSize - ponderingSize));
 
       // subboard
-      int subBoardX = grx;
-      int subBoardY = gry + grh;
-      int subBoardWidth = grw;
-      int subBoardHeight = ponderingY - subBoardY;
+      int subBoardX = statx;
+      int subBoardWidth = statw;
+      int subBoardHeight = statw;
+      int subBoardY = ponderingY - subBoardHeight;
       int subBoardLength = min(subBoardWidth, subBoardHeight);
+
+      // winrate graph
+      int grx = statx;
+      int gry = staty + stath;
+      int grw = statw;
+      int grh = subBoardY - gry;
 
       if (width >= height) {
         // Landscape mode
