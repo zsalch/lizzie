@@ -211,7 +211,6 @@ public class WinrateGraph {
           while (node.next().isPresent()) {
             node = node.next().get();
           }
-          movenum = node.getData().moveNumber - 1;
           lastWr = node.getData().winrate;
           if (!node.getData().blackToPlay) lastWr = 100 - lastWr;
           g.setStroke(new BasicStroke(3));
