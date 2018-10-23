@@ -335,7 +335,7 @@ public class Board implements LeelazListener {
 
       // check to see if this coordinate is being replayed in history
       Optional<int[]> nextLast = history.getNext().flatMap(n -> n.lastMove);
-      if (nextLast.isPresent() && nextLast.get()[0] == x && nextLast.get()[1] == y) {
+      if (nextLast.isPresent() && nextLast.get()[0] == x && nextLast.get()[1] == y && !newBranch) {
         // this is the next coordinate in history. Just increment history so that we don't erase the
         // redo's
         history.next();

@@ -119,6 +119,7 @@ public class SGFParser {
             subTreeDepth += 1;
             // Initialize the step count
             subTreeStepMap.put(subTreeDepth, 0);
+            addPassForAwAb = true;
           } else {
             if (i > 0) {
               // Allow the comment tag includes '('
