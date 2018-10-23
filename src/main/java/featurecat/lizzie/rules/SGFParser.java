@@ -197,6 +197,8 @@ public class SGFParser {
               // add to node properties
               Lizzie.board.addNodeProperty(tag, tagContent);
               if (addPassForAwAb) {
+                // Save the step count
+                subTreeStepMap.put(subTreeDepth, subTreeStepMap.get(subTreeDepth) + 1);
                 Lizzie.board.pass(color);
                 addPassForAwAb = false;
               }
@@ -233,6 +235,8 @@ public class SGFParser {
               } else if ("AE".equals(tag)) {
                 // remove a stone
                 if (addPassForAwAb) {
+                  // Save the step count
+                  subTreeStepMap.put(subTreeDepth, subTreeStepMap.get(subTreeDepth) + 1);
                   Lizzie.board.pass(tag.equals("AB") ? Stone.BLACK : Stone.WHITE);
                   addPassForAwAb = false;
                 }
