@@ -27,6 +27,7 @@ public class VariationTree {
       int posy,
       int startLane,
       int maxposy,
+      int minposx,
       BoardHistoryNode startNode,
       int variationNumber,
       boolean isMain) {
@@ -47,7 +48,7 @@ public class VariationTree {
     if (lane >= laneUsageList.size()) {
       laneUsageList.add(0);
     }
-    if (variationNumber > 1) laneUsageList.set(lane - 1, startNode.getData().moveNumber - 1);
+    if (variationNumber > 1 && lane > laneUsageList.size()) laneUsageList.set(lane - 1, startNode.getData().moveNumber - 1);
     laneUsageList.set(lane, startNode.getData().moveNumber);
 
     // At this point, lane contains the lane we should use (the main branch is in lane 0)
@@ -60,51 +61,59 @@ public class VariationTree {
     if (lane > 0) {
       if (lane - startLane > 0 || variationNumber > 1) {
         // Need a horizontal and an angled line
-        g.drawLine(
-            curposx + dotoffset,
-            posy + dotoffset,
-            curposx + dotoffset - XSPACING,
-            posy + dotoffset - YSPACING);
-        g.drawLine(
+        drawLine(
+              g,
+              curposx + dotoffset,
+              posy + dotoffset,
+              curposx + dotoffset - XSPACING,
+              posy + dotoffset - YSPACING,
+              minposx);
+        drawLine(
+            g,
             posx + (startLane - variationNumber) * XSPACING + 2 * dotoffset,
             posy - YSPACING + dotoffset,
             curposx + dotoffset - XSPACING,
-            posy + dotoffset - YSPACING);
+            posy + dotoffset - YSPACING,
+            minposx);
       } else {
         // Just an angled line
-        g.drawLine(
+        drawLine(
+            g,
             curposx + dotoffset,
             posy + dotoffset,
             curposx + 2 * dotoffset - XSPACING,
-            posy + 2 * dotoffset - YSPACING);
+            posy + 2 * dotoffset - YSPACING,
+            minposx);
       }
     }
 
     // Draw all the nodes and lines in this lane (not variations)
     Color curcolor = g.getColor();
-    if (startNode.previous().isPresent()) {
-      if (!cur.getData().comment.isEmpty()) {
-        g.setColor(Lizzie.config.commentNodeColor);
-        g.fillOval(
-            curposx + (DOT_DIAM - RING_DIAM) / 2,
-            posy + (DOT_DIAM - RING_DIAM) / 2,
-            RING_DIAM,
-            RING_DIAM);
-      }
-      g.setColor(Lizzie.frame.getBlunderNodeColor(cur));
-      g.fillOval(curposx, posy, DOT_DIAM, DOT_DIAM);
-      if (startNode == curMove) {
+    if (curposx > minposx) {
+      if (startNode.previous().isPresent()) {
+        if (!cur.getData().comment.isEmpty()) {
+          g.setColor(Lizzie.config.commentNodeColor);
+          g.fillOval(
+              curposx + (DOT_DIAM - RING_DIAM) / 2,
+              posy + (DOT_DIAM - RING_DIAM) / 2,
+              RING_DIAM,
+              RING_DIAM);
+        }
+        g.setColor(Lizzie.frame.getBlunderNodeColor(cur));
+        g.fillOval(curposx, posy, DOT_DIAM, DOT_DIAM);
+        if (startNode == curMove) {
+          g.setColor(Color.BLACK);
+          g.fillOval(
+              curposx + (DOT_DIAM - CENTER_DIAM) / 2,
+              posy + (DOT_DIAM - CENTER_DIAM) / 2,
+              CENTER_DIAM,
+              CENTER_DIAM);
+        }
+      } else {
+        g.fillRect(curposx, posy, DOT_DIAM, DOT_DIAM);
         g.setColor(Color.BLACK);
-        g.fillOval(
-            curposx + (DOT_DIAM - CENTER_DIAM) / 2,
-            posy + (DOT_DIAM - CENTER_DIAM) / 2,
-            CENTER_DIAM,
-            CENTER_DIAM);
+        g.drawRect(curposx, posy, DOT_DIAM, DOT_DIAM);
       }
-    } else {
-      g.fillRect(curposx, posy, DOT_DIAM, DOT_DIAM);
-      g.setColor(Color.BLACK);
-      g.drawRect(curposx, posy, DOT_DIAM, DOT_DIAM);
     }
     g.setColor(curcolor);
 
@@ -112,27 +121,29 @@ public class VariationTree {
     while (cur.next().isPresent() && posy + YSPACING < maxposy) {
       posy += YSPACING;
       cur = cur.next().get();
-      if (!cur.getData().comment.isEmpty()) {
-        g.setColor(Lizzie.config.commentNodeColor);
-        g.fillOval(
-            curposx + (DOT_DIAM - RING_DIAM) / 2,
-            posy + (DOT_DIAM - RING_DIAM) / 2,
-            RING_DIAM,
-            RING_DIAM);
+      if (curposx > minposx) {
+        if (!cur.getData().comment.isEmpty()) {
+          g.setColor(Lizzie.config.commentNodeColor);
+          g.fillOval(
+              curposx + (DOT_DIAM - RING_DIAM) / 2,
+              posy + (DOT_DIAM - RING_DIAM) / 2,
+              RING_DIAM,
+              RING_DIAM);
+        }
+        g.setColor(Lizzie.frame.getBlunderNodeColor(cur));
+        g.fillOval(curposx, posy, DOT_DIAM, DOT_DIAM);
+        if (cur == curMove) {
+          g.setColor(Color.BLACK);
+          g.fillOval(
+              curposx + (DOT_DIAM - CENTER_DIAM) / 2,
+              posy + (DOT_DIAM - CENTER_DIAM) / 2,
+              CENTER_DIAM,
+              CENTER_DIAM);
+        }
+        g.setColor(curcolor);
+        g.drawLine(
+            curposx + dotoffset, posy - 1, curposx + dotoffset, posy - YSPACING + 2 * dotoffset + 2);
       }
-      g.setColor(Lizzie.frame.getBlunderNodeColor(cur));
-      g.fillOval(curposx, posy, DOT_DIAM, DOT_DIAM);
-      if (cur == curMove) {
-        g.setColor(Color.BLACK);
-        g.fillOval(
-            curposx + (DOT_DIAM - CENTER_DIAM) / 2,
-            posy + (DOT_DIAM - CENTER_DIAM) / 2,
-            CENTER_DIAM,
-            CENTER_DIAM);
-      }
-      g.setColor(curcolor);
-      g.drawLine(
-          curposx + dotoffset, posy - 1, curposx + dotoffset, posy - YSPACING + 2 * dotoffset + 2);
     }
     // Now we have drawn all the nodes in this variation, and has reached the bottom of this
     // variation
@@ -147,7 +158,7 @@ public class VariationTree {
         // every variation that has a variation (sort of))
         Optional<BoardHistoryNode> variation = cur.getVariation(i);
         if (variation.isPresent()) {
-          drawTree(g, posx, posy, curwidth, maxposy, variation.get(), i, false);
+          drawTree(g, posx, posy, curwidth, maxposy, minposx, variation.get(), i, false);
         }
       }
       posy -= YSPACING;
@@ -185,13 +196,55 @@ public class VariationTree {
 
     // Is current move a variation? If so, find top of variation
     BoardHistoryNode top = curMove.findTop();
-    int curposy = middleY - YSPACING * (curMove.getData().moveNumber - top.getData().moveNumber);
+    int curposy = middleY - YSPACING * top.findMoveNumberOfNode(curMove);  //(curMove.getData().moveNumber - top.getData().moveNumber);
     // Go to very top of tree (visible in assigned area)
     BoardHistoryNode node = top;
     while (curposy > posy + YSPACING && node.previous().isPresent()) {
       node = node.previous().get();
       curposy -= YSPACING;
     }
-    drawTree(g, posx + xoffset, curposy, 0, posy + height, node, 0, true);
+
+    // Main trunk
+    int lane = 0;
+    BoardHistoryNode next = node;
+    int nexty = curposy;
+    while (next.next().isPresent() && nexty + YSPACING < posy + height) {
+      nexty += YSPACING;
+      next = next.next().get();
+    }
+    // All the nodes in this variation
+    int maxlane = 0;
+    while (next.previous().isPresent() && next != node) {
+      next = next.previous().get();
+      // Each variation, uses recursion
+      maxlane = maxlane + next.numberOfChildren() - 1;
+      if (next.findIndexOfNode(curMove, true) > 0) {
+        lane = maxlane;
+      }
+    }
+    int startx = posx + xoffset;
+    if (((lane + 1) * XSPACING + xoffset - width) > 0) {
+      startx = startx - ((lane + 1) * XSPACING + xoffset - width);
+    }
+    drawTree(g, startx, curposy, 0, posy + height, posx + strokeRadius, node, 0, true);
+  }
+  
+  private void drawLine(Graphics g, int x1, int y1, int x2, int y2, int minx) {
+    if (x1 <= minx && x2 <= minx) {
+      return;
+    }
+    int nx1 = x1, ny1 = y1, nx2 = x2, ny2 = y2;
+    if (x1 > minx && x2 <= minx) {
+      ny2 = y2 - (x1 - minx)/(x1 - x2) * (y2 - y1);
+      nx2 = minx;
+    } else if (x2 > minx && x1 <= minx) {
+      ny1 = y1 - (x2 - minx)/(x2 - x1) * (y1 - y2);
+      nx1 = minx;
+    }
+    g.drawLine(
+        nx1,
+        ny1,
+        nx2,
+        ny2);
   }
 }

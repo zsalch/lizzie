@@ -307,6 +307,50 @@ public class BoardHistoryNode {
   }
 
   /**
+   * Given a child node, find the index of that child node in it's parent
+   *
+   * @return index of child node, -1 if child node not a child of parent
+   */
+  public int findIndexOfNode(BoardHistoryNode childNode, boolean allSub) {
+    if (!next().isPresent()) {
+      return -1;
+    }
+    for (int i = 0; i < numberOfChildren(); i++) {
+      Optional<BoardHistoryNode> node = getVariation(i);
+      while (node.isPresent()) {
+        if (node.map(n -> n == childNode).orElse(false)) {
+          return i;
+        }
+        node = node.get().next();
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * Given a child node, find the move number of that child node in it's parent
+   *
+   * @return index of child node, -1 if child node not a child of parent
+   */
+  public int findMoveNumberOfNode(BoardHistoryNode childNode) {
+    if (!next().isPresent()) {
+      return 0;
+    }
+    for (int i = 0; i < numberOfChildren(); i++) {
+      Optional<BoardHistoryNode> node = getVariation(i);
+      int move = 0;
+      while (node.isPresent()) {
+        if (node.map(n -> n == childNode).orElse(false)) {
+          return move;
+        }
+        move++;
+        node = node.get().next();
+      }
+    }
+    return 0;
+  }
+
+  /**
    * Check if node is part of the main trunk (rightmost branch)
    *
    * @return true if node is part of main trunk, false otherwise
