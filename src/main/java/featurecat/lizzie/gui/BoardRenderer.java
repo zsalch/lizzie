@@ -386,14 +386,16 @@ public class BoardRenderer {
     for (int i = 0; i < Board.boardSize; i++) {
       for (int j = 0; j < Board.boardSize; j++) {
         // Display latest stone for ghost dead stone
-        // if (Lizzie.board.getData().stones[Board.getIndex(i, j)] != Stone.EMPTY) continue;
-        if (branch.data.moveNumberList[Board.getIndex(i, j)] > maxBranchMoves()) continue;
+        int index = Board.getIndex(i, j);
+        Stone stone = branch.data.stones[index];
+        boolean isGhost = (stone == Stone.BLACK_GHOST || stone == Stone.WHITE_GHOST);
+        if (Lizzie.board.getData().stones[index] != Stone.EMPTY && !isGhost) continue;
+        if (branch.data.moveNumberList[index] > maxBranchMoves()) continue;
 
         int stoneX = scaledMargin + squareLength * i;
         int stoneY = scaledMargin + squareLength * j;
 
-        drawStone(
-            g, gShadow, stoneX, stoneY, branch.data.stones[Board.getIndex(i, j)].unGhosted(), i, j);
+        drawStone(g, gShadow, stoneX, stoneY, stone.unGhosted(), i, j);
       }
     }
 
