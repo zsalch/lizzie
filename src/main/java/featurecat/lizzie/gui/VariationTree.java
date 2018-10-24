@@ -154,7 +154,8 @@ public class VariationTree {
     // Now we have drawn all the nodes in this variation, and has reached the bottom of this
     // variation
     // Move back up, and for each, draw any variations we find
-    while (cur.previous().isPresent() && cur != startNode) {
+    BoardHistoryNode end = isMain ? null : startNode;
+    while (cur.previous().isPresent() && cur != end) {
       cur = cur.previous().get();
       int curwidth = lane;
       // Draw each variation, uses recursion

@@ -338,7 +338,7 @@ public class BoardHistoryNode {
     }
     for (int i = 0; i < numberOfChildren(); i++) {
       Optional<BoardHistoryNode> node = getVariation(i);
-      int move = 0;
+      int move = 1;
       while (node.isPresent()) {
         if (node.map(n -> n == childNode).orElse(false)) {
           return move;
