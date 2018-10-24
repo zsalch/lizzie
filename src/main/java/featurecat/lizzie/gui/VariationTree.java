@@ -39,17 +39,20 @@ public class VariationTree {
     int lane = startLane;
     // Figures out how far out too the right (which lane) we have to go not to collide with other
     // variations
-    while (lane < laneUsageList.size()
-        && laneUsageList.get(lane) <= startNode.getData().moveNumber + depth) {
+    int moveNumber =
+        isMain
+            ? startNode.getData().moveNumber
+            : startNode.findTop().findMoveNumberOfNode(startNode);
+    while (lane < laneUsageList.size() && laneUsageList.get(lane) <= moveNumber + depth) {
       // laneUsageList keeps a list of how far down it is to a variation in the different "lanes"
-      laneUsageList.set(lane, startNode.getData().moveNumber - 1);
+      laneUsageList.set(lane, moveNumber - 1);
       lane++;
     }
     if (lane >= laneUsageList.size()) {
       laneUsageList.add(0);
     }
-    if (variationNumber > 1 && lane > laneUsageList.size()) laneUsageList.set(lane - 1, startNode.getData().moveNumber - 1);
-    laneUsageList.set(lane, startNode.getData().moveNumber);
+    if (variationNumber > 1) laneUsageList.set(lane - 1, moveNumber - 1);
+    laneUsageList.set(lane, moveNumber);
 
     // At this point, lane contains the lane we should use (the main branch is in lane 0)
 
@@ -62,12 +65,12 @@ public class VariationTree {
       if (lane - startLane > 0 || variationNumber > 1) {
         // Need a horizontal and an angled line
         drawLine(
-              g,
-              curposx + dotoffset,
-              posy + dotoffset,
-              curposx + dotoffset - XSPACING,
-              posy + dotoffset - YSPACING,
-              minposx);
+            g,
+            curposx + dotoffset,
+            posy + dotoffset,
+            curposx + dotoffset - XSPACING,
+            posy + dotoffset - YSPACING,
+            minposx);
         drawLine(
             g,
             posx + (startLane - variationNumber) * XSPACING + 2 * dotoffset,
@@ -142,7 +145,10 @@ public class VariationTree {
         }
         g.setColor(curcolor);
         g.drawLine(
-            curposx + dotoffset, posy - 1, curposx + dotoffset, posy - YSPACING + 2 * dotoffset + 2);
+            curposx + dotoffset,
+            posy - 1,
+            curposx + dotoffset,
+            posy - YSPACING + 2 * dotoffset + 2);
       }
     }
     // Now we have drawn all the nodes in this variation, and has reached the bottom of this
@@ -196,7 +202,11 @@ public class VariationTree {
 
     // Is current move a variation? If so, find top of variation
     BoardHistoryNode top = curMove.findTop();
-    int curposy = middleY - YSPACING * top.findMoveNumberOfNode(curMove);  //(curMove.getData().moveNumber - top.getData().moveNumber);
+    int curposy =
+        middleY
+            - YSPACING
+                * top.findMoveNumberOfNode(
+                    curMove); // (curMove.getData().moveNumber - top.getData().moveNumber);
     // Go to very top of tree (visible in assigned area)
     BoardHistoryNode node = top;
     while (curposy > posy + YSPACING && node.previous().isPresent()) {
@@ -228,23 +238,19 @@ public class VariationTree {
     }
     drawTree(g, startx, curposy, 0, posy + height, posx + strokeRadius, node, 0, true);
   }
-  
+
   private void drawLine(Graphics g, int x1, int y1, int x2, int y2, int minx) {
     if (x1 <= minx && x2 <= minx) {
       return;
     }
     int nx1 = x1, ny1 = y1, nx2 = x2, ny2 = y2;
     if (x1 > minx && x2 <= minx) {
-      ny2 = y2 - (x1 - minx)/(x1 - x2) * (y2 - y1);
+      ny2 = y2 - (x1 - minx) / (x1 - x2) * (y2 - y1);
       nx2 = minx;
     } else if (x2 > minx && x1 <= minx) {
-      ny1 = y1 - (x2 - minx)/(x2 - x1) * (y1 - y2);
+      ny1 = y1 - (x2 - minx) / (x2 - x1) * (y1 - y2);
       nx1 = minx;
     }
-    g.drawLine(
-        nx1,
-        ny1,
-        nx2,
-        ny2);
+    g.drawLine(nx1, ny1, nx2, ny2);
   }
 }
