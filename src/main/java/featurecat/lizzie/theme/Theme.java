@@ -103,6 +103,12 @@ public class Theme {
     return config.optBoolean(key, uiConfig.optBoolean(key));
   }
 
+  /** Show the node with the comment color */
+  public boolean showCommentNodeColor() {
+    String key = "show-comment-node-color";
+    return config.optBoolean(key, uiConfig.optBoolean(key, true));
+  }
+
   /** The size of the shadow */
   public int shadowSize() {
     return getIntByKey("shadow-size", 100);

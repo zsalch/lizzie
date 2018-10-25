@@ -91,7 +91,7 @@ public class VariationTree {
     Color curcolor = g.getColor();
     if (curposx > minposx) {
       if (startNode.previous().isPresent()) {
-        if (!cur.getData().comment.isEmpty()) {
+        if (Lizzie.config.showCommentNodeColor && !cur.getData().comment.isEmpty()) {
           g.setColor(Lizzie.config.commentNodeColor);
           g.fillOval(
               curposx + (DOT_DIAM - RING_DIAM) / 2,
@@ -122,7 +122,7 @@ public class VariationTree {
       posy += YSPACING;
       cur = cur.next().get();
       if (curposx > minposx) {
-        if (!cur.getData().comment.isEmpty()) {
+        if (Lizzie.config.showCommentNodeColor && !cur.getData().comment.isEmpty()) {
           g.setColor(Lizzie.config.commentNodeColor);
           g.fillOval(
               curposx + (DOT_DIAM - RING_DIAM) / 2,

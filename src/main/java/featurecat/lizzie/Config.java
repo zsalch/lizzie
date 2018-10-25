@@ -60,6 +60,7 @@ public class Config {
   public Color blunderBarColor = null;
   public boolean solidStoneIndicator = false;
   public boolean appendWinrateToComment = false;
+  public boolean showCommentNodeColor = true;
   public Color commentNodeColor = null;
   public Optional<List<Double>> blunderWinrateThresholds;
   public Optional<Map<Double, Color>> blunderNodeColors;
@@ -179,6 +180,7 @@ public class Config {
     winrateMissLineColor = theme.winrateMissLineColor();
     blunderBarColor = theme.blunderBarColor();
     solidStoneIndicator = theme.solidStoneIndicator();
+    showCommentNodeColor = theme.showCommentNodeColor();
     commentNodeColor = theme.commentNodeColor();
     blunderWinrateThresholds = theme.blunderWinrateThresholds();
     blunderNodeColors = theme.blunderNodeColors();
@@ -240,6 +242,10 @@ public class Config {
 
   public void toggleShowComment() {
     this.showComment = !this.showComment;
+  }
+
+  public void toggleShowCommentNodeColor() {
+    this.showCommentNodeColor = !this.showCommentNodeColor;
   }
 
   public void toggleShowBestMoves() {
