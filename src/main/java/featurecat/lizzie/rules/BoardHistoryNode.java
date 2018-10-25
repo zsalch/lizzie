@@ -356,8 +356,8 @@ public class BoardHistoryNode {
    * @return move number of node, 0 if node not a child of branch
    */
   public int moveNumberOfBranch() {
-    BoardHistoryNode top = findTop();
-    return top.getData().moveNumber + top.depthOfNode(this);
+    Optional<BoardHistoryNode> top = firstParentWithVariations();
+    return top.isPresent() ? top.get().moveNumberOfNode() + top.get().depthOfNode(this) : 0;
   }
 
   /**

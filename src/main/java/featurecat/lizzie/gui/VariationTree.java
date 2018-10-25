@@ -200,7 +200,7 @@ public class VariationTree {
 
     // Is current move a variation? If so, find top of variation
     BoardHistoryNode top = curMove.findTop();
-    int curposy = middleY - YSPACING * top.depthOfNode(curMove);
+    int curposy = middleY - YSPACING * (curMove.moveNumberOfNode() - top.moveNumberOfNode());
     // Go to very top of tree (visible in assigned area)
     BoardHistoryNode node = top;
     while (curposy > posy + YSPACING && node.previous().isPresent()) {
