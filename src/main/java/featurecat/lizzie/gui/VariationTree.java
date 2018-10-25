@@ -39,10 +39,7 @@ public class VariationTree {
     int lane = startLane;
     // Figures out how far out too the right (which lane) we have to go not to collide with other
     // variations
-    int moveNumber =
-        isMain
-            ? startNode.getData().moveNumber
-            : startNode.findTop().findMoveNumberOfNode(startNode);
+    int moveNumber = startNode.moveNumberOfNode();
     while (lane < laneUsageList.size() && laneUsageList.get(lane) <= moveNumber + depth) {
       // laneUsageList keeps a list of how far down it is to a variation in the different "lanes"
       laneUsageList.set(lane, moveNumber - 1);
@@ -203,11 +200,7 @@ public class VariationTree {
 
     // Is current move a variation? If so, find top of variation
     BoardHistoryNode top = curMove.findTop();
-    int curposy =
-        middleY
-            - YSPACING
-                * top.findMoveNumberOfNode(
-                    curMove); // (curMove.getData().moveNumber - top.getData().moveNumber);
+    int curposy = middleY - YSPACING * top.depthOfNode(curMove);
     // Go to very top of tree (visible in assigned area)
     BoardHistoryNode node = top;
     while (curposy > posy + YSPACING && node.previous().isPresent()) {

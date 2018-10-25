@@ -328,11 +328,11 @@ public class BoardHistoryNode {
   }
 
   /**
-   * Given a child node, find the move number of that child node in it's parent
+   * Given a child node, find the depth of that child node in it's parent
    *
-   * @return index of child node, -1 if child node not a child of parent
+   * @return depth of child node, 0 if child node not a child of parent
    */
-  public int findMoveNumberOfNode(BoardHistoryNode childNode) {
+  public int depthOfNode(BoardHistoryNode childNode) {
     if (!next().isPresent()) {
       return 0;
     }
@@ -348,6 +348,25 @@ public class BoardHistoryNode {
       }
     }
     return 0;
+  }
+
+  /**
+   * The move number of that node in it's branch
+   *
+   * @return move number of node, 0 if node not a child of branch
+   */
+  public int moveNumberOfBranch() {
+    BoardHistoryNode top = findTop();
+    return top.getData().moveNumber + top.depthOfNode(this);
+  }
+
+  /**
+   * The move number of that node
+   *
+   * @return move number of node
+   */
+  public int moveNumberOfNode() {
+    return isMainTrunk() ? getData().moveNumber : moveNumberOfBranch();
   }
 
   /**
