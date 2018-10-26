@@ -89,7 +89,7 @@ public class VariationTree {
 
     // Draw all the nodes and lines in this lane (not variations)
     Color curcolor = g.getColor();
-    if (curposx > minposx) {
+    if (curposx > minposx && posy > 0) {
       if (startNode.previous().isPresent()) {
         if (Lizzie.config.showCommentNodeColor && !cur.getData().comment.isEmpty()) {
           g.setColor(Lizzie.config.commentNodeColor);
@@ -121,7 +121,7 @@ public class VariationTree {
     while (cur.next().isPresent() && posy + YSPACING < maxposy) {
       posy += YSPACING;
       cur = cur.next().get();
-      if (curposx > minposx) {
+      if (curposx > minposx && posy > 0) {
         if (Lizzie.config.showCommentNodeColor && !cur.getData().comment.isEmpty()) {
           g.setColor(Lizzie.config.commentNodeColor);
           g.fillOval(
