@@ -139,7 +139,7 @@ public class LizzieFrame extends JFrame {
     variationTree = new VariationTree();
     winrateGraph = new WinrateGraph();
 
-    setMinimumSize(new Dimension(640, 480));
+    setMinimumSize(new Dimension(640, 400));
     JSONArray windowSize = Lizzie.config.uiConfig.getJSONArray("window-size");
     setSize(windowSize.getInt(0), windowSize.getInt(1));
     setLocationRelativeTo(null); // Start centered, needs to be called *after* setSize...
@@ -1180,6 +1180,9 @@ public class LizzieFrame extends JFrame {
     }
     if (Lizzie.config.showSubBoard && subBoardRenderer.isInside(x, y)) {
       Lizzie.config.toggleLargeSubBoard();
+    }
+    if (Lizzie.config.showVariationGraph) {
+      variationTree.onClicked(x, y);
     }
     repaint();
   }
