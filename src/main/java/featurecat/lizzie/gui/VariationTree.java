@@ -15,6 +15,7 @@ public class VariationTree {
   private int RING_DIAM = 15;
 
   private ArrayList<Integer> laneUsageList;
+  private int laneCount = 0;
   private BoardHistoryNode curMove;
   private Rectangle area;
   private Point clickPoint;
@@ -47,7 +48,7 @@ public class VariationTree {
     int lane = startLane;
     // Figures out how far out too the right (which lane) we have to go not to collide with other
     // variations
-    int moveNumber = startNode.moveNumberOfNode();
+    int moveNumber = startNode.getData().moveNumber;
     while (lane < laneUsageList.size() && laneUsageList.get(lane) <= moveNumber + depth) {
       // laneUsageList keeps a list of how far down it is to a variation in the different "lanes"
       laneUsageList.set(lane, moveNumber - 1);
@@ -233,35 +234,18 @@ public class VariationTree {
 
     // Is current move a variation? If so, find top of variation
     BoardHistoryNode top = curMove.findTop();
-    int curposy = middleY - YSPACING * (curMove.moveNumberOfNode() - top.moveNumberOfNode());
+    int curposy = middleY - YSPACING * (curMove.getData().moveNumber - top.getData().moveNumber);
     // Go to very top of tree (visible in assigned area)
     BoardHistoryNode node = top;
     while (curposy > posy + YSPACING && node.previous().isPresent()) {
       node = node.previous().get();
       curposy -= YSPACING;
     }
-
-    // Main trunk
-    int lane = 0;
-    BoardHistoryNode next = node;
-    int nexty = curposy;
-    while (next.next().isPresent() && nexty + YSPACING < posy + height) {
-      nexty += YSPACING;
-      next = next.next().get();
-    }
-    // All the nodes in this variation
-    int maxlane = 0;
-    while (next.previous().isPresent() && next != node) {
-      next = next.previous().get();
-      // Each variation, uses recursion
-      maxlane = maxlane + next.numberOfChildren() - 1;
-      if (next.findIndexOfNode(curMove, true) > 0) {
-        lane = maxlane;
-      }
-    }
+    laneCount = 0;
+    int lane = getCurLane(node, curMove, curposy, posy + height, true);
     int startx = posx + xoffset;
-    if (((lane + 1) * XSPACING + xoffset - width) > 0) {
-      startx = startx - ((lane + 1) * XSPACING + xoffset - width);
+    if (((lane + 1) * XSPACING + xoffset + DOT_DIAM + strokeRadius - width) > 0) {
+      startx = startx - ((lane + 1) * XSPACING + xoffset + DOT_DIAM + strokeRadius - width);
     }
     return drawTree(g, startx, curposy, 0, posy + height, posx + strokeRadius, node, 0, true, calc);
   }
@@ -291,5 +275,34 @@ public class VariationTree {
       Optional<BoardHistoryNode> node = draw(null, area.x, area.y, area.width, area.height, true);
       node.ifPresent(n -> Lizzie.board.moveToAnyPosition(n));
     }
+  }
+
+  private int getCurLane(
+      BoardHistoryNode start, BoardHistoryNode curMove, int curposy, int maxy, boolean isMain) {
+    BoardHistoryNode next = start;
+    int nexty = curposy;
+    while (next.next().isPresent() && nexty + YSPACING < maxy) {
+      nexty += YSPACING;
+      next = next.next().get();
+    }
+    BoardHistoryNode end = isMain ? null : start;
+    while (next.previous().isPresent() && next != end) {
+      next = next.previous().get();
+      for (int i = 1; i < next.numberOfChildren(); i++) {
+        laneCount++;
+        if (next.findIndexOfNode(curMove, true) == i) {
+          return laneCount;
+        }
+        Optional<BoardHistoryNode> variation = next.getVariation(i);
+        if (variation.isPresent()) {
+          int subLane = getCurLane(variation.get(), curMove, nexty, maxy, false);
+          if (subLane > 0) {
+            return subLane;
+          }
+        }
+      }
+      nexty -= YSPACING;
+    }
+    return 0;
   }
 }

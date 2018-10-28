@@ -768,7 +768,7 @@ public class Board implements LeelazListener {
    * @return the list of candidate nodes
    */
   private List<BoardHistoryNode> branchCandidates(BoardHistoryNode node) {
-    int targetDepth = node.moveNumberOfNode();
+    int targetDepth = node.getData().moveNumber;
     Stream<BoardHistoryNode> nodes = singletonList(history.root()).stream();
     for (int i = 0; i < targetDepth; i++) {
       nodes = nodes.flatMap(n -> n.getVariations().stream());
