@@ -365,7 +365,7 @@ public class LizzieFrame extends JFrame {
       int boardX = (width - maxSize) / 2;
       int boardY = topInset + (height - topInset - maxSize) / 2 + 3;
 
-      int panelMargin = (int) (maxSize * 0.05);
+      int panelMargin = (int) (maxSize * 0.02);
 
       // captured stones
       int capx = leftInset;
