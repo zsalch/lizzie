@@ -369,6 +369,10 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         toggleShowDynamicKomi();
         break;
 
+      case VK_R:
+        Lizzie.frame.replayVariation();
+        break;
+
         // Use Ctrl+Num to switching multiple engine
       case VK_0:
       case VK_1:
