@@ -502,11 +502,11 @@ public class BoardRenderer {
         // playout information written
         if (moveNumberList[Board.getIndex(i, j)] > 0
             && (!branchOpt.isPresent() || !Lizzie.frame.isMouseOver(i, j))) {
-          if (lastMoveOpt.isPresent() && lastMoveOpt.get()[0] == i && lastMoveOpt.get()[1] == j)
+          if (lastMoveOpt.isPresent() && lastMoveOpt.get()[0] == i && lastMoveOpt.get()[1] == j) {
             g.setColor(Color.RED.brighter()); // stoneHere.isBlack() ? Color.RED.brighter() :
-          if (moveNumberList[Board.getIndex(i, j)] > maxBranchMoves()) continue;
-          // Color.BLUE.brighter());
-          else {
+            if (moveNumberList[Board.getIndex(i, j)] > maxBranchMoves()) continue;
+            // Color.BLUE.brighter());
+          } else {
             // Draw white letters on black stones nomally.
             // But use black letters for showing black moves without stones.
             boolean reverse = (moveNumberList[Board.getIndex(i, j)] > maxBranchMoves());

@@ -1455,9 +1455,9 @@ public class LizzieFrame extends JFrame {
           public void run() {
             for (int i = 1; i < replaySteps + 1; i++) {
               if (!isReplayVariation) break;
-              System.out.println("repaly move " + i);
+              // System.out.println("repaly move " + i);
               setDisplayedBranchLength(i);
-              Lizzie.frame.repaint();
+              repaint();
               try {
                 Thread.sleep(1000);
               } catch (InterruptedException e) {
