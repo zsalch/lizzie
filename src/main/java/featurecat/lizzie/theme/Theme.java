@@ -129,6 +129,11 @@ public class Theme {
     return getIntByKey("comment-font-size", 3);
   }
 
+  /** The size of the shadow */
+  public int nodeColorMode() {
+    return getIntByKey("node-color-mode", 0);
+  }
+
   /**
    * The background color of the comment panel
    *
