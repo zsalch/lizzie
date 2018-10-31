@@ -75,6 +75,7 @@ public class LizzieFrame extends JFrame {
     resourceBundle.getString("LizzieFrame.commands.keyW"),
     resourceBundle.getString("LizzieFrame.commands.keyCtrlW"),
     resourceBundle.getString("LizzieFrame.commands.keyG"),
+    resourceBundle.getString("LizzieFrame.commands.keyR"),
     resourceBundle.getString("LizzieFrame.commands.keyT"),
     resourceBundle.getString("LizzieFrame.commands.keyCtrlT"),
     resourceBundle.getString("LizzieFrame.commands.keyY"),
@@ -102,6 +103,7 @@ public class LizzieFrame extends JFrame {
   public int winRateGridLines = 3;
 
   private long lastAutosaveTime = System.currentTimeMillis();
+  private boolean isReplayVariation = false;
 
   // Save the player title
   private String playerTitle = "";
@@ -1206,7 +1208,11 @@ public class LizzieFrame extends JFrame {
     mouseOverCoordinate = outOfBoundCoordinate;
     Optional<int[]> coords = boardRenderer.convertScreenToCoordinates(x, y);
     coords.filter(c -> !isMouseOver(c[0], c[1])).ifPresent(c -> repaint());
-    coords.ifPresent(c -> mouseOverCoordinate = c);
+    coords.ifPresent(
+        c -> {
+          mouseOverCoordinate = c;
+          isReplayVariation = false;
+        });
   }
 
   public boolean isMouseOver(int x, int y) {
@@ -1441,5 +1447,36 @@ public class LizzieFrame extends JFrame {
     } else {
       return Color.WHITE;
     }
+  }
+
+  public void replayBranch() {
+    if (isReplayVariation) return;
+    int replaySteps = boardRenderer.getReplayBranch();
+    if (replaySteps <= 0) return; // Bad steps or no branch
+    int oriBranchLength = boardRenderer.getDisplayedBranchLength();
+    isReplayVariation = true;
+    if (Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
+    Runnable runnable =
+        new Runnable() {
+          public void run() {
+            for (int i = 1; i < replaySteps + 1; i++) {
+              if (!isReplayVariation) {
+                if (!Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
+                break;
+              }
+              setDisplayedBranchLength(i);
+              repaint();
+              try {
+                Thread.sleep(1000);
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+            }
+            boardRenderer.setDisplayedBranchLength(oriBranchLength);
+            isReplayVariation = false;
+          }
+        };
+    Thread thread = new Thread(runnable);
+    thread.start();
   }
 }
