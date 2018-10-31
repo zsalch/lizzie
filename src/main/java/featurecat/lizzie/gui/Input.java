@@ -314,6 +314,10 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         }
         break;
 
+      case VK_Y:
+        Lizzie.config.toggleNodeColorMode();
+        break;
+
       case VK_C:
         if (controlIsPressed(e)) {
           Lizzie.frame.copySgf();

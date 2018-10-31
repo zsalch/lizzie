@@ -73,9 +73,12 @@ public class LizzieFrame extends JFrame {
     resourceBundle.getString("LizzieFrame.commands.keyF"),
     resourceBundle.getString("LizzieFrame.commands.keyV"),
     resourceBundle.getString("LizzieFrame.commands.keyW"),
+    resourceBundle.getString("LizzieFrame.commands.keyCtrlW"),
     resourceBundle.getString("LizzieFrame.commands.keyG"),
-    resourceBundle.getString("LizzieFrame.commands.keyT"),
     resourceBundle.getString("LizzieFrame.commands.keyR"),
+    resourceBundle.getString("LizzieFrame.commands.keyT"),
+    resourceBundle.getString("LizzieFrame.commands.keyCtrlT"),
+    resourceBundle.getString("LizzieFrame.commands.keyY"),
     resourceBundle.getString("LizzieFrame.commands.keyHome"),
     resourceBundle.getString("LizzieFrame.commands.keyEnd"),
     resourceBundle.getString("LizzieFrame.commands.keyControl"),
@@ -871,7 +874,7 @@ public class LizzieFrame extends JFrame {
     Graphics2D g = cachedImage.createGraphics();
 
     int maxSize = min(getWidth(), getHeight());
-    Font font = new Font(Lizzie.config.fontName, Font.PLAIN, (int) (maxSize * 0.034));
+    Font font = new Font(Lizzie.config.fontName, Font.PLAIN, (int) (maxSize * 0.03));
     g.setFont(font);
 
     FontMetrics metrics = g.getFontMetrics(font);
@@ -1427,6 +1430,10 @@ public class LizzieFrame extends JFrame {
   }
 
   public Color getBlunderNodeColor(BoardHistoryNode node) {
+    if (Lizzie.config.nodeColorMode == 1 && node.getData().blackToPlay
+        || Lizzie.config.nodeColorMode == 2 && !node.getData().blackToPlay) {
+      return Color.WHITE;
+    }
     double diffWinrate = lastWinrateDiff(node);
     Optional<Double> st =
         diffWinrate >= 0

@@ -64,6 +64,7 @@ public class Config {
   public Color commentNodeColor = null;
   public Optional<List<Double>> blunderWinrateThresholds;
   public Optional<Map<Double, Color>> blunderNodeColors;
+  public int nodeColorMode = 0;
 
   private JSONObject loadAndMergeConfig(
       JSONObject defaultCfg, String fileName, boolean needValidation) throws IOException {
@@ -184,6 +185,7 @@ public class Config {
     commentNodeColor = theme.commentNodeColor();
     blunderWinrateThresholds = theme.blunderWinrateThresholds();
     blunderNodeColors = theme.blunderNodeColors();
+    nodeColorMode = theme.nodeColorMode();
   }
 
   // Modifies config by adding in values from default_config that are missing.
@@ -222,6 +224,10 @@ public class Config {
     } else {
       this.showMoveNumber = !this.showMoveNumber;
     }
+  }
+
+  public void toggleNodeColorMode() {
+    this.nodeColorMode = this.nodeColorMode > 1 ? 0 : this.nodeColorMode + 1;
   }
 
   public void toggleShowBranch() {
