@@ -11,7 +11,7 @@ public class VariationTree {
   private int YSPACING;
   private int XSPACING;
   private int DOT_DIAM = 11; // Should be odd number
-  private int DOT_DIAM_S = 9; // Should be odd number
+  private int DOT_DIAM_S = 9; // For small node
   private int CENTER_DIAM = 5;
   private int RING_DIAM = 15;
   private int diam = DOT_DIAM;
