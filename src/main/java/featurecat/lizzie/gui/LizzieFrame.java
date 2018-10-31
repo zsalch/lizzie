@@ -103,6 +103,7 @@ public class LizzieFrame extends JFrame {
   public int winRateGridLines = 3;
 
   private long lastAutosaveTime = System.currentTimeMillis();
+  private boolean isReplayVariation = false;
 
   // Save the player title
   private String playerTitle = "";
@@ -1448,9 +1449,7 @@ public class LizzieFrame extends JFrame {
     }
   }
 
-  boolean isReplayVariation = false;
-
-  public void replayVariation() {
+  public void replayBranch() {
     if (isReplayVariation) return;
     int replaySteps = boardRenderer.getReplayBranch();
     if (replaySteps <= 0) return; // Bad steps or no branch
@@ -1460,19 +1459,20 @@ public class LizzieFrame extends JFrame {
     Runnable runnable =
         new Runnable() {
           public void run() {
+            int secs = (int)(Lizzie.config.repalyBranchIntervalSeconds*1000);
             for (int i = 1; i < replaySteps + 1; i++) {
               if (!isReplayVariation) break;
-              // System.out.println("repaly move " + i);
               setDisplayedBranchLength(i);
               repaint();
               try {
-                Thread.sleep(1000);
+                Thread.sleep(secs);
               } catch (InterruptedException e) {
                 e.printStackTrace();
               }
             }
             boardRenderer.setDisplayedBranchLength(oriBranchLength);
             isReplayVariation = false;
+            if (!Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
           }
         };
     Thread thread = new Thread(runnable);

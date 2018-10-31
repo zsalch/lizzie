@@ -374,7 +374,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         break;
 
       case VK_R:
-        Lizzie.frame.replayVariation();
+        Lizzie.frame.replayBranch();
         break;
 
         // Use Ctrl+Num to switching multiple engine
