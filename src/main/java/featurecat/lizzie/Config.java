@@ -28,6 +28,7 @@ public class Config {
   public boolean showCaptured = true;
   public boolean handicapInsteadOfWinrate = false;
   public boolean showDynamicKomi = true;
+  public double repalyBranchIntervalSeconds = 1.0;
 
   public boolean showStatus = true;
   public boolean showBranch = true;
@@ -167,6 +168,7 @@ public class Config {
     startMaximized = uiConfig.getBoolean("window-maximized");
     showDynamicKomi = uiConfig.getBoolean("show-dynamic-komi");
     appendWinrateToComment = uiConfig.optBoolean("append-winrate-to-comment");
+    repalyBranchIntervalSeconds = uiConfig.optDouble("repaly-branch-interval-seconds", 1.0);
 
     winrateStrokeWidth = theme.winrateStrokeWidth();
     minimumBlunderBarWidth = theme.minimumBlunderBarWidth();

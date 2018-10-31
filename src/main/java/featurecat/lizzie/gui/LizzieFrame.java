@@ -1459,21 +1459,20 @@ public class LizzieFrame extends JFrame {
     Runnable runnable =
         new Runnable() {
           public void run() {
+            int secs = (int)(Lizzie.config.repalyBranchIntervalSeconds*1000);
             for (int i = 1; i < replaySteps + 1; i++) {
-              if (!isReplayVariation) {
-                if (!Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
-                break;
-              }
+              if (!isReplayVariation) break;
               setDisplayedBranchLength(i);
               repaint();
               try {
-                Thread.sleep(1000);
+                Thread.sleep(secs);
               } catch (InterruptedException e) {
                 e.printStackTrace();
               }
             }
             boardRenderer.setDisplayedBranchLength(oriBranchLength);
             isReplayVariation = false;
+            if (!Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
           }
         };
     Thread thread = new Thread(runnable);
