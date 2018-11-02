@@ -17,6 +17,7 @@ public class Config {
 
   public boolean showMoveNumber = false;
   public int onlyLastMoveNumber = 0;
+  public boolean newMoveNubmerInBranch = true;
   public boolean showWinrate = true;
   public boolean largeWinrate = false;
   public boolean showBlunderBar = true;
@@ -29,6 +30,7 @@ public class Config {
   public boolean handicapInsteadOfWinrate = false;
   public boolean showDynamicKomi = true;
   public double repalyBranchIntervalSeconds = 1.0;
+  public boolean showCoordinates = false;
 
   public boolean showStatus = true;
   public boolean showBranch = true;
@@ -150,6 +152,7 @@ public class Config {
 
     showMoveNumber = uiConfig.getBoolean("show-move-number");
     onlyLastMoveNumber = uiConfig.optInt("only-last-move-number", 9999);
+    newMoveNubmerInBranch = uiConfig.optBoolean("new-move-number-in-branch", true);
     showStatus = uiConfig.getBoolean("show-status");
     showBranch = uiConfig.getBoolean("show-leelaz-variation");
     showWinrate = uiConfig.getBoolean("show-winrate");
@@ -167,6 +170,7 @@ public class Config {
     handicapInsteadOfWinrate = uiConfig.getBoolean("handicap-instead-of-winrate");
     startMaximized = uiConfig.getBoolean("window-maximized");
     showDynamicKomi = uiConfig.getBoolean("show-dynamic-komi");
+    showCoordinates = uiConfig.optBoolean("show-coordinates");
     appendWinrateToComment = uiConfig.optBoolean("append-winrate-to-comment");
     repalyBranchIntervalSeconds = uiConfig.optDouble("repaly-branch-interval-seconds", 1.0);
 
@@ -270,6 +274,10 @@ public class Config {
 
   public void toggleLargeSubBoard() {
     this.largeSubBoard = !this.largeSubBoard;
+  }
+
+  public void toggleCoordinates() {
+    showCoordinates = !showCoordinates;
   }
 
   public boolean showLargeSubBoard() {
