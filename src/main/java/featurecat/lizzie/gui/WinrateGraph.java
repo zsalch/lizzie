@@ -120,7 +120,6 @@ public class WinrateGraph {
     }
 
     while (node.previous().isPresent()) {
-      BoardHistoryNode previous = node.previous().get();
       double wr = node.getData().winrate;
       int playouts = node.getData().playouts;
       if (node == curMove) {
@@ -211,6 +210,7 @@ public class WinrateGraph {
           while (node.next().isPresent()) {
             node = node.next().get();
           }
+          movenum = node.getData().moveNumber - 1;
           lastWr = node.getData().winrate;
           if (!node.getData().blackToPlay) lastWr = 100 - lastWr;
           g.setStroke(new BasicStroke(3));
@@ -225,7 +225,7 @@ public class WinrateGraph {
         lastNodeOk = false;
       }
 
-      node = previous;
+      node = node.previous().get();
       movenum--;
     }
 
