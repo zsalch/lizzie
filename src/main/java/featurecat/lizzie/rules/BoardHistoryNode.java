@@ -1,5 +1,6 @@
 package featurecat.lizzie.rules;
 
+import featurecat.lizzie.Lizzie;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -87,6 +88,16 @@ public class BoardHistoryNode {
           return variations.get(i);
         }
       }
+    }
+    if (Lizzie.config.newMoveNubmerInBranch && !variations.isEmpty()) {
+      if (!newBranch) {
+        data.moveNumberList = new int[Board.boardSize * Board.boardSize];
+      }
+      if (data.moveMNNumber == -1) {
+        data.moveMNNumber = data.dummy ? 0 : 1;
+      }
+      data.lastMove.ifPresent(
+          m -> data.moveNumberList[Board.getIndex(m[0], m[1])] = data.moveMNNumber);
     }
     BoardHistoryNode node = new BoardHistoryNode(data);
     // Add node
@@ -304,6 +315,69 @@ public class BoardHistoryNode {
       }
     }
     return -1;
+  }
+
+  /**
+   * Given a child node, find the index of that child node in it's parent
+   *
+   * @return index of child node, -1 if child node not a child of parent
+   */
+  public int findIndexOfNode(BoardHistoryNode childNode, boolean allSub) {
+    if (!next().isPresent()) {
+      return -1;
+    }
+    for (int i = 0; i < numberOfChildren(); i++) {
+      Optional<BoardHistoryNode> node = getVariation(i);
+      while (node.isPresent()) {
+        if (node.map(n -> n == childNode).orElse(false)) {
+          return i;
+        }
+        node = node.get().next();
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * Given a child node, find the depth of that child node in it's parent
+   *
+   * @return depth of child node, 0 if child node not a child of parent
+   */
+  public int depthOfNode(BoardHistoryNode childNode) {
+    if (!next().isPresent()) {
+      return 0;
+    }
+    for (int i = 0; i < numberOfChildren(); i++) {
+      Optional<BoardHistoryNode> node = getVariation(i);
+      int move = 1;
+      while (node.isPresent()) {
+        if (node.map(n -> n == childNode).orElse(false)) {
+          return move;
+        }
+        move++;
+        node = node.get().next();
+      }
+    }
+    return 0;
+  }
+
+  /**
+   * The move number of that node in it's branch
+   *
+   * @return move number of node, 0 if node not a child of branch
+   */
+  public int moveNumberOfBranch() {
+    Optional<BoardHistoryNode> top = firstParentWithVariations();
+    return top.isPresent() ? top.get().moveNumberOfNode() + top.get().depthOfNode(this) : 0;
+  }
+
+  /**
+   * The move number of that node
+   *
+   * @return move number of node
+   */
+  public int moveNumberOfNode() {
+    return isMainTrunk() ? getData().moveNumber : moveNumberOfBranch();
   }
 
   /**
