@@ -12,6 +12,7 @@ import featurecat.lizzie.analysis.GameInfo;
 import featurecat.lizzie.analysis.Leelaz;
 import featurecat.lizzie.rules.Board;
 import featurecat.lizzie.rules.BoardData;
+import featurecat.lizzie.rules.BoardHistoryNode;
 import featurecat.lizzie.rules.GIBParser;
 import featurecat.lizzie.rules.SGFParser;
 import java.awt.*;
@@ -72,8 +73,11 @@ public class LizzieFrame extends JFrame {
     resourceBundle.getString("LizzieFrame.commands.keyF"),
     resourceBundle.getString("LizzieFrame.commands.keyV"),
     resourceBundle.getString("LizzieFrame.commands.keyW"),
+    resourceBundle.getString("LizzieFrame.commands.keyCtrlW"),
     resourceBundle.getString("LizzieFrame.commands.keyG"),
     resourceBundle.getString("LizzieFrame.commands.keyT"),
+    resourceBundle.getString("LizzieFrame.commands.keyCtrlT"),
+    resourceBundle.getString("LizzieFrame.commands.keyY"),
     resourceBundle.getString("LizzieFrame.commands.keyHome"),
     resourceBundle.getString("LizzieFrame.commands.keyEnd"),
     resourceBundle.getString("LizzieFrame.commands.keyControl"),
@@ -869,7 +873,7 @@ public class LizzieFrame extends JFrame {
     Graphics2D g = cachedImage.createGraphics();
 
     int maxSize = min(getWidth(), getHeight());
-    Font font = new Font(Lizzie.config.fontName, Font.PLAIN, (int) (maxSize * 0.034));
+    Font font = new Font(Lizzie.config.fontName, Font.PLAIN, (int) (maxSize * 0.03));
     g.setFont(font);
 
     FontMetrics metrics = g.getFontMetrics(font);
@@ -1383,5 +1387,56 @@ public class LizzieFrame extends JFrame {
         commentRect.height,
         null);
     cachedComment = comment;
+  }
+
+  public double lastWinrateDiff(BoardHistoryNode node) {
+
+    // Last winrate
+    BoardData lastData = node.previous().get().getData();
+    boolean validLastWinrate = (lastData != null && lastData.playouts > 0);
+    double lastWR = validLastWinrate ? lastData.winrate : 50;
+
+    // Current winrate
+    BoardData data = node.getData();
+    boolean validWinrate = false;
+    double curWR = 50;
+    if (data == Lizzie.board.getHistory().getData()) {
+      Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
+      curWR = stats.maxWinrate;
+      validWinrate = (stats.totalPlayouts > 0);
+      if (isPlayingAgainstLeelaz
+          && playerIsBlack == !Lizzie.board.getHistory().getData().blackToPlay) {
+        validWinrate = false;
+      }
+    } else {
+      validWinrate = (data.playouts > 0);
+      curWR = validWinrate ? data.winrate : 100 - lastWR;
+    }
+
+    // Last move difference winrate
+    if (validLastWinrate && validWinrate) {
+      return 100 - lastWR - curWR;
+    } else {
+      return 0;
+    }
+  }
+
+  public Color getBlunderNodeColor(BoardHistoryNode node) {
+    if (Lizzie.config.nodeColorMode == 1 && node.getData().blackToPlay
+        || Lizzie.config.nodeColorMode == 2 && !node.getData().blackToPlay) {
+      return Color.WHITE;
+    }
+    double diffWinrate = lastWinrateDiff(node);
+    Optional<Double> st =
+        diffWinrate >= 0
+            ? Lizzie.config.blunderWinrateThresholds.flatMap(
+                l -> l.stream().filter(t -> (t > 0 && t <= diffWinrate)).reduce((f, s) -> s))
+            : Lizzie.config.blunderWinrateThresholds.flatMap(
+                l -> l.stream().filter(t -> (t < 0 && t >= diffWinrate)).reduce((f, s) -> f));
+    if (st.isPresent()) {
+      return Lizzie.config.blunderNodeColors.map(m -> m.get(st.get())).get();
+    } else {
+      return Color.WHITE;
+    }
   }
 }
