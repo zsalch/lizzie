@@ -89,10 +89,12 @@ public class BoardHistoryNode {
         }
       }
     }
-    if (Lizzie.config.newMoveNubmerInBranch && !newBranch && !variations.isEmpty()) {
-      data.moveNumberList = new int[Board.boardSize * Board.boardSize];
+    if (Lizzie.config.newMoveNubmerInBranch && !variations.isEmpty()) {
+      if (!newBranch) {
+        data.moveNumberList = new int[Board.boardSize * Board.boardSize];
+      }
       if (data.moveMNNumber == -1) {
-        data.moveMNNumber = 1;
+        data.moveMNNumber = data.dummy ? 0 : 1;
       }
       data.lastMove.ifPresent(
           m -> data.moveNumberList[Board.getIndex(m[0], m[1])] = data.moveMNNumber);
