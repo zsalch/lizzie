@@ -191,13 +191,10 @@ public class BoardHistoryList {
 
   public boolean violatesKoRule(BoardData data) {
     // check if the current position is identical to the position two moves ago
-    if (head.previous().isPresent()) {
-      return this.head
-          .previous()
-          .map(p -> p != null && data.zobrist.equals(p.getData().zobrist))
-          .orElse(false);
-    }
-    return false;
+    return this.head
+        .previous()
+        .map(p -> p != null && data.zobrist.equals(p.getData().zobrist))
+        .orElse(false);
   }
 
   /**
