@@ -1454,7 +1454,7 @@ public class LizzieFrame extends JFrame {
     Runnable runnable =
         new Runnable() {
           public void run() {
-            int secs = (int) (Lizzie.config.repalyBranchIntervalSeconds * 1000);
+            int secs = (int) (Lizzie.config.replayBranchIntervalSeconds * 1000);
             for (int i = 1; i < replaySteps + 1; i++) {
               if (!isReplayVariation) break;
               setDisplayedBranchLength(i);

@@ -29,7 +29,7 @@ public class Config {
   public boolean showCaptured = true;
   public boolean handicapInsteadOfWinrate = false;
   public boolean showDynamicKomi = true;
-  public double repalyBranchIntervalSeconds = 1.0;
+  public double replayBranchIntervalSeconds = 1.0;
   public boolean showCoordinates = false;
 
   public boolean showStatus = true;
@@ -172,7 +172,7 @@ public class Config {
     showDynamicKomi = uiConfig.getBoolean("show-dynamic-komi");
     showCoordinates = uiConfig.optBoolean("show-coordinates");
     appendWinrateToComment = uiConfig.optBoolean("append-winrate-to-comment");
-    repalyBranchIntervalSeconds = uiConfig.optDouble("repaly-branch-interval-seconds", 1.0);
+    replayBranchIntervalSeconds = uiConfig.optDouble("replay-branch-interval-seconds", 1.0);
 
     winrateStrokeWidth = theme.winrateStrokeWidth();
     minimumBlunderBarWidth = theme.minimumBlunderBarWidth();
