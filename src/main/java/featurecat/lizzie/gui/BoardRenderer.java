@@ -692,7 +692,7 @@ public class BoardRenderer {
         cachedBoardImage = Lizzie.config.theme.board();
       }
 
-      int shadowRadius = (int) (boardLength * MARGIN / 6);
+      int shadowRadius = Lizzie.config.showBorder ? (int) (boardLength * MARGIN / 6) : 0;
       drawTextureImage(
           g,
           cachedBoardImage,
@@ -701,15 +701,16 @@ public class BoardRenderer {
           boardLength + 4 * shadowRadius,
           boardLength + 4 * shadowRadius);
 
-      g.setStroke(new BasicStroke(shadowRadius * 2));
-
-      // draw border
-      g.setColor(new Color(0, 0, 0, 50));
-      g.drawRect(
-          x - shadowRadius,
-          y - shadowRadius,
-          boardLength + 2 * shadowRadius,
-          boardLength + 2 * shadowRadius);
+      if (Lizzie.config.showBorder) {
+        g.setStroke(new BasicStroke(shadowRadius * 2));
+        // draw border
+        g.setColor(new Color(0, 0, 0, 50));
+        g.drawRect(
+            x - shadowRadius,
+            y - shadowRadius,
+            boardLength + 2 * shadowRadius,
+            boardLength + 2 * shadowRadius);
+      }
       g.setStroke(new BasicStroke(1));
 
     } else {

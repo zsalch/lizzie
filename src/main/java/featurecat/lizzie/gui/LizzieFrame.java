@@ -367,7 +367,7 @@ public class LizzieFrame extends JFrame {
       int maxSize = (int) (min(width, height - topInset));
       maxSize = max(maxSize, Board.boardSize + 5); // don't let maxWidth become too small
       int boardX = (width - maxSize) / 2;
-      int boardY = topInset + (height - topInset - maxSize) / 2 + 3;
+      int boardY = topInset + (height - topInset - maxSize) / 2;
 
       int panelMargin = (int) (maxSize * 0.02);
 
@@ -414,11 +414,11 @@ public class LizzieFrame extends JFrame {
       int loadingY = ponderingY - (int) (maxBound * (loadingSize - ponderingSize));
 
       // subboard
-      int subBoardX = statx;
       int subBoardY = gry + grh;
       int subBoardWidth = grw;
       int subBoardHeight = ponderingY - subBoardY;
       int subBoardLength = min(subBoardWidth, subBoardHeight);
+      int subBoardX = statx + (statw - subBoardLength) / 2;
 
       if (width >= height) {
         // Landscape mode
@@ -449,6 +449,7 @@ public class LizzieFrame extends JFrame {
           subBoardWidth = spaceW;
           subBoardHeight = ponderingY - subBoardY;
           subBoardLength = Math.min(subBoardWidth, subBoardHeight);
+          subBoardX = statx + (statw + vw - subBoardLength) / 2;
         } else if (Lizzie.config.showLargeWinrate()) {
           boardX = width - maxSize - panelMargin;
           int spaceW = boardX - panelMargin;
@@ -477,6 +478,7 @@ public class LizzieFrame extends JFrame {
           subBoardWidth = panelW - leftInset;
           subBoardHeight = panelH;
           subBoardLength = Math.min(subBoardWidth, subBoardHeight);
+          subBoardX = statx + (vx - subBoardLength) / 2;
         }
       } else {
         // Portrait mode
@@ -939,7 +941,7 @@ public class LizzieFrame extends JFrame {
 
     Font font = new Font(Lizzie.config.fontName, Font.PLAIN, (int) (maxSize * 0.03));
     String commandString = resourceBundle.getString("LizzieFrame.prompt.showControlsHint");
-    int strokeRadius = 2;
+    int strokeRadius = Lizzie.config.showBorder ? 2 : 0;
 
     int showCommandsHeight = (int) (font.getSize() * 1.1);
     int showCommandsWidth = g.getFontMetrics(font).stringWidth(commandString) + 4 * strokeRadius;
@@ -947,13 +949,15 @@ public class LizzieFrame extends JFrame {
     int showCommandsY = getHeight() - showCommandsHeight - this.getInsets().bottom;
     g.setColor(new Color(0, 0, 0, 130));
     g.fillRect(showCommandsX, showCommandsY, showCommandsWidth, showCommandsHeight);
-    g.setStroke(new BasicStroke(2 * strokeRadius));
-    g.setColor(new Color(0, 0, 0, 60));
-    g.drawRect(
-        showCommandsX + strokeRadius,
-        showCommandsY + strokeRadius,
-        showCommandsWidth - 2 * strokeRadius,
-        showCommandsHeight - 2 * strokeRadius);
+    if (Lizzie.config.showBorder) {
+      g.setStroke(new BasicStroke(2 * strokeRadius));
+      g.setColor(new Color(0, 0, 0, 60));
+      g.drawRect(
+          showCommandsX + strokeRadius,
+          showCommandsY + strokeRadius,
+          showCommandsWidth - 2 * strokeRadius,
+          showCommandsHeight - 2 * strokeRadius);
+    }
     g.setStroke(new BasicStroke(1));
 
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -998,17 +1002,19 @@ public class LizzieFrame extends JFrame {
     g.fillRect(posX, posY, width, height);
 
     // border. does not include bottom edge
-    int strokeRadius = 3;
-    g.setStroke(new BasicStroke(2 * strokeRadius));
+    int strokeRadius = Lizzie.config.showBorder ? 3 : 1;
+    g.setStroke(new BasicStroke(strokeRadius == 1 ? strokeRadius : 2 * strokeRadius));
     g.drawLine(
         posX + strokeRadius, posY + strokeRadius,
         posX - strokeRadius + width, posY + strokeRadius);
-    g.drawLine(
-        posX + strokeRadius, posY + 3 * strokeRadius,
-        posX + strokeRadius, posY - strokeRadius + height);
-    g.drawLine(
-        posX - strokeRadius + width, posY + 3 * strokeRadius,
-        posX - strokeRadius + width, posY - strokeRadius + height);
+    if (Lizzie.config.showBorder) {
+      g.drawLine(
+          posX + strokeRadius, posY + 3 * strokeRadius,
+          posX + strokeRadius, posY - strokeRadius + height);
+      g.drawLine(
+          posX - strokeRadius + width, posY + 3 * strokeRadius,
+          posX - strokeRadius + width, posY - strokeRadius + height);
+    }
 
     // resize the box now so it's inside the border
     posX += 2 * strokeRadius;
@@ -1091,20 +1097,25 @@ public class LizzieFrame extends JFrame {
     g.fillRect(posX, posY, width, height);
 
     // border. does not include bottom edge
-    int strokeRadius = 3;
-    g.setStroke(new BasicStroke(2 * strokeRadius));
-    g.drawLine(
-        posX + strokeRadius, posY + strokeRadius, posX - strokeRadius + width, posY + strokeRadius);
-    g.drawLine(
-        posX + strokeRadius,
-        posY + 3 * strokeRadius,
-        posX + strokeRadius,
-        posY - strokeRadius + height);
-    g.drawLine(
-        posX - strokeRadius + width,
-        posY + 3 * strokeRadius,
-        posX - strokeRadius + width,
-        posY - strokeRadius + height);
+    int strokeRadius = Lizzie.config.showBorder ? 3 : 1;
+    g.setStroke(new BasicStroke(strokeRadius == 1 ? strokeRadius : 2 * strokeRadius));
+    if (Lizzie.config.showBorder) {
+      g.drawLine(
+          posX + strokeRadius,
+          posY + strokeRadius,
+          posX - strokeRadius + width,
+          posY + strokeRadius);
+      g.drawLine(
+          posX + strokeRadius,
+          posY + 3 * strokeRadius,
+          posX + strokeRadius,
+          posY - strokeRadius + height);
+      g.drawLine(
+          posX - strokeRadius + width,
+          posY + 3 * strokeRadius,
+          posX - strokeRadius + width,
+          posY - strokeRadius + height);
+    }
 
     // Draw middle line
     g.drawLine(
