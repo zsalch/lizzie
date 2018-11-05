@@ -274,7 +274,11 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         break;
 
       case VK_HOME:
-        while (Lizzie.board.previousMove()) ;
+        if (controlIsPressed(e)) {
+          Lizzie.board.clear();
+        } else {
+          while (Lizzie.board.previousMove()) ;
+        }
         break;
 
       case VK_END:
