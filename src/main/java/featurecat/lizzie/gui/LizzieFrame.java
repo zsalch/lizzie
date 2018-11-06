@@ -888,7 +888,8 @@ public class LizzieFrame extends JFrame {
     Graphics2D g = cachedImage.createGraphics();
 
     int maxSize = min(getWidth(), getHeight());
-    Font font = new Font(Lizzie.config.fontName, Font.PLAIN, (int) (maxSize * 0.03));
+    int fontSize = (int) (maxSize * min(0.03, 0.86 / commandsToShow.size()));
+    Font font = new Font(Lizzie.config.fontName, Font.PLAIN, fontSize);
     g.setFont(font);
 
     FontMetrics metrics = g.getFontMetrics(font);
@@ -899,7 +900,8 @@ public class LizzieFrame extends JFrame {
     int boxHeight = min(commandsToShow.size() * lineHeight, getHeight());
 
     int commandsX = min(getWidth() / 2 - boxWidth / 2, getWidth());
-    int commandsY = min(getHeight() / 2 - boxHeight / 2, getHeight());
+    int top = this.getInsets().top;
+    int commandsY = top + min((getHeight() - top) / 2 - boxHeight / 2, getHeight() - top);
 
     BufferedImage result = new BufferedImage(boxWidth, boxHeight, TYPE_INT_ARGB);
     filter10.filter(
@@ -908,15 +910,16 @@ public class LizzieFrame extends JFrame {
 
     g.setColor(new Color(0, 0, 0, 130));
     g.fillRect(commandsX, commandsY, boxWidth, boxHeight);
-    int strokeRadius = 2;
-    g.setStroke(new BasicStroke(2 * strokeRadius));
-    g.setColor(new Color(0, 0, 0, 60));
-    g.drawRect(
-        commandsX + strokeRadius,
-        commandsY + strokeRadius,
-        boxWidth - 2 * strokeRadius,
-        boxHeight - 2 * strokeRadius);
-
+    int strokeRadius = Lizzie.config.showBorder ? 2 : 1;
+    g.setStroke(new BasicStroke(strokeRadius == 1 ? strokeRadius : 2 * strokeRadius));
+    if (Lizzie.config.showBorder) {
+      g.setColor(new Color(0, 0, 0, 60));
+      g.drawRect(
+          commandsX + strokeRadius,
+          commandsY + strokeRadius,
+          boxWidth - 2 * strokeRadius,
+          boxHeight - 2 * strokeRadius);
+    }
     int verticalLineX = (int) (commandsX + boxWidth * 0.3);
     g.setColor(new Color(0, 0, 0, 60));
     g.drawLine(
