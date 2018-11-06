@@ -609,43 +609,35 @@ public class LizzieFrame extends JFrame {
         }
       }
 
-      // comment panel
-      int cx = 0, cy = 0, cw = 0, ch = 0;
-      if (Lizzie.config.showComment) {
-        if (width >= height) {
-          cx = vx;
-          if (Lizzie.config.showVariationGraph) {
-            vh = vh / 2;
-            cy = vy + vh;
-            ch = vh;
-          } else {
-            cy = topInset;
-            ch = vh - topInset;
-          }
-        } else {
-          cy = vy;
-          if (Lizzie.config.showVariationGraph) {
-            if (Lizzie.config.showLargeSubBoard()) {
-              vh = vh / 2;
-              cx = vx;
-              cy = vy + vh;
-            } else {
-              vw = vw / 2;
-              cx = vx + vw;
-            }
-          } else {
-            cx = vx;
-          }
-          ch = vh;
-        }
-        cw = vw;
-      }
-
       // variation tree
       int treex = vx;
       int treey = vy;
       int treew = vw;
       int treeh = vh;
+
+      // comment panel
+      int cx = vx, cy = vy, cw = vw, ch = vh;
+      if (Lizzie.config.showComment) {
+        if (width >= height) {
+          if (Lizzie.config.showVariationGraph) {
+            treeh = vh / 2;
+            cy = vy + treeh;
+            ch = treeh;
+          }
+        } else {
+          if (Lizzie.config.showVariationGraph) {
+            if (Lizzie.config.showLargeSubBoard()) {
+              treeh = vh / 2;
+              cy = vy + treeh;
+              ch = treeh;
+            } else {
+              treew = vw / 2;
+              cx = vx + treew;
+              cw = treew;
+            }
+          }
+        }
+      }
 
       // initialize
 
@@ -686,16 +678,16 @@ public class LizzieFrame extends JFrame {
           winrateGraph.draw(g, grx, gry, grw, grh);
         }
 
-        if (Lizzie.config.showVariationGraph) {
+        if (Lizzie.config.showVariationGraph || Lizzie.config.showComment) {
           if (backgroundG.isPresent()) {
             drawContainer(backgroundG.get(), vx, vy, vw, vh);
           }
-          variationTree.draw(g, treex, treey, treew, treeh);
-        }
-
-        if (Lizzie.config.showComment) {
-          // Draw the Comment of the Sgf
-          drawComment(g, cx, cy, cw, ch);
+          if (Lizzie.config.showVariationGraph) {
+            variationTree.draw(g, treex, treey, treew, treeh);
+          }
+          if (Lizzie.config.showComment) {
+            drawComment(g, cx, cy, cw, ch);
+          }
         }
 
         if (Lizzie.config.showSubBoard) {
