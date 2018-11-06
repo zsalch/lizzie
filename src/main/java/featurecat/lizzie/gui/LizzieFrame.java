@@ -888,7 +888,7 @@ public class LizzieFrame extends JFrame {
     Graphics2D g = cachedImage.createGraphics();
 
     int maxSize = min(getWidth(), getHeight());
-    int fontSize = (int) (maxSize * min(0.03, 0.86 / commandsToShow.size()));
+    int fontSize = (int) (maxSize * min(0.034, 0.86 / commandsToShow.size()));
     Font font = new Font(Lizzie.config.fontName, Font.PLAIN, fontSize);
     g.setFont(font);
 
