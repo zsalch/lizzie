@@ -468,7 +468,7 @@ public class BoardHistoryNode {
     return Optional.empty();
   }
 
-  public int getNextNodeWithCommentMoves() {
+  public int goToNextNodeWithComment() {
     BoardHistoryNode node = this;
     int moves = 0;
     while (node.next().isPresent()) {
@@ -482,7 +482,7 @@ public class BoardHistoryNode {
     return moves;
   }
 
-  public int getPreviousNodeWithCommentMoves() {
+  public int goToPreviousNodeWithComment() {
     BoardHistoryNode node = this;
     int moves = 0;
     while (node.previous().isPresent()) {
