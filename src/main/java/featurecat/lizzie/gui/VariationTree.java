@@ -17,7 +17,6 @@ public class VariationTree {
   private int diam = DOT_DIAM;
 
   private ArrayList<Integer> laneUsageList;
-  private int laneCount = 0;
   private BoardHistoryNode curMove;
   private Rectangle area;
   private Point clickPoint;
@@ -194,8 +193,7 @@ public class VariationTree {
     // Now we have drawn all the nodes in this variation, and has reached the bottom of this
     // variation
     // Move back up, and for each, draw any variations we find
-    BoardHistoryNode end = isMain ? null : startNode;
-    while (cur.previous().isPresent() && cur != end) {
+    while (cur.previous().isPresent() && (isMain || cur != startNode)) {
       cur = cur.previous().get();
       int curwidth = lane;
       // Draw each variation, uses recursion
@@ -265,8 +263,7 @@ public class VariationTree {
       node = node.previous().get();
       curposy -= YSPACING;
     }
-    laneCount = 0;
-    int lane = getCurLane(node, curMove, curposy, posy + height, true);
+    int lane = getCurLane(node, curMove, curposy, posy + height, 0, true);
     int startx = posx + xoffset;
     if (((lane + 1) * XSPACING + xoffset + DOT_DIAM + strokeRadius - width) > 0) {
       startx = startx - ((lane + 1) * XSPACING + xoffset + DOT_DIAM + strokeRadius - width);
@@ -302,15 +299,19 @@ public class VariationTree {
   }
 
   private int getCurLane(
-      BoardHistoryNode start, BoardHistoryNode curMove, int curposy, int maxy, boolean isMain) {
+      BoardHistoryNode start,
+      BoardHistoryNode curMove,
+      int curposy,
+      int maxy,
+      int laneCount,
+      boolean isMain) {
     BoardHistoryNode next = start;
     int nexty = curposy;
     while (next.next().isPresent() && nexty + YSPACING < maxy) {
       nexty += YSPACING;
       next = next.next().get();
     }
-    BoardHistoryNode end = isMain ? null : start;
-    while (next.previous().isPresent() && next != end) {
+    while (next.previous().isPresent() && (isMain || next != start)) {
       next = next.previous().get();
       for (int i = 1; i < next.numberOfChildren(); i++) {
         laneCount++;
@@ -319,7 +320,7 @@ public class VariationTree {
         }
         Optional<BoardHistoryNode> variation = next.getVariation(i);
         if (variation.isPresent()) {
-          int subLane = getCurLane(variation.get(), curMove, nexty, maxy, false);
+          int subLane = getCurLane(variation.get(), curMove, nexty, maxy, laneCount, false);
           if (subLane > 0) {
             return subLane;
           }
