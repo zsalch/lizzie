@@ -444,6 +444,11 @@ public class BoardHistoryNode {
     return true;
   }
 
+  /**
+   * Finds the next node with the comment.
+   *
+   * @return the first next node with comment, if any, Optional.empty otherwise
+   */
   public Optional<BoardHistoryNode> findNextNodeWithComment() {
     BoardHistoryNode node = this;
     while (node.next().isPresent()) {
@@ -456,6 +461,11 @@ public class BoardHistoryNode {
     return Optional.empty();
   }
 
+  /**
+   * Finds the previous node with the comment.
+   *
+   * @return the first previous node with comment, if any, Optional.empty otherwise
+   */
   public Optional<BoardHistoryNode> findPreviousNodeWithComment() {
     BoardHistoryNode node = this;
     while (node.previous().isPresent()) {
@@ -468,6 +478,11 @@ public class BoardHistoryNode {
     return Optional.empty();
   }
 
+  /**
+   * Go to the next node with the comment.
+   *
+   * @return the move count to the next node with comment, 0 otherwise
+   */
   public int goToNextNodeWithComment() {
     BoardHistoryNode node = this;
     int moves = 0;
@@ -482,6 +497,11 @@ public class BoardHistoryNode {
     return moves;
   }
 
+  /**
+   * Go to the previous node with the comment.
+   *
+   * @return the move count to the previous node with comment, 0 otherwise
+   */
   public int goToPreviousNodeWithComment() {
     BoardHistoryNode node = this;
     int moves = 0;
