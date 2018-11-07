@@ -20,7 +20,7 @@ public class Config {
   public int onlyLastMoveNumber = 0;
   // 0: Do not show; -1: Show all move number; other: Show last move number
   public int allowMoveNumber = -1;
-  public boolean newMoveNubmerInBranch = true;
+  public boolean newMoveNumberInBranch = true;
   public boolean showWinrate = true;
   public boolean largeWinrate = false;
   public boolean showBlunderBar = true;
@@ -157,7 +157,7 @@ public class Config {
     showMoveNumber = uiConfig.getBoolean("show-move-number");
     onlyLastMoveNumber = uiConfig.optInt("only-last-move-number");
     allowMoveNumber = showMoveNumber ? (onlyLastMoveNumber > 0 ? onlyLastMoveNumber : -1) : 0;
-    newMoveNubmerInBranch = uiConfig.optBoolean("new-move-number-in-branch", true);
+    newMoveNumberInBranch = uiConfig.optBoolean("new-move-number-in-branch", true);
     showStatus = uiConfig.getBoolean("show-status");
     showBranch = uiConfig.getBoolean("show-leelaz-variation");
     showWinrate = uiConfig.getBoolean("show-winrate");
