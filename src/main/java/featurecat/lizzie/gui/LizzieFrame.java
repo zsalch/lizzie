@@ -1422,9 +1422,9 @@ public class LizzieFrame extends JFrame {
   public double lastWinrateDiff(BoardHistoryNode node) {
 
     // Last winrate
-    BoardData lastData = node.previous().get().getData();
-    boolean validLastWinrate = (lastData != null && lastData.playouts > 0);
-    double lastWR = validLastWinrate ? lastData.winrate : 50;
+    Optional<BoardData> lastNode = node.previous().flatMap(n -> Optional.of(n.getData()));
+    boolean validLastWinrate = lastNode.map(d -> d.playouts > 0).orElse(false);
+    double lastWR = validLastWinrate ? lastNode.get().winrate : 50;
 
     // Current winrate
     BoardData data = node.getData();

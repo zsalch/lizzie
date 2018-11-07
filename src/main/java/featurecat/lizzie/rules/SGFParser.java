@@ -10,6 +10,7 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -483,9 +484,9 @@ public class SGFParser {
     String playouts = Lizzie.frame.getPlayoutsString(data.playouts);
 
     // Last winrate
-    BoardData lastNode = node.previous().get().getData();
-    boolean validLastWinrate = (lastNode.playouts > 0);
-    double lastWR = validLastWinrate ? lastNode.winrate : 50;
+    Optional<BoardData> lastNode = node.previous().flatMap(n -> Optional.of(n.getData()));
+    boolean validLastWinrate = lastNode.map(d -> d.playouts > 0).orElse(false);
+    double lastWR = validLastWinrate ? lastNode.get().winrate : 50;
 
     // Current winrate
     boolean validWinrate = (data.playouts > 0);
