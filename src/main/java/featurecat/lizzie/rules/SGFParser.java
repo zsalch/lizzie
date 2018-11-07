@@ -10,6 +10,7 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -345,15 +346,9 @@ public class SGFParser {
             "KM[%s]PW[%s]PB[%s]DT[%s]AP[Lizzie: %s]",
             komi, playerW, playerB, date, Lizzie.lizzieVersion));
 
-    // For append the winrate to the comment of sgf, maybe need to update the Winrate
+    // To append the winrate to the comment of sgf we might need to update the Winrate
     if (Lizzie.config.appendWinrateToComment) {
-
-      // Update winrate
-      Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
-      if (stats.maxWinrate >= 0 && stats.totalPlayouts > history.getData().playouts) {
-        history.getData().winrate = stats.maxWinrate;
-        history.getData().playouts = stats.totalPlayouts;
-      }
+      Lizzie.board.updateWinrate();
     }
 
     // move to the first move
@@ -489,9 +484,9 @@ public class SGFParser {
     String playouts = Lizzie.frame.getPlayoutsString(data.playouts);
 
     // Last winrate
-    BoardData lastNode = node.previous().get().getData();
-    boolean validLastWinrate = (lastNode != null && lastNode.playouts > 0);
-    double lastWR = validLastWinrate ? lastNode.winrate : 50;
+    Optional<BoardData> lastNode = node.previous().flatMap(n -> Optional.of(n.getData()));
+    boolean validLastWinrate = lastNode.map(d -> d.playouts > 0).orElse(false);
+    double lastWR = validLastWinrate ? lastNode.get().winrate : 50;
 
     // Current winrate
     boolean validWinrate = (data.playouts > 0);
@@ -515,13 +510,10 @@ public class SGFParser {
       }
     }
 
-    // Format:
-    // Move <Move number> <Winrate> (<Last Move Rate Difference>)
-    // (<Weight name> / <Playouts>)
     String wf = "Move %d\n%s %s\n(%s / %s playouts)";
     String nc = String.format(wf, data.moveNumber, curWinrate, lastMoveDiff, engine, playouts);
 
-    if (data.comment != null) {
+    if (!data.comment.isEmpty()) {
       String wp =
           "Move [0-9]+\n[0-9\\.\\-]+%* \\(*[0-9\\.\\-]*%*\\)*\n\\([^\\(\\)/]* \\/ [0-9\\.]*[kmKM]* playouts\\)";
       if (data.comment.matches("(?s).*" + wp + "(?s).*")) {
