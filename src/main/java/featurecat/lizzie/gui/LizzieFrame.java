@@ -643,6 +643,7 @@ public class LizzieFrame extends JFrame {
 
       cachedImage = new BufferedImage(width, height, TYPE_INT_ARGB);
       Graphics2D g = (Graphics2D) cachedImage.getGraphics();
+      g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
       if (Lizzie.config.showStatus) drawCommandString(g);
 
@@ -712,6 +713,7 @@ public class LizzieFrame extends JFrame {
 
     // draw the image
     Graphics2D bsGraphics = (Graphics2D) bs.getDrawGraphics();
+    bsGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
     bsGraphics.drawImage(cachedBackground, 0, 0, null);
     bsGraphics.drawImage(cachedImage, 0, 0, null);
 
@@ -745,6 +747,7 @@ public class LizzieFrame extends JFrame {
     redrawContainerAnyway = true;
 
     Graphics2D g = cachedBackground.createGraphics();
+    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
     BufferedImage wallpaper = boardRenderer.getWallpaper();
     int drawWidth = max(wallpaper.getWidth(), getWidth());
@@ -889,7 +892,8 @@ public class LizzieFrame extends JFrame {
     int lineHeight = (int) (font.getSize() * 1.15);
 
     int boxWidth = min((int) (maxCmdWidth * 1.4), getWidth());
-    int boxHeight = min(commandsToShow.size() * lineHeight, getHeight());
+    int boxHeight =
+        min(commandsToShow.size() * lineHeight, getHeight() - getInsets().top - getInsets().bottom);
 
     int commandsX = min(getWidth() / 2 - boxWidth / 2, getWidth());
     int top = this.getInsets().top;
@@ -1230,6 +1234,9 @@ public class LizzieFrame extends JFrame {
           mouseOverCoordinate = c;
           isReplayVariation = false;
         });
+    if (!coords.isPresent() && boardRenderer.isShowingBranch()) {
+      repaint();
+    }
   }
 
   public boolean isMouseOver(int x, int y) {

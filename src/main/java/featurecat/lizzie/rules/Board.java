@@ -146,7 +146,6 @@ public class Board implements LeelazListener {
   public void moveNumber(int moveNumber) {
     synchronized (this) {
       BoardData data = history.getData();
-      //      data.moveNumber = moveNumber;
       if (data.lastMove.isPresent()) {
         int[] moveNumberList = history.getMoveNumberList();
         moveNumberList[Board.getIndex(data.lastMove.get()[0], data.lastMove.get()[1])] = moveNumber;
@@ -205,7 +204,6 @@ public class Board implements LeelazListener {
       Stone oriColor = stones[getIndex(x, y)];
       stones[getIndex(x, y)] = Stone.EMPTY;
       zobrist.toggleStone(x, y, oriColor);
-      //      data.moveNumber = 0;
       data.moveNumberList[Board.getIndex(x, y)] = 0;
 
       Lizzie.frame.repaint();

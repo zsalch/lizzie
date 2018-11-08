@@ -172,6 +172,7 @@ public class BoardRenderer {
 
       cachedBackgroundImage = new BufferedImage(width, height, TYPE_INT_ARGB);
       Graphics2D g = cachedBackgroundImage.createGraphics();
+      g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
       // Draw the wooden background
       drawWoodenBoard(g);
@@ -294,7 +295,9 @@ public class BoardRenderer {
       cachedStonesImage = new BufferedImage(boardLength, boardLength, TYPE_INT_ARGB);
       cachedStonesShadowImage = new BufferedImage(boardLength, boardLength, TYPE_INT_ARGB);
       Graphics2D g = cachedStonesImage.createGraphics();
+      g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
       Graphics2D gShadow = cachedStonesShadowImage.createGraphics();
+      gShadow.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
       // we need antialiasing to make the stones pretty. Java is a bit slow at antialiasing; that's
       // why we want the cache
@@ -324,6 +327,7 @@ public class BoardRenderer {
    */
   private void drawScore(Graphics2D go) {
     Graphics2D g = cachedStonesImage.createGraphics();
+    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
     Stone scorestones[] = Lizzie.board.scoreStones();
     int scoreRadius = stoneRadius / 4;
     for (int i = 0; i < Board.boardSize; i++) {
@@ -370,7 +374,9 @@ public class BoardRenderer {
     }
 
     Graphics2D g = (Graphics2D) branchStonesImage.getGraphics();
+    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
     Graphics2D gShadow = (Graphics2D) branchStonesShadowImage.getGraphics();
+    gShadow.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
     Optional<MoveData> suggestedMove = (isMainBoard ? mouseOveredMove() : getBestMove());
     if (!suggestedMove.isPresent()) {
@@ -855,6 +861,7 @@ public class BoardRenderer {
       stoneImage = new BufferedImage(size, size, TYPE_INT_ARGB);
       Image img = isBlack ? Lizzie.config.theme.blackStone() : Lizzie.config.theme.whiteStone();
       Graphics2D g2 = stoneImage.createGraphics();
+      g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
       g2.drawImage(img.getScaledInstance(size, size, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
       g2.dispose();
       if (isBlack) {

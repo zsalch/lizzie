@@ -65,12 +65,12 @@ public class Config {
   public Color winrateMissLineColor = null;
   public Color blunderBarColor = null;
   public boolean solidStoneIndicator = false;
-  public boolean appendWinrateToComment = false;
   public boolean showCommentNodeColor = true;
   public Color commentNodeColor = null;
   public Optional<List<Double>> blunderWinrateThresholds;
   public Optional<Map<Double, Color>> blunderNodeColors;
   public int nodeColorMode = 0;
+  public boolean appendWinrateToComment = false;
 
   private JSONObject loadAndMergeConfig(
       JSONObject defaultCfg, String fileName, boolean needValidation) throws IOException {
@@ -175,8 +175,8 @@ public class Config {
     handicapInsteadOfWinrate = uiConfig.getBoolean("handicap-instead-of-winrate");
     startMaximized = uiConfig.getBoolean("window-maximized");
     showDynamicKomi = uiConfig.getBoolean("show-dynamic-komi");
-    showCoordinates = uiConfig.optBoolean("show-coordinates");
     appendWinrateToComment = uiConfig.optBoolean("append-winrate-to-comment");
+    showCoordinates = uiConfig.optBoolean("show-coordinates");
     replayBranchIntervalSeconds = uiConfig.optDouble("replay-branch-interval-seconds", 1.0);
 
     winrateStrokeWidth = theme.winrateStrokeWidth();
@@ -322,8 +322,7 @@ public class Config {
     leelaz.put(
         "engine-command",
         String.format(
-            "%s --gtp --lagbuffer 0 --weights %%network-file --threads 2",
-            getBestDefaultLeelazPath()));
+            "%s --gtp --lagbuffer 0 --weights %%network-file", getBestDefaultLeelazPath()));
     leelaz.put("engine-start-location", ".");
     leelaz.put("max-analyze-time-minutes", 5);
     leelaz.put("max-game-thinking-time-seconds", 2);
@@ -368,7 +367,7 @@ public class Config {
     ui.put("window-maximized", false);
     ui.put("show-dynamic-komi", true);
     ui.put("min-playout-ratio-for-stats", 0.0);
-
+    ui.put("theme", "default");
     config.put("ui", ui);
     return config;
   }
