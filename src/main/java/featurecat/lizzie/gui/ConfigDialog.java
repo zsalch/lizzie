@@ -4,19 +4,24 @@ import featurecat.lizzie.Lizzie;
 import java.awt.BorderLayout;
 import java.awt.Dialog.ModalityType;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.Window.Type;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.Optional;
 import java.util.stream.IntStream;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class ConfigDialog extends JDialog {
   private JTextField txtEngine;
@@ -83,7 +88,7 @@ public class ConfigDialog extends JDialog {
       engineTab.add(lblEngine);
       {
         txtEngine = new JTextField();
-        txtEngine.setBounds(110, 39, 466, 26);
+        txtEngine.setBounds(110, 39, 479, 26);
         engineTab.add(txtEngine);
         txtEngine.setColumns(10);
       }
@@ -95,7 +100,7 @@ public class ConfigDialog extends JDialog {
 
       txtEngine2 = new JTextField();
       txtEngine2.setColumns(10);
-      txtEngine2.setBounds(110, 105, 466, 26);
+      txtEngine2.setBounds(110, 105, 479, 26);
       engineTab.add(txtEngine2);
 
       JLabel lblEngine2 = new JLabel("Engine 2");
@@ -105,7 +110,7 @@ public class ConfigDialog extends JDialog {
 
       txtEngine1 = new JTextField();
       txtEngine1.setColumns(10);
-      txtEngine1.setBounds(110, 75, 466, 26);
+      txtEngine1.setBounds(110, 75, 479, 26);
       engineTab.add(txtEngine1);
 
       JLabel lblEngine3 = new JLabel("Engine 3");
@@ -115,7 +120,7 @@ public class ConfigDialog extends JDialog {
 
       txtEngine3 = new JTextField();
       txtEngine3.setColumns(10);
-      txtEngine3.setBounds(110, 135, 466, 26);
+      txtEngine3.setBounds(110, 135, 479, 26);
       engineTab.add(txtEngine3);
 
       JLabel lblEngine4 = new JLabel("Engine 4");
@@ -125,7 +130,7 @@ public class ConfigDialog extends JDialog {
 
       txtEngine4 = new JTextField();
       txtEngine4.setColumns(10);
-      txtEngine4.setBounds(110, 165, 466, 26);
+      txtEngine4.setBounds(110, 165, 479, 26);
       engineTab.add(txtEngine4);
 
       JLabel lblEngine5 = new JLabel("Engine 5");
@@ -135,7 +140,7 @@ public class ConfigDialog extends JDialog {
 
       txtEngine5 = new JTextField();
       txtEngine5.setColumns(10);
-      txtEngine5.setBounds(110, 195, 466, 26);
+      txtEngine5.setBounds(110, 195, 479, 26);
       engineTab.add(txtEngine5);
 
       JLabel lblEngine6 = new JLabel("Engine 6");
@@ -145,7 +150,7 @@ public class ConfigDialog extends JDialog {
 
       txtEngine6 = new JTextField();
       txtEngine6.setColumns(10);
-      txtEngine6.setBounds(110, 225, 466, 26);
+      txtEngine6.setBounds(110, 225, 479, 26);
       engineTab.add(txtEngine6);
 
       JLabel lblEngine7 = new JLabel("Engine 7");
@@ -155,7 +160,7 @@ public class ConfigDialog extends JDialog {
 
       txtEngine7 = new JTextField();
       txtEngine7.setColumns(10);
-      txtEngine7.setBounds(110, 255, 466, 26);
+      txtEngine7.setBounds(110, 255, 479, 26);
       engineTab.add(txtEngine7);
 
       JLabel lblEngine8 = new JLabel("Engine 8");
@@ -165,18 +170,63 @@ public class ConfigDialog extends JDialog {
 
       txtEngine8 = new JTextField();
       txtEngine8.setColumns(10);
-      txtEngine8.setBounds(110, 285, 466, 26);
+      txtEngine8.setBounds(110, 285, 479, 26);
       engineTab.add(txtEngine8);
 
       txtEngine9 = new JTextField();
       txtEngine9.setColumns(10);
-      txtEngine9.setBounds(110, 318, 466, 26);
+      txtEngine9.setBounds(110, 318, 479, 26);
       engineTab.add(txtEngine9);
 
       JLabel lblEngine9 = new JLabel("Engine 9");
       lblEngine9.setHorizontalAlignment(SwingConstants.LEFT);
       lblEngine9.setBounds(6, 320, 92, 16);
       engineTab.add(lblEngine9);
+      
+      JButton button = new JButton("...");
+      button.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          String el = getEngineLine();
+        }
+      });
+      button.setBounds(590, 39, 44, 29);
+      engineTab.add(button);
+      
+      JButton button_1 = new JButton("...");
+      button_1.setBounds(590, 75, 44, 29);
+      engineTab.add(button_1);
+      
+      JButton button_2 = new JButton("...");
+      button_2.setBounds(590, 105, 44, 29);
+      engineTab.add(button_2);
+      
+      JButton button_3 = new JButton("...");
+      button_3.setBounds(590, 135, 44, 29);
+      engineTab.add(button_3);
+      
+      JButton button_4 = new JButton("...");
+      button_4.setBounds(590, 165, 44, 29);
+      engineTab.add(button_4);
+      
+      JButton button_5 = new JButton("...");
+      button_5.setBounds(590, 195, 44, 29);
+      engineTab.add(button_5);
+      
+      JButton button_6 = new JButton("...");
+      button_6.setBounds(590, 225, 44, 29);
+      engineTab.add(button_6);
+      
+      JButton button_7 = new JButton("...");
+      button_7.setBounds(590, 255, 44, 29);
+      engineTab.add(button_7);
+      
+      JButton button_8 = new JButton("...");
+      button_8.setBounds(590, 285, 44, 29);
+      engineTab.add(button_8);
+      
+      JButton button_9 = new JButton("...");
+      button_9.setBounds(590, 315, 44, 29);
+      engineTab.add(button_9);
       {
         JPanel uiTab = new JPanel();
         tabbedPane.addTab("UI", null, uiTab, null);
@@ -206,5 +256,35 @@ public class ConfigDialog extends JDialog {
                   });
         });
     setLocationRelativeTo(getOwner());
+  }
+  
+  private String getEngineLine() {
+    setVisible(false);
+    String engineLine = "";
+    File enginePath = null;
+    File weightPath = null;
+    FileNameExtensionFilter filter = new FileNameExtensionFilter("leela zero", "*");
+    JSONObject filesystem = Lizzie.config.persisted.getJSONObject("filesystem");
+    JFileChooser chooser = new JFileChooser(filesystem.getString("last-folder"));
+//    chooser.setFileFilter(filter);
+    chooser.setMultiSelectionEnabled(false);
+    chooser.setDialogTitle("Please select the leela zero");
+    int result = chooser.showOpenDialog(this);
+    if (result == JFileChooser.APPROVE_OPTION) {
+      enginePath = chooser.getSelectedFile();
+      if (enginePath != null) {
+        chooser.setDialogTitle("Please select the weight file");
+        result = chooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+          weightPath = chooser.getSelectedFile();
+          if (weightPath != null) {
+            EngineParameter ep = new EngineParameter(enginePath.getPath(), weightPath.getPath());
+            ep.setVisible(true);
+          }
+        }
+      }
+    }
+    setVisible(true);
+    return engineLine;
   }
 }
