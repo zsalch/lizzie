@@ -8,6 +8,7 @@ import java.awt.Window.Type;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.IntStream;
 import javax.swing.JButton;
@@ -263,9 +264,10 @@ public class ConfigDialog extends JDialog {
     String engineLine = "";
     File enginePath = null;
     File weightPath = null;
-    FileNameExtensionFilter filter = new FileNameExtensionFilter("leela zero", "*");
-    JSONObject filesystem = Lizzie.config.persisted.getJSONObject("filesystem");
-    JFileChooser chooser = new JFileChooser(filesystem.getString("last-folder"));
+//    FileNameExtensionFilter filter = new FileNameExtensionFilter("leela zero", "*");
+//    JSONObject filesystem = Lizzie.config.persisted.getJSONObject("filesystem");
+    Path curPath = (new File(".")).getAbsoluteFile().toPath();
+    JFileChooser chooser = new JFileChooser(".");
     //    chooser.setFileFilter(filter);
     chooser.setMultiSelectionEnabled(false);
     chooser.setDialogTitle("Please select the leela zero");
@@ -274,10 +276,14 @@ public class ConfigDialog extends JDialog {
       enginePath = chooser.getSelectedFile();
       if (enginePath != null) {
         chooser.setDialogTitle("Please select the weight file");
+        String a = curPath.relativize(enginePath.toPath()).toString();
+        a = "./" + a;
         result = chooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
           weightPath = chooser.getSelectedFile();
           if (weightPath != null) {
+            String b = curPath.relativize(enginePath.toPath()).toString();
+            b = "./" + b;
             EngineParameter ep = new EngineParameter(enginePath.getPath(), weightPath.getPath());
             ep.setVisible(true);
           }
