@@ -667,9 +667,9 @@ public class SGFParser {
     props.forEach((key, value) -> Lizzie.board.addNodeProperty(key, value));
     props = new HashMap<String, String>();
   }
-  
+
   public static String Escaping(String in) {
-    String out = in.replaceAll("\\\\\\\\", "\\\\\\\\\\\\\\\\");
-    return out.replaceAll("]", "\\]");
+    String out = in.replaceAll("\\\\", "\\\\\\\\");
+    return out.replaceAll("\\]", "\\\\]");
   }
 }
