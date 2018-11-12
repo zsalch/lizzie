@@ -4,7 +4,6 @@ import featurecat.lizzie.Lizzie;
 import java.awt.BorderLayout;
 import java.awt.Dialog.ModalityType;
 import java.awt.FlowLayout;
-import java.awt.Window;
 import java.awt.Window.Type;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -182,48 +181,49 @@ public class ConfigDialog extends JDialog {
       lblEngine9.setHorizontalAlignment(SwingConstants.LEFT);
       lblEngine9.setBounds(6, 320, 92, 16);
       engineTab.add(lblEngine9);
-      
+
       JButton button = new JButton("...");
-      button.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          String el = getEngineLine();
-        }
-      });
+      button.addActionListener(
+          new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              String el = getEngineLine();
+            }
+          });
       button.setBounds(590, 39, 44, 29);
       engineTab.add(button);
-      
+
       JButton button_1 = new JButton("...");
       button_1.setBounds(590, 75, 44, 29);
       engineTab.add(button_1);
-      
+
       JButton button_2 = new JButton("...");
       button_2.setBounds(590, 105, 44, 29);
       engineTab.add(button_2);
-      
+
       JButton button_3 = new JButton("...");
       button_3.setBounds(590, 135, 44, 29);
       engineTab.add(button_3);
-      
+
       JButton button_4 = new JButton("...");
       button_4.setBounds(590, 165, 44, 29);
       engineTab.add(button_4);
-      
+
       JButton button_5 = new JButton("...");
       button_5.setBounds(590, 195, 44, 29);
       engineTab.add(button_5);
-      
+
       JButton button_6 = new JButton("...");
       button_6.setBounds(590, 225, 44, 29);
       engineTab.add(button_6);
-      
+
       JButton button_7 = new JButton("...");
       button_7.setBounds(590, 255, 44, 29);
       engineTab.add(button_7);
-      
+
       JButton button_8 = new JButton("...");
       button_8.setBounds(590, 285, 44, 29);
       engineTab.add(button_8);
-      
+
       JButton button_9 = new JButton("...");
       button_9.setBounds(590, 315, 44, 29);
       engineTab.add(button_9);
@@ -257,7 +257,7 @@ public class ConfigDialog extends JDialog {
         });
     setLocationRelativeTo(getOwner());
   }
-  
+
   private String getEngineLine() {
     setVisible(false);
     String engineLine = "";
@@ -266,7 +266,7 @@ public class ConfigDialog extends JDialog {
     FileNameExtensionFilter filter = new FileNameExtensionFilter("leela zero", "*");
     JSONObject filesystem = Lizzie.config.persisted.getJSONObject("filesystem");
     JFileChooser chooser = new JFileChooser(filesystem.getString("last-folder"));
-//    chooser.setFileFilter(filter);
+    //    chooser.setFileFilter(filter);
     chooser.setMultiSelectionEnabled(false);
     chooser.setDialogTitle("Please select the leela zero");
     int result = chooser.showOpenDialog(this);

@@ -371,6 +371,7 @@ public class Config {
     ui.put("only-last-move-number", 0);
     ui.put("new-move-number-in-branch", true);
     ui.put("append-winrate-to-comment", false);
+    ui.put("replay-branch-interval-seconds", 1.0);
     config.put("ui", ui);
     return config;
   }
