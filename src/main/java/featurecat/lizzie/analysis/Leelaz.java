@@ -75,6 +75,10 @@ public class Leelaz {
   // dynamic komi and opponent komi as reported by dynamic-komi version of leelaz
   private float dynamicKomi = Float.NaN;
   private float dynamicOppKomi = Float.NaN;
+
+  // pause out info(best moves) to board when replay branch
+  private boolean pauseOutInfo = false;
+
   /**
    * Initializes the leelaz process and starts reading output
    *
@@ -234,6 +238,8 @@ public class Leelaz {
       } else if (line.equals("\n")) {
         // End of response
       } else if (line.startsWith("info")) {
+        // Ignore info if in replaying branch
+        if (pauseOutInfo) return;
         isLoaded = true;
         // Clear switching prompt
         switching = false;
@@ -627,5 +633,9 @@ public class Leelaz {
 
   public String engineCommand() {
     return this.engineCommand;
+  }
+
+  public void pauseOutPonder(boolean on) {
+    pauseOutInfo = on;
   }
 }
