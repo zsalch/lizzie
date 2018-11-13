@@ -7,14 +7,25 @@ import java.awt.FlowLayout;
 import java.awt.Window.Type;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -34,6 +45,13 @@ public class ConfigDialog extends JDialog {
   private JTextField txtEngine7;
   private JTextField txtEngine8;
   private JTextField txtEngine9;
+  
+  public String enginePath = "";
+  public String weightPath = "";
+  public String commandHelp = "";
+
+  private Path curPath;
+  private BufferedInputStream inputStream;
 
   /** Launch the application. */
   public static void main(String[] args) {
@@ -88,7 +106,7 @@ public class ConfigDialog extends JDialog {
       engineTab.add(lblEngine);
       {
         txtEngine = new JTextField();
-        txtEngine.setBounds(110, 39, 479, 26);
+        txtEngine.setBounds(87, 40, 502, 26);
         engineTab.add(txtEngine);
         txtEngine.setColumns(10);
       }
@@ -100,7 +118,7 @@ public class ConfigDialog extends JDialog {
 
       txtEngine2 = new JTextField();
       txtEngine2.setColumns(10);
-      txtEngine2.setBounds(110, 105, 479, 26);
+      txtEngine2.setBounds(87, 105, 502, 26);
       engineTab.add(txtEngine2);
 
       JLabel lblEngine2 = new JLabel("Engine 2");
@@ -110,7 +128,7 @@ public class ConfigDialog extends JDialog {
 
       txtEngine1 = new JTextField();
       txtEngine1.setColumns(10);
-      txtEngine1.setBounds(110, 75, 479, 26);
+      txtEngine1.setBounds(87, 75, 502, 26);
       engineTab.add(txtEngine1);
 
       JLabel lblEngine3 = new JLabel("Engine 3");
@@ -120,7 +138,7 @@ public class ConfigDialog extends JDialog {
 
       txtEngine3 = new JTextField();
       txtEngine3.setColumns(10);
-      txtEngine3.setBounds(110, 135, 479, 26);
+      txtEngine3.setBounds(87, 135, 502, 26);
       engineTab.add(txtEngine3);
 
       JLabel lblEngine4 = new JLabel("Engine 4");
@@ -130,7 +148,7 @@ public class ConfigDialog extends JDialog {
 
       txtEngine4 = new JTextField();
       txtEngine4.setColumns(10);
-      txtEngine4.setBounds(110, 165, 479, 26);
+      txtEngine4.setBounds(87, 165, 502, 26);
       engineTab.add(txtEngine4);
 
       JLabel lblEngine5 = new JLabel("Engine 5");
@@ -140,7 +158,7 @@ public class ConfigDialog extends JDialog {
 
       txtEngine5 = new JTextField();
       txtEngine5.setColumns(10);
-      txtEngine5.setBounds(110, 195, 479, 26);
+      txtEngine5.setBounds(87, 195, 502, 26);
       engineTab.add(txtEngine5);
 
       JLabel lblEngine6 = new JLabel("Engine 6");
@@ -150,7 +168,7 @@ public class ConfigDialog extends JDialog {
 
       txtEngine6 = new JTextField();
       txtEngine6.setColumns(10);
-      txtEngine6.setBounds(110, 225, 479, 26);
+      txtEngine6.setBounds(87, 225, 502, 26);
       engineTab.add(txtEngine6);
 
       JLabel lblEngine7 = new JLabel("Engine 7");
@@ -160,7 +178,7 @@ public class ConfigDialog extends JDialog {
 
       txtEngine7 = new JTextField();
       txtEngine7.setColumns(10);
-      txtEngine7.setBounds(110, 255, 479, 26);
+      txtEngine7.setBounds(87, 255, 502, 26);
       engineTab.add(txtEngine7);
 
       JLabel lblEngine8 = new JLabel("Engine 8");
@@ -170,12 +188,12 @@ public class ConfigDialog extends JDialog {
 
       txtEngine8 = new JTextField();
       txtEngine8.setColumns(10);
-      txtEngine8.setBounds(110, 285, 479, 26);
+      txtEngine8.setBounds(87, 285, 502, 26);
       engineTab.add(txtEngine8);
 
       txtEngine9 = new JTextField();
       txtEngine9.setColumns(10);
-      txtEngine9.setBounds(110, 318, 479, 26);
+      txtEngine9.setBounds(87, 315, 502, 26);
       engineTab.add(txtEngine9);
 
       JLabel lblEngine9 = new JLabel("Engine 9");
@@ -188,45 +206,49 @@ public class ConfigDialog extends JDialog {
           new ActionListener() {
             public void actionPerformed(ActionEvent e) {
               String el = getEngineLine();
+              if (!el.isEmpty()) {
+                txtEngine.setText(el);
+              }
+              setVisible(true);
             }
           });
-      button.setBounds(590, 39, 44, 29);
+      button.setBounds(595, 40, 40, 26);
       engineTab.add(button);
 
       JButton button_1 = new JButton("...");
-      button_1.setBounds(590, 75, 44, 29);
+      button_1.setBounds(595, 75, 40, 26);
       engineTab.add(button_1);
 
       JButton button_2 = new JButton("...");
-      button_2.setBounds(590, 105, 44, 29);
+      button_2.setBounds(595, 105, 40, 26);
       engineTab.add(button_2);
 
       JButton button_3 = new JButton("...");
-      button_3.setBounds(590, 135, 44, 29);
+      button_3.setBounds(595, 135, 40, 26);
       engineTab.add(button_3);
 
       JButton button_4 = new JButton("...");
-      button_4.setBounds(590, 165, 44, 29);
+      button_4.setBounds(595, 165, 40, 26);
       engineTab.add(button_4);
 
       JButton button_5 = new JButton("...");
-      button_5.setBounds(590, 195, 44, 29);
+      button_5.setBounds(595, 195, 40, 26);
       engineTab.add(button_5);
 
       JButton button_6 = new JButton("...");
-      button_6.setBounds(590, 225, 44, 29);
+      button_6.setBounds(595, 225, 40, 26);
       engineTab.add(button_6);
 
       JButton button_7 = new JButton("...");
-      button_7.setBounds(590, 255, 44, 29);
+      button_7.setBounds(595, 255, 40, 26);
       engineTab.add(button_7);
 
       JButton button_8 = new JButton("...");
-      button_8.setBounds(590, 285, 44, 29);
+      button_8.setBounds(595, 285, 40, 26);
       engineTab.add(button_8);
 
       JButton button_9 = new JButton("...");
-      button_9.setBounds(590, 315, 44, 29);
+      button_9.setBounds(595, 315, 40, 26);
       engineTab.add(button_9);
       {
         JPanel uiTab = new JPanel();
@@ -256,41 +278,81 @@ public class ConfigDialog extends JDialog {
                     txts[i].setText(a.getString(i));
                   });
         });
+
+    curPath = (new File("")).getAbsoluteFile().toPath();
     setLocationRelativeTo(getOwner());
   }
 
   private String getEngineLine() {
     setVisible(false);
     String engineLine = "";
-    File enginePath = null;
-    File weightPath = null;
-//    FileNameExtensionFilter filter = new FileNameExtensionFilter("leela zero", "*");
-//    JSONObject filesystem = Lizzie.config.persisted.getJSONObject("filesystem");
-    Path curPath = (new File(".")).getAbsoluteFile().toPath();
+    File engineFile = null;
+    File weightFile = null;
     JFileChooser chooser = new JFileChooser(".");
-    //    chooser.setFileFilter(filter);
     chooser.setMultiSelectionEnabled(false);
     chooser.setDialogTitle("Please select the leela zero");
     int result = chooser.showOpenDialog(this);
     if (result == JFileChooser.APPROVE_OPTION) {
-      enginePath = chooser.getSelectedFile();
-      if (enginePath != null) {
+      engineFile = chooser.getSelectedFile();
+      if (engineFile != null) {
+        enginePath = engineFile.getAbsolutePath();
+        enginePath = curPath.relativize(engineFile.toPath()).toString();
+//        enginePath = "./" + enginePath;
+        getCommandHelp();
         chooser.setDialogTitle("Please select the weight file");
-        String a = curPath.relativize(enginePath.toPath()).toString();
-        a = "./" + a;
         result = chooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
-          weightPath = chooser.getSelectedFile();
-          if (weightPath != null) {
-            String b = curPath.relativize(enginePath.toPath()).toString();
-            b = "./" + b;
-            EngineParameter ep = new EngineParameter(enginePath.getPath(), weightPath.getPath());
+          weightFile = chooser.getSelectedFile();
+          if (weightFile != null) {
+            weightPath = curPath.relativize(weightFile.toPath()).toString();
+            weightPath = "./" + weightPath;
+            EngineParameter ep = new EngineParameter(enginePath, weightPath, this);
             ep.setVisible(true);
+            if (!ep.commandLine.isEmpty()) {
+              engineLine = ep.commandLine;
+            }
           }
         }
       }
     }
-    setVisible(true);
     return engineLine;
+  }
+
+  private String RelativizePath(Path path) {
+    Path relatPath = curPath.relativize(path);
+    return relatPath.toString();
+  }
+  
+  private void getCommandHelp() {
+
+    List<String >commands = new ArrayList<String>();
+    commands.add(enginePath);
+    commands.add("-h");
+
+    ProcessBuilder processBuilder = new ProcessBuilder(commands);
+    processBuilder.directory();
+    processBuilder.redirectErrorStream(true);
+    try {
+      Process process = processBuilder.start();
+      inputStream = new BufferedInputStream(process.getInputStream());
+      ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+      executor.execute(this::read);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+  
+  private void read() {
+    try {
+      int c;
+      StringBuilder line = new StringBuilder();
+      while ((c = inputStream.read()) != -1) {
+        line.append((char) c);
+      }
+      commandHelp = line.toString();
+      System.out.println("Command help done."+commandHelp);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }

@@ -148,7 +148,7 @@ public class Leelaz {
 
     // run leelaz
     ProcessBuilder processBuilder = new ProcessBuilder(commands);
-    processBuilder.directory(startfolder); // todo enable
+    processBuilder.directory(startfolder);
     processBuilder.redirectErrorStream(true);
     process = processBuilder.start();
 
