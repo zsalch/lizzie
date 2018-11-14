@@ -1,38 +1,34 @@
 package featurecat.lizzie.gui;
 
-import featurecat.lizzie.Lizzie;
 import java.awt.BorderLayout;
-import java.awt.Dialog.ModalityType;
 import java.awt.FlowLayout;
-import java.awt.Window.Type;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import featurecat.lizzie.Lizzie;
 
 public class ConfigDialog extends JDialog {
   private JTextField txtEngine;
@@ -45,13 +41,19 @@ public class ConfigDialog extends JDialog {
   private JTextField txtEngine7;
   private JTextField txtEngine8;
   private JTextField txtEngine9;
-  
+  private JTextField[] txts;
+
   public String enginePath = "";
   public String weightPath = "";
   public String commandHelp = "";
 
   private Path curPath;
   private BufferedInputStream inputStream;
+  private JFormattedTextField txtMaxAnalyzeTime;
+  private JFormattedTextField txtMaxGameThinkingTime;
+  private JFormattedTextField txtAnalyzeUpdateInterval;
+  private JCheckBox chkPrintEngineLog;
+  private JSONObject leelazConfig;
 
   /** Launch the application. */
   public static void main(String[] args) {
@@ -66,6 +68,7 @@ public class ConfigDialog extends JDialog {
 
   /** Create the dialog. */
   public ConfigDialog() {
+    setTitle("Config");
     setModalityType(ModalityType.APPLICATION_MODAL);
     setType(Type.POPUP);
     setBounds(100, 100, 661, 567);
@@ -76,6 +79,13 @@ public class ConfigDialog extends JDialog {
       getContentPane().add(buttonPane, BorderLayout.SOUTH);
       {
         JButton okButton = new JButton("OK");
+        okButton.addActionListener(
+            new ActionListener() {
+              public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+                saveConfig();
+              }
+            });
         okButton.setActionCommand("OK");
         buttonPane.add(okButton);
         getRootPane().setDefaultButton(okButton);
@@ -100,7 +110,7 @@ public class ConfigDialog extends JDialog {
       tabbedPane.addTab("Engine", null, engineTab, null);
       engineTab.setLayout(null);
 
-      JLabel lblEngine = new JLabel("Default Engine");
+      JLabel lblEngine = new JLabel("Engine");
       lblEngine.setBounds(6, 44, 92, 16);
       lblEngine.setHorizontalAlignment(SwingConstants.LEFT);
       engineTab.add(lblEngine);
@@ -216,46 +226,186 @@ public class ConfigDialog extends JDialog {
       engineTab.add(button);
 
       JButton button_1 = new JButton("...");
+      button_1.addActionListener(
+          new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              String el = getEngineLine();
+              if (!el.isEmpty()) {
+                txtEngine1.setText(el);
+              }
+              setVisible(true);
+            }
+          });
       button_1.setBounds(595, 75, 40, 26);
       engineTab.add(button_1);
 
       JButton button_2 = new JButton("...");
+      button_2.addActionListener(
+          new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              String el = getEngineLine();
+              if (!el.isEmpty()) {
+                txtEngine2.setText(el);
+              }
+              setVisible(true);
+            }
+          });
       button_2.setBounds(595, 105, 40, 26);
       engineTab.add(button_2);
 
       JButton button_3 = new JButton("...");
+      button_3.addActionListener(
+          new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              String el = getEngineLine();
+              if (!el.isEmpty()) {
+                txtEngine3.setText(el);
+              }
+              setVisible(true);
+            }
+          });
       button_3.setBounds(595, 135, 40, 26);
       engineTab.add(button_3);
 
       JButton button_4 = new JButton("...");
+      button_4.addActionListener(
+          new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              String el = getEngineLine();
+              if (!el.isEmpty()) {
+                txtEngine4.setText(el);
+              }
+              setVisible(true);
+            }
+          });
       button_4.setBounds(595, 165, 40, 26);
       engineTab.add(button_4);
 
       JButton button_5 = new JButton("...");
+      button_5.addActionListener(
+          new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              String el = getEngineLine();
+              if (!el.isEmpty()) {
+                txtEngine5.setText(el);
+              }
+              setVisible(true);
+            }
+          });
       button_5.setBounds(595, 195, 40, 26);
       engineTab.add(button_5);
 
       JButton button_6 = new JButton("...");
+      button_6.addActionListener(
+          new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              String el = getEngineLine();
+              if (!el.isEmpty()) {
+                txtEngine6.setText(el);
+              }
+              setVisible(true);
+            }
+          });
       button_6.setBounds(595, 225, 40, 26);
       engineTab.add(button_6);
 
       JButton button_7 = new JButton("...");
+      button_7.addActionListener(
+          new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              String el = getEngineLine();
+              if (!el.isEmpty()) {
+                txtEngine7.setText(el);
+              }
+              setVisible(true);
+            }
+          });
       button_7.setBounds(595, 255, 40, 26);
       engineTab.add(button_7);
 
       JButton button_8 = new JButton("...");
+      button_8.addActionListener(
+          new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              String el = getEngineLine();
+              if (!el.isEmpty()) {
+                txtEngine8.setText(el);
+              }
+              setVisible(true);
+            }
+          });
       button_8.setBounds(595, 285, 40, 26);
       engineTab.add(button_8);
 
       JButton button_9 = new JButton("...");
+      button_9.addActionListener(
+          new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              String el = getEngineLine();
+              if (!el.isEmpty()) {
+                txtEngine9.setText(el);
+              }
+              setVisible(true);
+            }
+          });
       button_9.setBounds(595, 315, 40, 26);
       engineTab.add(button_9);
+
+      JLabel lblMaxAnalyzeTime = new JLabel("MaxAnalyzeTime");
+      lblMaxAnalyzeTime.setBounds(6, 370, 157, 16);
+      engineTab.add(lblMaxAnalyzeTime);
+
+      JLabel lblMaxAnalyzeTimeMinutes = new JLabel("Minutes");
+      lblMaxAnalyzeTimeMinutes.setBounds(213, 370, 82, 16);
+      engineTab.add(lblMaxAnalyzeTimeMinutes);
+
+      txtMaxAnalyzeTime = new JFormattedTextField(NumberFormat.getIntegerInstance());
+      txtMaxAnalyzeTime.setBounds(171, 365, 40, 26);
+      engineTab.add(txtMaxAnalyzeTime);
+      txtMaxAnalyzeTime.setColumns(10);
+
+      JLabel lblMaxGameThinkingTime = new JLabel("MaxGameThinkingTime");
+      lblMaxGameThinkingTime.setBounds(6, 400, 157, 16);
+      engineTab.add(lblMaxGameThinkingTime);
+
+      JLabel lblMaxGameThinkingTimeSeconds = new JLabel("Seconds");
+      lblMaxGameThinkingTimeSeconds.setBounds(213, 400, 82, 16);
+      engineTab.add(lblMaxGameThinkingTimeSeconds);
+
+      txtMaxGameThinkingTime = new JFormattedTextField(NumberFormat.getIntegerInstance());
+      txtMaxGameThinkingTime.setColumns(10);
+      txtMaxGameThinkingTime.setBounds(171, 395, 40, 26);
+      engineTab.add(txtMaxGameThinkingTime);
+
+      JLabel lblAnalyzeUpdateInterval = new JLabel("AnalyzeUpdateInterval");
+      lblAnalyzeUpdateInterval.setBounds(331, 368, 157, 16);
+      engineTab.add(lblAnalyzeUpdateInterval);
+
+      JLabel lblAnalyzeUpdateIntervalCentisec = new JLabel("Centisecond");
+      lblAnalyzeUpdateIntervalCentisec.setBounds(538, 368, 82, 16);
+      engineTab.add(lblAnalyzeUpdateIntervalCentisec);
+
+      txtAnalyzeUpdateInterval = new JFormattedTextField(NumberFormat.getIntegerInstance());
+      txtAnalyzeUpdateInterval.setColumns(10);
+      txtAnalyzeUpdateInterval.setBounds(496, 363, 40, 26);
+      engineTab.add(txtAnalyzeUpdateInterval);
+
+      JLabel lblPrintEngineLog = new JLabel("Print Engine Log");
+      lblPrintEngineLog.setBounds(6, 430, 157, 16);
+      engineTab.add(lblPrintEngineLog);
+
+      chkPrintEngineLog = new JCheckBox("");
+      chkPrintEngineLog.setBounds(167, 425, 201, 23);
+      engineTab.add(chkPrintEngineLog);
       {
         JPanel uiTab = new JPanel();
         tabbedPane.addTab("UI", null, uiTab, null);
       }
+
+      JTabbedPane tabTheme = new JTabbedPane(JTabbedPane.TOP);
+      tabbedPane.addTab("Theme", null, tabTheme, null);
     }
-    JTextField[] txts =
+    txts =
         new JTextField[] {
           txtEngine1,
           txtEngine2,
@@ -267,9 +417,10 @@ public class ConfigDialog extends JDialog {
           txtEngine8,
           txtEngine9
         };
-    txtEngine.setText(Lizzie.config.leelazConfig.getString("engine-command"));
+    leelazConfig = Lizzie.config.leelazConfig;
+    txtEngine.setText(leelazConfig.getString("engine-command"));
     Optional<JSONArray> enginesOpt =
-        Optional.ofNullable(Lizzie.config.leelazConfig.optJSONArray("engine-command-list"));
+        Optional.ofNullable(leelazConfig.optJSONArray("engine-command-list"));
     enginesOpt.ifPresent(
         a -> {
           IntStream.range(0, a.length())
@@ -278,34 +429,37 @@ public class ConfigDialog extends JDialog {
                     txts[i].setText(a.getString(i));
                   });
         });
-
+    txtMaxAnalyzeTime.setText(String.valueOf(leelazConfig.getInt("max-analyze-time-minutes")));
+    txtAnalyzeUpdateInterval.setText(
+        String.valueOf(leelazConfig.getInt("analyze-update-interval-centisec")));
+    txtMaxGameThinkingTime.setText(
+        String.valueOf(leelazConfig.getInt("max-game-thinking-time-seconds")));
+    chkPrintEngineLog.setSelected(leelazConfig.getBoolean("print-comms"));
     curPath = (new File("")).getAbsoluteFile().toPath();
     setLocationRelativeTo(getOwner());
   }
 
   private String getEngineLine() {
-    setVisible(false);
     String engineLine = "";
     File engineFile = null;
     File weightFile = null;
     JFileChooser chooser = new JFileChooser(".");
     chooser.setMultiSelectionEnabled(false);
     chooser.setDialogTitle("Please select the leela zero");
+    setVisible(false);
     int result = chooser.showOpenDialog(this);
     if (result == JFileChooser.APPROVE_OPTION) {
       engineFile = chooser.getSelectedFile();
       if (engineFile != null) {
         enginePath = engineFile.getAbsolutePath();
-        enginePath = curPath.relativize(engineFile.toPath()).toString();
-//        enginePath = "./" + enginePath;
+        enginePath = relativizePath(engineFile.toPath());
         getCommandHelp();
         chooser.setDialogTitle("Please select the weight file");
         result = chooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
           weightFile = chooser.getSelectedFile();
           if (weightFile != null) {
-            weightPath = curPath.relativize(weightFile.toPath()).toString();
-            weightPath = "./" + weightPath;
+            weightPath = relativizePath(weightFile.toPath());
             EngineParameter ep = new EngineParameter(enginePath, weightPath, this);
             ep.setVisible(true);
             if (!ep.commandLine.isEmpty()) {
@@ -318,14 +472,19 @@ public class ConfigDialog extends JDialog {
     return engineLine;
   }
 
-  private String RelativizePath(Path path) {
-    Path relatPath = curPath.relativize(path);
+  private String relativizePath(Path path) {
+    Path relatPath;
+    if (path.startsWith(curPath)) {
+      relatPath = curPath.relativize(path);
+    } else {
+      relatPath = path;
+    }
     return relatPath.toString();
   }
-  
+
   private void getCommandHelp() {
 
-    List<String >commands = new ArrayList<String>();
+    List<String> commands = new ArrayList<String>();
     commands.add(enginePath);
     commands.add("-h");
 
@@ -341,7 +500,7 @@ public class ConfigDialog extends JDialog {
       e.printStackTrace();
     }
   }
-  
+
   private void read() {
     try {
       int c;
@@ -350,9 +509,34 @@ public class ConfigDialog extends JDialog {
         line.append((char) c);
       }
       commandHelp = line.toString();
-      System.out.println("Command help done."+commandHelp);
+      System.out.println("Command help done." + commandHelp);
     } catch (IOException e) {
       e.printStackTrace();
+    }
+  }
+
+  private void saveConfig() {
+    try {
+      leelazConfig.putOpt("max-analyze-time-minutes", txtFieldValue(txtMaxAnalyzeTime));
+      leelazConfig.putOpt(
+          "analyze-update-interval-centisec", txtFieldValue(txtAnalyzeUpdateInterval));
+      leelazConfig.putOpt("max-game-thinking-time-seconds", txtFieldValue(txtMaxGameThinkingTime));
+      leelazConfig.putOpt("print-comms", chkPrintEngineLog.isSelected());
+      leelazConfig.put("engine-command", txtEngine.getText().trim());
+      JSONArray engines = new JSONArray();
+      Arrays.asList(txts).forEach(t -> engines.put(t.getText().trim()));
+      leelazConfig.put("engine-command-list", engines);
+      Lizzie.config.save();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private Integer txtFieldValue(JTextField txt) {
+    if (txt.getText().trim().isEmpty()) {
+      return 0;
+    } else {
+      return Integer.parseInt(txt.getText().trim());
     }
   }
 }
