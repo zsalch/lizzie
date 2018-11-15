@@ -26,6 +26,9 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import featurecat.lizzie.Lizzie;
@@ -538,5 +541,15 @@ public class ConfigDialog extends JDialog {
     } else {
       return Integer.parseInt(txt.getText().trim());
     }
+  }
+
+  private class DocFilter extends DocumentFilter {
+    @Override
+    public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+        throws BadLocationException {}
+
+    @Override
+    public void replace(FilterBypass fb, int offs, int length, String text, AttributeSet attrs)
+        throws BadLocationException {}
   }
 }

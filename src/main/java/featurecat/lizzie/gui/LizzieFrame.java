@@ -1483,6 +1483,7 @@ public class LizzieFrame extends JFrame {
     if (replaySteps <= 0) return; // Bad steps or no branch
     int oriBranchLength = boardRenderer.getDisplayedBranchLength();
     isReplayVariation = true;
+    if (Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
     Runnable runnable =
         new Runnable() {
           public void run() {
@@ -1499,6 +1500,7 @@ public class LizzieFrame extends JFrame {
             }
             boardRenderer.setDisplayedBranchLength(oriBranchLength);
             isReplayVariation = false;
+            if (Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
           }
         };
     Thread thread = new Thread(runnable);
