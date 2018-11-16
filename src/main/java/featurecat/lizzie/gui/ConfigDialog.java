@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.IntStream;
@@ -30,10 +31,13 @@ import javax.swing.SwingConstants;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
+import javax.swing.text.DocumentFilter.FilterBypass;
+import javax.swing.text.InternationalFormatter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class ConfigDialog extends JDialog {
+  public final ResourceBundle resourceBundle = ResourceBundle.getBundle("l10n.DisplayStrings");
   private JTextField txtEngine;
   private JTextField txtEngine1;
   private JTextField txtEngine2;
@@ -71,7 +75,7 @@ public class ConfigDialog extends JDialog {
 
   /** Create the dialog. */
   public ConfigDialog() {
-    setTitle("Config");
+    setTitle(resourceBundle.getString("LizzieConfig.title.config"));
     setModalityType(ModalityType.APPLICATION_MODAL);
     setType(Type.POPUP);
     setBounds(100, 100, 661, 567);
@@ -79,7 +83,7 @@ public class ConfigDialog extends JDialog {
     JPanel buttonPane = new JPanel();
     buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
     getContentPane().add(buttonPane, BorderLayout.SOUTH);
-    JButton okButton = new JButton("OK");
+    JButton okButton = new JButton(resourceBundle.getString("LizzieConfig.button.ok"));
     okButton.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
@@ -90,7 +94,7 @@ public class ConfigDialog extends JDialog {
     okButton.setActionCommand("OK");
     buttonPane.add(okButton);
     getRootPane().setDefaultButton(okButton);
-    JButton cancelButton = new JButton("Cancel");
+    JButton cancelButton = new JButton(resourceBundle.getString("LizzieConfig.button.cancel"));
     cancelButton.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
@@ -103,10 +107,10 @@ public class ConfigDialog extends JDialog {
     getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
     JPanel engineTab = new JPanel();
-    tabbedPane.addTab("Engine", null, engineTab, null);
+    tabbedPane.addTab(resourceBundle.getString("LizzieConfig.title.engine"), null, engineTab, null);
     engineTab.setLayout(null);
 
-    JLabel lblEngine = new JLabel("Engine");
+    JLabel lblEngine = new JLabel(resourceBundle.getString("LizzieConfig.title.engine"));
     lblEngine.setBounds(6, 44, 92, 16);
     lblEngine.setHorizontalAlignment(SwingConstants.LEFT);
     engineTab.add(lblEngine);
@@ -116,7 +120,7 @@ public class ConfigDialog extends JDialog {
     engineTab.add(txtEngine);
     txtEngine.setColumns(10);
 
-    JLabel lblEngine1 = new JLabel("Engine 1");
+    JLabel lblEngine1 = new JLabel(resourceBundle.getString("LizzieConfig.title.engine") + " 1");
     lblEngine1.setHorizontalAlignment(SwingConstants.LEFT);
     lblEngine1.setBounds(6, 80, 92, 16);
     engineTab.add(lblEngine1);
@@ -126,7 +130,7 @@ public class ConfigDialog extends JDialog {
     txtEngine2.setBounds(87, 105, 502, 26);
     engineTab.add(txtEngine2);
 
-    JLabel lblEngine2 = new JLabel("Engine 2");
+    JLabel lblEngine2 = new JLabel(resourceBundle.getString("LizzieConfig.title.engine") + " 2");
     lblEngine2.setHorizontalAlignment(SwingConstants.LEFT);
     lblEngine2.setBounds(6, 110, 92, 16);
     engineTab.add(lblEngine2);
@@ -136,7 +140,7 @@ public class ConfigDialog extends JDialog {
     txtEngine1.setBounds(87, 75, 502, 26);
     engineTab.add(txtEngine1);
 
-    JLabel lblEngine3 = new JLabel("Engine 3");
+    JLabel lblEngine3 = new JLabel(resourceBundle.getString("LizzieConfig.title.engine") + " 3");
     lblEngine3.setHorizontalAlignment(SwingConstants.LEFT);
     lblEngine3.setBounds(6, 140, 92, 16);
     engineTab.add(lblEngine3);
@@ -146,7 +150,7 @@ public class ConfigDialog extends JDialog {
     txtEngine3.setBounds(87, 135, 502, 26);
     engineTab.add(txtEngine3);
 
-    JLabel lblEngine4 = new JLabel("Engine 4");
+    JLabel lblEngine4 = new JLabel(resourceBundle.getString("LizzieConfig.title.engine") + " 4");
     lblEngine4.setHorizontalAlignment(SwingConstants.LEFT);
     lblEngine4.setBounds(6, 170, 92, 16);
     engineTab.add(lblEngine4);
@@ -156,7 +160,7 @@ public class ConfigDialog extends JDialog {
     txtEngine4.setBounds(87, 165, 502, 26);
     engineTab.add(txtEngine4);
 
-    JLabel lblEngine5 = new JLabel("Engine 5");
+    JLabel lblEngine5 = new JLabel(resourceBundle.getString("LizzieConfig.title.engine") + " 5");
     lblEngine5.setHorizontalAlignment(SwingConstants.LEFT);
     lblEngine5.setBounds(6, 200, 92, 16);
     engineTab.add(lblEngine5);
@@ -166,7 +170,7 @@ public class ConfigDialog extends JDialog {
     txtEngine5.setBounds(87, 195, 502, 26);
     engineTab.add(txtEngine5);
 
-    JLabel lblEngine6 = new JLabel("Engine 6");
+    JLabel lblEngine6 = new JLabel(resourceBundle.getString("LizzieConfig.title.engine") + " 6");
     lblEngine6.setHorizontalAlignment(SwingConstants.LEFT);
     lblEngine6.setBounds(6, 230, 92, 16);
     engineTab.add(lblEngine6);
@@ -176,7 +180,7 @@ public class ConfigDialog extends JDialog {
     txtEngine6.setBounds(87, 225, 502, 26);
     engineTab.add(txtEngine6);
 
-    JLabel lblEngine7 = new JLabel("Engine 7");
+    JLabel lblEngine7 = new JLabel(resourceBundle.getString("LizzieConfig.title.engine") + " 7");
     lblEngine7.setHorizontalAlignment(SwingConstants.LEFT);
     lblEngine7.setBounds(6, 260, 92, 16);
     engineTab.add(lblEngine7);
@@ -186,7 +190,7 @@ public class ConfigDialog extends JDialog {
     txtEngine7.setBounds(87, 255, 502, 26);
     engineTab.add(txtEngine7);
 
-    JLabel lblEngine8 = new JLabel("Engine 8");
+    JLabel lblEngine8 = new JLabel(resourceBundle.getString("LizzieConfig.title.engine") + " 8");
     lblEngine8.setHorizontalAlignment(SwingConstants.LEFT);
     lblEngine8.setBounds(6, 290, 92, 16);
     engineTab.add(lblEngine8);
@@ -201,7 +205,7 @@ public class ConfigDialog extends JDialog {
     txtEngine9.setBounds(87, 315, 502, 26);
     engineTab.add(txtEngine9);
 
-    JLabel lblEngine9 = new JLabel("Engine 9");
+    JLabel lblEngine9 = new JLabel(resourceBundle.getString("LizzieConfig.title.engine") + " 9");
     lblEngine9.setHorizontalAlignment(SwingConstants.LEFT);
     lblEngine9.setBounds(6, 320, 92, 16);
     engineTab.add(lblEngine9);
@@ -346,46 +350,79 @@ public class ConfigDialog extends JDialog {
     button_9.setBounds(595, 315, 40, 26);
     engineTab.add(button_9);
 
-    JLabel lblMaxAnalyzeTime = new JLabel("MaxAnalyzeTime");
+    JLabel lblMaxAnalyzeTime =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.maxAnalyzeTime"));
     lblMaxAnalyzeTime.setBounds(6, 370, 157, 16);
     engineTab.add(lblMaxAnalyzeTime);
 
-    JLabel lblMaxAnalyzeTimeMinutes = new JLabel("Minutes");
+    JLabel lblMaxAnalyzeTimeMinutes =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.minutes"));
     lblMaxAnalyzeTimeMinutes.setBounds(213, 370, 82, 16);
     engineTab.add(lblMaxAnalyzeTimeMinutes);
 
-    txtMaxAnalyzeTime = new JFormattedTextField(NumberFormat.getIntegerInstance());
+    txtMaxAnalyzeTime =
+        new JFormattedTextField(
+            new InternationalFormatter(NumberFormat.getIntegerInstance()) {
+              protected DocumentFilter getDocumentFilter() {
+                return filter;
+              }
+
+              private DocumentFilter filter = new DigitOnlyFilter();
+            });
     txtMaxAnalyzeTime.setBounds(171, 365, 40, 26);
     engineTab.add(txtMaxAnalyzeTime);
     txtMaxAnalyzeTime.setColumns(10);
 
-    JLabel lblMaxGameThinkingTime = new JLabel("MaxGameThinkingTime");
+    JLabel lblMaxGameThinkingTime =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.maxGameThinkingTime"));
     lblMaxGameThinkingTime.setBounds(6, 400, 157, 16);
     engineTab.add(lblMaxGameThinkingTime);
 
-    JLabel lblMaxGameThinkingTimeSeconds = new JLabel("Seconds");
+    JLabel lblMaxGameThinkingTimeSeconds =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.seconds"));
     lblMaxGameThinkingTimeSeconds.setBounds(213, 400, 82, 16);
     engineTab.add(lblMaxGameThinkingTimeSeconds);
 
-    txtMaxGameThinkingTime = new JFormattedTextField(NumberFormat.getIntegerInstance());
+    NumberFormat nf = NumberFormat.getIntegerInstance();
+    nf.setGroupingUsed(false);
+    txtMaxGameThinkingTime =
+        new JFormattedTextField(
+            new InternationalFormatter(nf) {
+              protected DocumentFilter getDocumentFilter() {
+                return filter;
+              }
+
+              private DocumentFilter filter = new DigitOnlyFilter();
+            });
     txtMaxGameThinkingTime.setColumns(10);
     txtMaxGameThinkingTime.setBounds(171, 395, 40, 26);
     engineTab.add(txtMaxGameThinkingTime);
 
-    JLabel lblAnalyzeUpdateInterval = new JLabel("AnalyzeUpdateInterval");
+    JLabel lblAnalyzeUpdateInterval =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.analyzeUpdateInterval"));
     lblAnalyzeUpdateInterval.setBounds(331, 368, 157, 16);
     engineTab.add(lblAnalyzeUpdateInterval);
 
-    JLabel lblAnalyzeUpdateIntervalCentisec = new JLabel("Centisecond");
+    JLabel lblAnalyzeUpdateIntervalCentisec =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.centisecond"));
     lblAnalyzeUpdateIntervalCentisec.setBounds(538, 368, 82, 16);
     engineTab.add(lblAnalyzeUpdateIntervalCentisec);
 
-    txtAnalyzeUpdateInterval = new JFormattedTextField(NumberFormat.getIntegerInstance());
+    txtAnalyzeUpdateInterval =
+        new JFormattedTextField(
+            new InternationalFormatter(NumberFormat.getIntegerInstance()) {
+              protected DocumentFilter getDocumentFilter() {
+                return filter;
+              }
+
+              private DocumentFilter filter = new DigitOnlyFilter();
+            });
     txtAnalyzeUpdateInterval.setColumns(10);
     txtAnalyzeUpdateInterval.setBounds(496, 363, 40, 26);
     engineTab.add(txtAnalyzeUpdateInterval);
 
-    JLabel lblPrintEngineLog = new JLabel("Print Engine Log");
+    JLabel lblPrintEngineLog =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.printEngineLog"));
     lblPrintEngineLog.setBounds(6, 430, 157, 16);
     engineTab.add(lblPrintEngineLog);
 
@@ -393,10 +430,10 @@ public class ConfigDialog extends JDialog {
     chkPrintEngineLog.setBounds(167, 425, 201, 23);
     engineTab.add(chkPrintEngineLog);
     JPanel uiTab = new JPanel();
-    tabbedPane.addTab("UI", null, uiTab, null);
+    tabbedPane.addTab(resourceBundle.getString("LizzieConfig.title.ui"), null, uiTab, null);
 
     JTabbedPane tabTheme = new JTabbedPane(JTabbedPane.TOP);
-    tabbedPane.addTab("Theme", null, tabTheme, null);
+    tabbedPane.addTab(resourceBundle.getString("LizzieConfig.title.theme"), null, tabTheme, null);
     txts =
         new JTextField[] {
           txtEngine1,
@@ -437,7 +474,7 @@ public class ConfigDialog extends JDialog {
     File weightFile = null;
     JFileChooser chooser = new JFileChooser(".");
     chooser.setMultiSelectionEnabled(false);
-    chooser.setDialogTitle("Please select the leela zero");
+    chooser.setDialogTitle(resourceBundle.getString("LizzieConfig.prompt.selectEngine"));
     setVisible(false);
     int result = chooser.showOpenDialog(this);
     if (result == JFileChooser.APPROVE_OPTION) {
@@ -446,7 +483,7 @@ public class ConfigDialog extends JDialog {
         enginePath = engineFile.getAbsolutePath();
         enginePath = relativizePath(engineFile.toPath());
         getCommandHelp();
-        chooser.setDialogTitle("Please select the weight file");
+        chooser.setDialogTitle(resourceBundle.getString("LizzieConfig.prompt.selectWeight"));
         result = chooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
           weightFile = chooser.getSelectedFile();
@@ -501,7 +538,6 @@ public class ConfigDialog extends JDialog {
         line.append((char) c);
       }
       commandHelp = line.toString();
-      System.out.println("Command help done." + commandHelp);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -532,13 +568,23 @@ public class ConfigDialog extends JDialog {
     }
   }
 
-  private class DocFilter extends DocumentFilter {
+  private class DigitOnlyFilter extends DocumentFilter {
     @Override
     public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
-        throws BadLocationException {}
+        throws BadLocationException {
+      String newStr = string.replaceAll("\\D++", "");
+      if (!newStr.isEmpty()) {
+        fb.insertString(offset, newStr, attr);
+      }
+    }
 
     @Override
-    public void replace(FilterBypass fb, int offs, int length, String text, AttributeSet attrs)
-        throws BadLocationException {}
+    public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+        throws BadLocationException {
+      String newStr = text.replaceAll("\\D++", "");
+      if (!newStr.isEmpty()) {
+        fb.replace(offset, length, newStr, attrs);
+      }
+    }
   }
 }

@@ -31,7 +31,7 @@ public class EngineParameter extends JDialog {
 
   /** Create the dialog. */
   public EngineParameter(String enginePath, String weightPath, ConfigDialog configDialog) {
-    setTitle("Parameter Config");
+    setTitle(configDialog.resourceBundle.getString("LizzieConfig.title.parameterConfig"));
     setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
     setModal(true);
     setType(Type.POPUP);
@@ -41,7 +41,8 @@ public class EngineParameter extends JDialog {
     contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
     getContentPane().add(contentPanel, BorderLayout.CENTER);
     contentPanel.setLayout(null);
-    JLabel lblEngneCommand = new JLabel("Engine");
+    JLabel lblEngneCommand =
+        new JLabel(configDialog.resourceBundle.getString("LizzieConfig.title.engine"));
     lblEngneCommand.setBounds(6, 17, 83, 16);
     contentPanel.add(lblEngneCommand);
     txtCommandLine = new JTextField();
@@ -50,7 +51,8 @@ public class EngineParameter extends JDialog {
     txtCommandLine.setText(enginePath + " --weights " + weightPath);
     contentPanel.add(txtCommandLine);
     txtCommandLine.setColumns(10);
-    JLabel lblParameter = new JLabel("Parameter");
+    JLabel lblParameter =
+        new JLabel(configDialog.resourceBundle.getString("LizzieConfig.title.parameter"));
     lblParameter.setBounds(6, 45, 83, 16);
     contentPanel.add(lblParameter);
     txtParameter = new JTextField();
@@ -82,13 +84,14 @@ public class EngineParameter extends JDialog {
     txtParams.setText(configDialog.commandHelp);
     txtParams.setEditable(false);
 
-    JLabel lblParameterList = new JLabel("Parameter List");
+    JLabel lblParameterList =
+        new JLabel(configDialog.resourceBundle.getString("LizzieConfig.title.parameterList"));
     lblParameterList.setBounds(6, 81, 114, 16);
     contentPanel.add(lblParameterList);
     JPanel buttonPane = new JPanel();
     buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
     getContentPane().add(buttonPane, BorderLayout.SOUTH);
-    JButton okButton = new JButton("OK");
+    JButton okButton = new JButton(configDialog.resourceBundle.getString("LizzieConfig.button.ok"));
     okButton.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
@@ -104,7 +107,8 @@ public class EngineParameter extends JDialog {
     okButton.setActionCommand("OK");
     buttonPane.add(okButton);
     getRootPane().setDefaultButton(okButton);
-    JButton cancelButton = new JButton("Cancel");
+    JButton cancelButton =
+        new JButton(configDialog.resourceBundle.getString("LizzieConfig.button.cancel"));
     cancelButton.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
