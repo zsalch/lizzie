@@ -13,6 +13,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
@@ -28,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
@@ -38,6 +40,7 @@ import org.json.JSONObject;
 
 public class ConfigDialog extends JDialog {
   public final ResourceBundle resourceBundle = ResourceBundle.getBundle("l10n.DisplayStrings");
+  private String osName;
   private JTextField txtEngine;
   private JTextField txtEngine1;
   private JTextField txtEngine2;
@@ -62,18 +65,6 @@ public class ConfigDialog extends JDialog {
   private JCheckBox chkPrintEngineLog;
   private JSONObject leelazConfig;
 
-  /** Launch the application. */
-  public static void main(String[] args) {
-    try {
-      ConfigDialog dialog = new ConfigDialog();
-      dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-      dialog.setVisible(true);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  /** Create the dialog. */
   public ConfigDialog() {
     setTitle(resourceBundle.getString("LizzieConfig.title.config"));
     setModalityType(ModalityType.APPLICATION_MODAL);
@@ -465,6 +456,7 @@ public class ConfigDialog extends JDialog {
         String.valueOf(leelazConfig.getInt("max-game-thinking-time-seconds")));
     chkPrintEngineLog.setSelected(leelazConfig.getBoolean("print-comms"));
     curPath = (new File("")).getAbsoluteFile().toPath();
+    osName = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
     setLocationRelativeTo(getOwner());
   }
 
@@ -473,6 +465,13 @@ public class ConfigDialog extends JDialog {
     File engineFile = null;
     File weightFile = null;
     JFileChooser chooser = new JFileChooser(".");
+    FileNameExtensionFilter filter = null;
+    if (isWindows()) {
+      filter =
+          new FileNameExtensionFilter(
+              resourceBundle.getString("LizzieConfig.title.engine"), "exe", "bat");
+      chooser.setFileFilter(filter);
+    }
     chooser.setMultiSelectionEnabled(false);
     chooser.setDialogTitle(resourceBundle.getString("LizzieConfig.prompt.selectEngine"));
     setVisible(false);
@@ -484,6 +483,9 @@ public class ConfigDialog extends JDialog {
         enginePath = relativizePath(engineFile.toPath());
         getCommandHelp();
         chooser.setDialogTitle(resourceBundle.getString("LizzieConfig.prompt.selectWeight"));
+        if (isWindows()) {
+          chooser.removeChoosableFileFilter(filter);
+        }
         result = chooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
           weightFile = chooser.getSelectedFile();
@@ -572,7 +574,7 @@ public class ConfigDialog extends JDialog {
     @Override
     public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
         throws BadLocationException {
-      String newStr = string.replaceAll("\\D++", "");
+      String newStr = string != null ? string.replaceAll("\\D++", "") : "";
       if (!newStr.isEmpty()) {
         fb.insertString(offset, newStr, attr);
       }
@@ -581,10 +583,14 @@ public class ConfigDialog extends JDialog {
     @Override
     public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
         throws BadLocationException {
-      String newStr = text.replaceAll("\\D++", "");
+      String newStr = text != null ? text.replaceAll("\\D++", "") : "";
       if (!newStr.isEmpty()) {
         fb.replace(offset, length, newStr, attrs);
       }
     }
+  }
+
+  public boolean isWindows() {
+    return !osName.contains("darwin") && osName.contains("win");
   }
 }
