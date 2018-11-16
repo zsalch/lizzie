@@ -41,41 +41,33 @@ public class EngineParameter extends JDialog {
     contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
     getContentPane().add(contentPanel, BorderLayout.CENTER);
     contentPanel.setLayout(null);
-    {
-      JLabel lblEngneCommand = new JLabel("Engine");
-      lblEngneCommand.setBounds(6, 17, 83, 16);
-      contentPanel.add(lblEngneCommand);
-    }
-    {
-      txtCommandLine = new JTextField();
-      txtCommandLine.setEditable(false);
-      txtCommandLine.setBounds(89, 12, 565, 26);
-      txtCommandLine.setText(enginePath + " --weights " + weightPath);
-      contentPanel.add(txtCommandLine);
-      txtCommandLine.setColumns(10);
-    }
-    {
-      JLabel lblParameter = new JLabel("Parameter");
-      lblParameter.setBounds(6, 45, 83, 16);
-      contentPanel.add(lblParameter);
-    }
-    {
-      txtParameter = new JTextField();
-      txtParameter.addFocusListener(
-          new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-              if (!txtParameter.getText().isEmpty()) {
-                txtParameter.setBackground(oriColor);
-              }
+    JLabel lblEngneCommand = new JLabel("Engine");
+    lblEngneCommand.setBounds(6, 17, 83, 16);
+    contentPanel.add(lblEngneCommand);
+    txtCommandLine = new JTextField();
+    txtCommandLine.setEditable(false);
+    txtCommandLine.setBounds(89, 12, 565, 26);
+    txtCommandLine.setText(enginePath + " --weights " + weightPath);
+    contentPanel.add(txtCommandLine);
+    txtCommandLine.setColumns(10);
+    JLabel lblParameter = new JLabel("Parameter");
+    lblParameter.setBounds(6, 45, 83, 16);
+    contentPanel.add(lblParameter);
+    txtParameter = new JTextField();
+    txtParameter.addFocusListener(
+        new FocusAdapter() {
+          @Override
+          public void focusLost(FocusEvent e) {
+            if (!txtParameter.getText().isEmpty()) {
+              txtParameter.setBackground(oriColor);
             }
-          });
-      txtParameter.setColumns(10);
-      txtParameter.setBounds(89, 44, 565, 26);
-      txtParameter.setText("-g --lagbuffer 0 ");
-      oriColor = txtParameter.getBackground();
-      contentPanel.add(txtParameter);
-    }
+          }
+        });
+    txtParameter.setColumns(10);
+    txtParameter.setBounds(89, 44, 565, 26);
+    txtParameter.setText("-g --lagbuffer 0 ");
+    oriColor = txtParameter.getBackground();
+    contentPanel.add(txtParameter);
 
     JScrollPane scrollPane = new JScrollPane();
     scrollPane.setBounds(6, 110, 648, 478);
@@ -93,40 +85,34 @@ public class EngineParameter extends JDialog {
     JLabel lblParameterList = new JLabel("Parameter List");
     lblParameterList.setBounds(6, 81, 114, 16);
     contentPanel.add(lblParameterList);
-    {
-      JPanel buttonPane = new JPanel();
-      buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-      getContentPane().add(buttonPane, BorderLayout.SOUTH);
-      {
-        JButton okButton = new JButton("OK");
-        okButton.addActionListener(
-            new ActionListener() {
-              public void actionPerformed(ActionEvent e) {
-                if (txtParameter.getText().isEmpty()) {
-                  txtParameter.setBackground(Color.RED);
-                } else {
-                  parameters = txtParameter.getText().trim();
-                  commandLine = txtCommandLine.getText() + " " + parameters;
-                  setVisible(false);
-                }
-              }
-            });
-        okButton.setActionCommand("OK");
-        buttonPane.add(okButton);
-        getRootPane().setDefaultButton(okButton);
-      }
-      {
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(
-            new ActionListener() {
-              public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-              }
-            });
-        cancelButton.setActionCommand("Cancel");
-        buttonPane.add(cancelButton);
-      }
-    }
+    JPanel buttonPane = new JPanel();
+    buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+    getContentPane().add(buttonPane, BorderLayout.SOUTH);
+    JButton okButton = new JButton("OK");
+    okButton.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            if (txtParameter.getText().isEmpty()) {
+              txtParameter.setBackground(Color.RED);
+            } else {
+              parameters = txtParameter.getText().trim();
+              commandLine = txtCommandLine.getText() + " " + parameters;
+              setVisible(false);
+            }
+          }
+        });
+    okButton.setActionCommand("OK");
+    buttonPane.add(okButton);
+    getRootPane().setDefaultButton(okButton);
+    JButton cancelButton = new JButton("Cancel");
+    cancelButton.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            setVisible(false);
+          }
+        });
+    cancelButton.setActionCommand("Cancel");
+    buttonPane.add(cancelButton);
     setLocationRelativeTo(getOwner());
   }
 }

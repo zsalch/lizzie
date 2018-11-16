@@ -1,5 +1,6 @@
 package featurecat.lizzie.gui;
 
+import featurecat.lizzie.Lizzie;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -31,7 +32,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import featurecat.lizzie.Lizzie;
 
 public class ConfigDialog extends JDialog {
   private JTextField txtEngine;
@@ -76,338 +76,327 @@ public class ConfigDialog extends JDialog {
     setType(Type.POPUP);
     setBounds(100, 100, 661, 567);
     getContentPane().setLayout(new BorderLayout());
-    {
-      JPanel buttonPane = new JPanel();
-      buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-      getContentPane().add(buttonPane, BorderLayout.SOUTH);
-      {
-        JButton okButton = new JButton("OK");
-        okButton.addActionListener(
-            new ActionListener() {
-              public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-                saveConfig();
-              }
-            });
-        okButton.setActionCommand("OK");
-        buttonPane.add(okButton);
-        getRootPane().setDefaultButton(okButton);
-      }
-      {
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(
-            new ActionListener() {
-              public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-              }
-            });
-        cancelButton.setActionCommand("Cancel");
-        buttonPane.add(cancelButton);
-      }
-    }
-    {
-      JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-      getContentPane().add(tabbedPane, BorderLayout.CENTER);
+    JPanel buttonPane = new JPanel();
+    buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+    getContentPane().add(buttonPane, BorderLayout.SOUTH);
+    JButton okButton = new JButton("OK");
+    okButton.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            setVisible(false);
+            saveConfig();
+          }
+        });
+    okButton.setActionCommand("OK");
+    buttonPane.add(okButton);
+    getRootPane().setDefaultButton(okButton);
+    JButton cancelButton = new JButton("Cancel");
+    cancelButton.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            setVisible(false);
+          }
+        });
+    cancelButton.setActionCommand("Cancel");
+    buttonPane.add(cancelButton);
+    JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+    getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
-      JPanel engineTab = new JPanel();
-      tabbedPane.addTab("Engine", null, engineTab, null);
-      engineTab.setLayout(null);
+    JPanel engineTab = new JPanel();
+    tabbedPane.addTab("Engine", null, engineTab, null);
+    engineTab.setLayout(null);
 
-      JLabel lblEngine = new JLabel("Engine");
-      lblEngine.setBounds(6, 44, 92, 16);
-      lblEngine.setHorizontalAlignment(SwingConstants.LEFT);
-      engineTab.add(lblEngine);
-      {
-        txtEngine = new JTextField();
-        txtEngine.setBounds(87, 40, 502, 26);
-        engineTab.add(txtEngine);
-        txtEngine.setColumns(10);
-      }
+    JLabel lblEngine = new JLabel("Engine");
+    lblEngine.setBounds(6, 44, 92, 16);
+    lblEngine.setHorizontalAlignment(SwingConstants.LEFT);
+    engineTab.add(lblEngine);
 
-      JLabel lblEngine1 = new JLabel("Engine 1");
-      lblEngine1.setHorizontalAlignment(SwingConstants.LEFT);
-      lblEngine1.setBounds(6, 80, 92, 16);
-      engineTab.add(lblEngine1);
+    txtEngine = new JTextField();
+    txtEngine.setBounds(87, 40, 502, 26);
+    engineTab.add(txtEngine);
+    txtEngine.setColumns(10);
 
-      txtEngine2 = new JTextField();
-      txtEngine2.setColumns(10);
-      txtEngine2.setBounds(87, 105, 502, 26);
-      engineTab.add(txtEngine2);
+    JLabel lblEngine1 = new JLabel("Engine 1");
+    lblEngine1.setHorizontalAlignment(SwingConstants.LEFT);
+    lblEngine1.setBounds(6, 80, 92, 16);
+    engineTab.add(lblEngine1);
 
-      JLabel lblEngine2 = new JLabel("Engine 2");
-      lblEngine2.setHorizontalAlignment(SwingConstants.LEFT);
-      lblEngine2.setBounds(6, 110, 92, 16);
-      engineTab.add(lblEngine2);
+    txtEngine2 = new JTextField();
+    txtEngine2.setColumns(10);
+    txtEngine2.setBounds(87, 105, 502, 26);
+    engineTab.add(txtEngine2);
 
-      txtEngine1 = new JTextField();
-      txtEngine1.setColumns(10);
-      txtEngine1.setBounds(87, 75, 502, 26);
-      engineTab.add(txtEngine1);
+    JLabel lblEngine2 = new JLabel("Engine 2");
+    lblEngine2.setHorizontalAlignment(SwingConstants.LEFT);
+    lblEngine2.setBounds(6, 110, 92, 16);
+    engineTab.add(lblEngine2);
 
-      JLabel lblEngine3 = new JLabel("Engine 3");
-      lblEngine3.setHorizontalAlignment(SwingConstants.LEFT);
-      lblEngine3.setBounds(6, 140, 92, 16);
-      engineTab.add(lblEngine3);
+    txtEngine1 = new JTextField();
+    txtEngine1.setColumns(10);
+    txtEngine1.setBounds(87, 75, 502, 26);
+    engineTab.add(txtEngine1);
 
-      txtEngine3 = new JTextField();
-      txtEngine3.setColumns(10);
-      txtEngine3.setBounds(87, 135, 502, 26);
-      engineTab.add(txtEngine3);
+    JLabel lblEngine3 = new JLabel("Engine 3");
+    lblEngine3.setHorizontalAlignment(SwingConstants.LEFT);
+    lblEngine3.setBounds(6, 140, 92, 16);
+    engineTab.add(lblEngine3);
 
-      JLabel lblEngine4 = new JLabel("Engine 4");
-      lblEngine4.setHorizontalAlignment(SwingConstants.LEFT);
-      lblEngine4.setBounds(6, 170, 92, 16);
-      engineTab.add(lblEngine4);
+    txtEngine3 = new JTextField();
+    txtEngine3.setColumns(10);
+    txtEngine3.setBounds(87, 135, 502, 26);
+    engineTab.add(txtEngine3);
 
-      txtEngine4 = new JTextField();
-      txtEngine4.setColumns(10);
-      txtEngine4.setBounds(87, 165, 502, 26);
-      engineTab.add(txtEngine4);
+    JLabel lblEngine4 = new JLabel("Engine 4");
+    lblEngine4.setHorizontalAlignment(SwingConstants.LEFT);
+    lblEngine4.setBounds(6, 170, 92, 16);
+    engineTab.add(lblEngine4);
 
-      JLabel lblEngine5 = new JLabel("Engine 5");
-      lblEngine5.setHorizontalAlignment(SwingConstants.LEFT);
-      lblEngine5.setBounds(6, 200, 92, 16);
-      engineTab.add(lblEngine5);
+    txtEngine4 = new JTextField();
+    txtEngine4.setColumns(10);
+    txtEngine4.setBounds(87, 165, 502, 26);
+    engineTab.add(txtEngine4);
 
-      txtEngine5 = new JTextField();
-      txtEngine5.setColumns(10);
-      txtEngine5.setBounds(87, 195, 502, 26);
-      engineTab.add(txtEngine5);
+    JLabel lblEngine5 = new JLabel("Engine 5");
+    lblEngine5.setHorizontalAlignment(SwingConstants.LEFT);
+    lblEngine5.setBounds(6, 200, 92, 16);
+    engineTab.add(lblEngine5);
 
-      JLabel lblEngine6 = new JLabel("Engine 6");
-      lblEngine6.setHorizontalAlignment(SwingConstants.LEFT);
-      lblEngine6.setBounds(6, 230, 92, 16);
-      engineTab.add(lblEngine6);
+    txtEngine5 = new JTextField();
+    txtEngine5.setColumns(10);
+    txtEngine5.setBounds(87, 195, 502, 26);
+    engineTab.add(txtEngine5);
 
-      txtEngine6 = new JTextField();
-      txtEngine6.setColumns(10);
-      txtEngine6.setBounds(87, 225, 502, 26);
-      engineTab.add(txtEngine6);
+    JLabel lblEngine6 = new JLabel("Engine 6");
+    lblEngine6.setHorizontalAlignment(SwingConstants.LEFT);
+    lblEngine6.setBounds(6, 230, 92, 16);
+    engineTab.add(lblEngine6);
 
-      JLabel lblEngine7 = new JLabel("Engine 7");
-      lblEngine7.setHorizontalAlignment(SwingConstants.LEFT);
-      lblEngine7.setBounds(6, 260, 92, 16);
-      engineTab.add(lblEngine7);
+    txtEngine6 = new JTextField();
+    txtEngine6.setColumns(10);
+    txtEngine6.setBounds(87, 225, 502, 26);
+    engineTab.add(txtEngine6);
 
-      txtEngine7 = new JTextField();
-      txtEngine7.setColumns(10);
-      txtEngine7.setBounds(87, 255, 502, 26);
-      engineTab.add(txtEngine7);
+    JLabel lblEngine7 = new JLabel("Engine 7");
+    lblEngine7.setHorizontalAlignment(SwingConstants.LEFT);
+    lblEngine7.setBounds(6, 260, 92, 16);
+    engineTab.add(lblEngine7);
 
-      JLabel lblEngine8 = new JLabel("Engine 8");
-      lblEngine8.setHorizontalAlignment(SwingConstants.LEFT);
-      lblEngine8.setBounds(6, 290, 92, 16);
-      engineTab.add(lblEngine8);
+    txtEngine7 = new JTextField();
+    txtEngine7.setColumns(10);
+    txtEngine7.setBounds(87, 255, 502, 26);
+    engineTab.add(txtEngine7);
 
-      txtEngine8 = new JTextField();
-      txtEngine8.setColumns(10);
-      txtEngine8.setBounds(87, 285, 502, 26);
-      engineTab.add(txtEngine8);
+    JLabel lblEngine8 = new JLabel("Engine 8");
+    lblEngine8.setHorizontalAlignment(SwingConstants.LEFT);
+    lblEngine8.setBounds(6, 290, 92, 16);
+    engineTab.add(lblEngine8);
 
-      txtEngine9 = new JTextField();
-      txtEngine9.setColumns(10);
-      txtEngine9.setBounds(87, 315, 502, 26);
-      engineTab.add(txtEngine9);
+    txtEngine8 = new JTextField();
+    txtEngine8.setColumns(10);
+    txtEngine8.setBounds(87, 285, 502, 26);
+    engineTab.add(txtEngine8);
 
-      JLabel lblEngine9 = new JLabel("Engine 9");
-      lblEngine9.setHorizontalAlignment(SwingConstants.LEFT);
-      lblEngine9.setBounds(6, 320, 92, 16);
-      engineTab.add(lblEngine9);
+    txtEngine9 = new JTextField();
+    txtEngine9.setColumns(10);
+    txtEngine9.setBounds(87, 315, 502, 26);
+    engineTab.add(txtEngine9);
 
-      JButton button = new JButton("...");
-      button.addActionListener(
-          new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-              String el = getEngineLine();
-              if (!el.isEmpty()) {
-                txtEngine.setText(el);
-              }
-              setVisible(true);
+    JLabel lblEngine9 = new JLabel("Engine 9");
+    lblEngine9.setHorizontalAlignment(SwingConstants.LEFT);
+    lblEngine9.setBounds(6, 320, 92, 16);
+    engineTab.add(lblEngine9);
+
+    JButton button = new JButton("...");
+    button.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            String el = getEngineLine();
+            if (!el.isEmpty()) {
+              txtEngine.setText(el);
             }
-          });
-      button.setBounds(595, 40, 40, 26);
-      engineTab.add(button);
+            setVisible(true);
+          }
+        });
+    button.setBounds(595, 40, 40, 26);
+    engineTab.add(button);
 
-      JButton button_1 = new JButton("...");
-      button_1.addActionListener(
-          new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-              String el = getEngineLine();
-              if (!el.isEmpty()) {
-                txtEngine1.setText(el);
-              }
-              setVisible(true);
+    JButton button_1 = new JButton("...");
+    button_1.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            String el = getEngineLine();
+            if (!el.isEmpty()) {
+              txtEngine1.setText(el);
             }
-          });
-      button_1.setBounds(595, 75, 40, 26);
-      engineTab.add(button_1);
+            setVisible(true);
+          }
+        });
+    button_1.setBounds(595, 75, 40, 26);
+    engineTab.add(button_1);
 
-      JButton button_2 = new JButton("...");
-      button_2.addActionListener(
-          new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-              String el = getEngineLine();
-              if (!el.isEmpty()) {
-                txtEngine2.setText(el);
-              }
-              setVisible(true);
+    JButton button_2 = new JButton("...");
+    button_2.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            String el = getEngineLine();
+            if (!el.isEmpty()) {
+              txtEngine2.setText(el);
             }
-          });
-      button_2.setBounds(595, 105, 40, 26);
-      engineTab.add(button_2);
+            setVisible(true);
+          }
+        });
+    button_2.setBounds(595, 105, 40, 26);
+    engineTab.add(button_2);
 
-      JButton button_3 = new JButton("...");
-      button_3.addActionListener(
-          new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-              String el = getEngineLine();
-              if (!el.isEmpty()) {
-                txtEngine3.setText(el);
-              }
-              setVisible(true);
+    JButton button_3 = new JButton("...");
+    button_3.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            String el = getEngineLine();
+            if (!el.isEmpty()) {
+              txtEngine3.setText(el);
             }
-          });
-      button_3.setBounds(595, 135, 40, 26);
-      engineTab.add(button_3);
+            setVisible(true);
+          }
+        });
+    button_3.setBounds(595, 135, 40, 26);
+    engineTab.add(button_3);
 
-      JButton button_4 = new JButton("...");
-      button_4.addActionListener(
-          new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-              String el = getEngineLine();
-              if (!el.isEmpty()) {
-                txtEngine4.setText(el);
-              }
-              setVisible(true);
+    JButton button_4 = new JButton("...");
+    button_4.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            String el = getEngineLine();
+            if (!el.isEmpty()) {
+              txtEngine4.setText(el);
             }
-          });
-      button_4.setBounds(595, 165, 40, 26);
-      engineTab.add(button_4);
+            setVisible(true);
+          }
+        });
+    button_4.setBounds(595, 165, 40, 26);
+    engineTab.add(button_4);
 
-      JButton button_5 = new JButton("...");
-      button_5.addActionListener(
-          new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-              String el = getEngineLine();
-              if (!el.isEmpty()) {
-                txtEngine5.setText(el);
-              }
-              setVisible(true);
+    JButton button_5 = new JButton("...");
+    button_5.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            String el = getEngineLine();
+            if (!el.isEmpty()) {
+              txtEngine5.setText(el);
             }
-          });
-      button_5.setBounds(595, 195, 40, 26);
-      engineTab.add(button_5);
+            setVisible(true);
+          }
+        });
+    button_5.setBounds(595, 195, 40, 26);
+    engineTab.add(button_5);
 
-      JButton button_6 = new JButton("...");
-      button_6.addActionListener(
-          new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-              String el = getEngineLine();
-              if (!el.isEmpty()) {
-                txtEngine6.setText(el);
-              }
-              setVisible(true);
+    JButton button_6 = new JButton("...");
+    button_6.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            String el = getEngineLine();
+            if (!el.isEmpty()) {
+              txtEngine6.setText(el);
             }
-          });
-      button_6.setBounds(595, 225, 40, 26);
-      engineTab.add(button_6);
+            setVisible(true);
+          }
+        });
+    button_6.setBounds(595, 225, 40, 26);
+    engineTab.add(button_6);
 
-      JButton button_7 = new JButton("...");
-      button_7.addActionListener(
-          new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-              String el = getEngineLine();
-              if (!el.isEmpty()) {
-                txtEngine7.setText(el);
-              }
-              setVisible(true);
+    JButton button_7 = new JButton("...");
+    button_7.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            String el = getEngineLine();
+            if (!el.isEmpty()) {
+              txtEngine7.setText(el);
             }
-          });
-      button_7.setBounds(595, 255, 40, 26);
-      engineTab.add(button_7);
+            setVisible(true);
+          }
+        });
+    button_7.setBounds(595, 255, 40, 26);
+    engineTab.add(button_7);
 
-      JButton button_8 = new JButton("...");
-      button_8.addActionListener(
-          new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-              String el = getEngineLine();
-              if (!el.isEmpty()) {
-                txtEngine8.setText(el);
-              }
-              setVisible(true);
+    JButton button_8 = new JButton("...");
+    button_8.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            String el = getEngineLine();
+            if (!el.isEmpty()) {
+              txtEngine8.setText(el);
             }
-          });
-      button_8.setBounds(595, 285, 40, 26);
-      engineTab.add(button_8);
+            setVisible(true);
+          }
+        });
+    button_8.setBounds(595, 285, 40, 26);
+    engineTab.add(button_8);
 
-      JButton button_9 = new JButton("...");
-      button_9.addActionListener(
-          new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-              String el = getEngineLine();
-              if (!el.isEmpty()) {
-                txtEngine9.setText(el);
-              }
-              setVisible(true);
+    JButton button_9 = new JButton("...");
+    button_9.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            String el = getEngineLine();
+            if (!el.isEmpty()) {
+              txtEngine9.setText(el);
             }
-          });
-      button_9.setBounds(595, 315, 40, 26);
-      engineTab.add(button_9);
+            setVisible(true);
+          }
+        });
+    button_9.setBounds(595, 315, 40, 26);
+    engineTab.add(button_9);
 
-      JLabel lblMaxAnalyzeTime = new JLabel("MaxAnalyzeTime");
-      lblMaxAnalyzeTime.setBounds(6, 370, 157, 16);
-      engineTab.add(lblMaxAnalyzeTime);
+    JLabel lblMaxAnalyzeTime = new JLabel("MaxAnalyzeTime");
+    lblMaxAnalyzeTime.setBounds(6, 370, 157, 16);
+    engineTab.add(lblMaxAnalyzeTime);
 
-      JLabel lblMaxAnalyzeTimeMinutes = new JLabel("Minutes");
-      lblMaxAnalyzeTimeMinutes.setBounds(213, 370, 82, 16);
-      engineTab.add(lblMaxAnalyzeTimeMinutes);
+    JLabel lblMaxAnalyzeTimeMinutes = new JLabel("Minutes");
+    lblMaxAnalyzeTimeMinutes.setBounds(213, 370, 82, 16);
+    engineTab.add(lblMaxAnalyzeTimeMinutes);
 
-      txtMaxAnalyzeTime = new JFormattedTextField(NumberFormat.getIntegerInstance());
-      txtMaxAnalyzeTime.setBounds(171, 365, 40, 26);
-      engineTab.add(txtMaxAnalyzeTime);
-      txtMaxAnalyzeTime.setColumns(10);
+    txtMaxAnalyzeTime = new JFormattedTextField(NumberFormat.getIntegerInstance());
+    txtMaxAnalyzeTime.setBounds(171, 365, 40, 26);
+    engineTab.add(txtMaxAnalyzeTime);
+    txtMaxAnalyzeTime.setColumns(10);
 
-      JLabel lblMaxGameThinkingTime = new JLabel("MaxGameThinkingTime");
-      lblMaxGameThinkingTime.setBounds(6, 400, 157, 16);
-      engineTab.add(lblMaxGameThinkingTime);
+    JLabel lblMaxGameThinkingTime = new JLabel("MaxGameThinkingTime");
+    lblMaxGameThinkingTime.setBounds(6, 400, 157, 16);
+    engineTab.add(lblMaxGameThinkingTime);
 
-      JLabel lblMaxGameThinkingTimeSeconds = new JLabel("Seconds");
-      lblMaxGameThinkingTimeSeconds.setBounds(213, 400, 82, 16);
-      engineTab.add(lblMaxGameThinkingTimeSeconds);
+    JLabel lblMaxGameThinkingTimeSeconds = new JLabel("Seconds");
+    lblMaxGameThinkingTimeSeconds.setBounds(213, 400, 82, 16);
+    engineTab.add(lblMaxGameThinkingTimeSeconds);
 
-      txtMaxGameThinkingTime = new JFormattedTextField(NumberFormat.getIntegerInstance());
-      txtMaxGameThinkingTime.setColumns(10);
-      txtMaxGameThinkingTime.setBounds(171, 395, 40, 26);
-      engineTab.add(txtMaxGameThinkingTime);
+    txtMaxGameThinkingTime = new JFormattedTextField(NumberFormat.getIntegerInstance());
+    txtMaxGameThinkingTime.setColumns(10);
+    txtMaxGameThinkingTime.setBounds(171, 395, 40, 26);
+    engineTab.add(txtMaxGameThinkingTime);
 
-      JLabel lblAnalyzeUpdateInterval = new JLabel("AnalyzeUpdateInterval");
-      lblAnalyzeUpdateInterval.setBounds(331, 368, 157, 16);
-      engineTab.add(lblAnalyzeUpdateInterval);
+    JLabel lblAnalyzeUpdateInterval = new JLabel("AnalyzeUpdateInterval");
+    lblAnalyzeUpdateInterval.setBounds(331, 368, 157, 16);
+    engineTab.add(lblAnalyzeUpdateInterval);
 
-      JLabel lblAnalyzeUpdateIntervalCentisec = new JLabel("Centisecond");
-      lblAnalyzeUpdateIntervalCentisec.setBounds(538, 368, 82, 16);
-      engineTab.add(lblAnalyzeUpdateIntervalCentisec);
+    JLabel lblAnalyzeUpdateIntervalCentisec = new JLabel("Centisecond");
+    lblAnalyzeUpdateIntervalCentisec.setBounds(538, 368, 82, 16);
+    engineTab.add(lblAnalyzeUpdateIntervalCentisec);
 
-      txtAnalyzeUpdateInterval = new JFormattedTextField(NumberFormat.getIntegerInstance());
-      txtAnalyzeUpdateInterval.setColumns(10);
-      txtAnalyzeUpdateInterval.setBounds(496, 363, 40, 26);
-      engineTab.add(txtAnalyzeUpdateInterval);
+    txtAnalyzeUpdateInterval = new JFormattedTextField(NumberFormat.getIntegerInstance());
+    txtAnalyzeUpdateInterval.setColumns(10);
+    txtAnalyzeUpdateInterval.setBounds(496, 363, 40, 26);
+    engineTab.add(txtAnalyzeUpdateInterval);
 
-      JLabel lblPrintEngineLog = new JLabel("Print Engine Log");
-      lblPrintEngineLog.setBounds(6, 430, 157, 16);
-      engineTab.add(lblPrintEngineLog);
+    JLabel lblPrintEngineLog = new JLabel("Print Engine Log");
+    lblPrintEngineLog.setBounds(6, 430, 157, 16);
+    engineTab.add(lblPrintEngineLog);
 
-      chkPrintEngineLog = new JCheckBox("");
-      chkPrintEngineLog.setBounds(167, 425, 201, 23);
-      engineTab.add(chkPrintEngineLog);
-      {
-        JPanel uiTab = new JPanel();
-        tabbedPane.addTab("UI", null, uiTab, null);
-      }
+    chkPrintEngineLog = new JCheckBox("");
+    chkPrintEngineLog.setBounds(167, 425, 201, 23);
+    engineTab.add(chkPrintEngineLog);
+    JPanel uiTab = new JPanel();
+    tabbedPane.addTab("UI", null, uiTab, null);
 
-      JTabbedPane tabTheme = new JTabbedPane(JTabbedPane.TOP);
-      tabbedPane.addTab("Theme", null, tabTheme, null);
-    }
+    JTabbedPane tabTheme = new JTabbedPane(JTabbedPane.TOP);
+    tabbedPane.addTab("Theme", null, tabTheme, null);
     txts =
         new JTextField[] {
           txtEngine1,
