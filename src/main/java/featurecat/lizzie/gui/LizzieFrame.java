@@ -1282,12 +1282,11 @@ public class LizzieFrame extends JFrame {
   public void createCommentImage(boolean forceRefresh, int w, int h) {
     if (forceRefresh || scrollPane.getWidth() != w || scrollPane.getHeight() != h) {
       if (w > 0 && h > 0) {
+        scrollPane.addNotify();
         scrollPane.setSize(w, h);
         cachedCommentImage =
             new BufferedImage(scrollPane.getWidth(), scrollPane.getHeight(), TYPE_INT_ARGB);
         Graphics2D g2 = cachedCommentImage.createGraphics();
-        scrollPane.doLayout();
-        scrollPane.addNotify();
         scrollPane.validate();
         scrollPane.printAll(g2);
         g2.dispose();
