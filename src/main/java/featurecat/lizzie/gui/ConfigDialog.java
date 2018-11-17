@@ -465,16 +465,16 @@ public class ConfigDialog extends JDialog {
     File engineFile = null;
     File weightFile = null;
     JFileChooser chooser = new JFileChooser(".");
-    FileNameExtensionFilter filter = null;
     if (isWindows()) {
-      filter =
+      FileNameExtensionFilter filter =
           new FileNameExtensionFilter(
               resourceBundle.getString("LizzieConfig.title.engine"), "exe", "bat");
       chooser.setFileFilter(filter);
+    } else {
+      setVisible(false);
     }
     chooser.setMultiSelectionEnabled(false);
     chooser.setDialogTitle(resourceBundle.getString("LizzieConfig.prompt.selectEngine"));
-    setVisible(false);
     int result = chooser.showOpenDialog(this);
     if (result == JFileChooser.APPROVE_OPTION) {
       engineFile = chooser.getSelectedFile();
@@ -482,13 +482,12 @@ public class ConfigDialog extends JDialog {
         enginePath = engineFile.getAbsolutePath();
         enginePath = relativizePath(engineFile.toPath());
         getCommandHelp();
-        chooser.setDialogTitle(resourceBundle.getString("LizzieConfig.prompt.selectWeight"));
-        if (isWindows()) {
-          chooser.removeChoosableFileFilter(filter);
-        }
-        result = chooser.showOpenDialog(this);
+        JFileChooser chooserw = new JFileChooser(".");
+        chooserw.setMultiSelectionEnabled(false);
+        chooserw.setDialogTitle(resourceBundle.getString("LizzieConfig.prompt.selectWeight"));
+        result = chooserw.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
-          weightFile = chooser.getSelectedFile();
+          weightFile = chooserw.getSelectedFile();
           if (weightFile != null) {
             weightPath = relativizePath(weightFile.toPath());
             EngineParameter ep = new EngineParameter(enginePath, weightPath, this);
@@ -591,6 +590,6 @@ public class ConfigDialog extends JDialog {
   }
 
   public boolean isWindows() {
-    return !osName.contains("darwin") && osName.contains("win");
+    return osName != null && !osName.contains("darwin") && osName.contains("win");
   }
 }
