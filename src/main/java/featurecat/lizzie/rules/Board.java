@@ -111,10 +111,11 @@ public class Board implements LeelazListener {
    * @param size
    */
   public void reopen(int size) {
-    size = (size == 13 || size == 9) ? size : 19;
+    size = (size >= 2) ? size : 19;
     if (size != boardSize) {
       boardSize = size;
-      initialize();
+      Zobrist.init();
+      clear();
       forceRefresh = true;
     }
   }

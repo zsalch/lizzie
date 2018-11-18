@@ -238,7 +238,6 @@ public class BoardRenderer {
               stoneRadius);
         }
       }
-      cachedBackgroundImageHasCoordinatesEnabled = showCoordinates();
       g.dispose();
     }
 
@@ -254,12 +253,16 @@ public class BoardRenderer {
    * @param g graphics2d object to draw
    */
   private void drawStarPoints(Graphics2D g) {
-    if (Board.boardSize == 9) {
-      drawStarPoints0(2, 2, 4, true, g);
+    if (Board.boardSize == 19) {
+      drawStarPoints0(3, 3, 6, false, g);
     } else if (Board.boardSize == 13) {
       drawStarPoints0(2, 3, 6, true, g);
-    } else {
-      drawStarPoints0(3, 3, 6, false, g);
+    } else if (Board.boardSize == 9) {
+      drawStarPoints0(2, 2, 4, true, g);
+    } else if (Board.boardSize == 7) {
+      drawStarPoints0(2, 2, 2, true, g);
+    } else if (Board.boardSize == 5) {
+      drawStarPoints0(0, 0, 2, true, g);
     }
   }
 
@@ -288,6 +291,7 @@ public class BoardRenderer {
     if (cachedStonesImage.getWidth() != boardLength
         || cachedStonesImage.getHeight() != boardLength
         || cachedDisplayedBranchLength != displayedBranchLength
+        || cachedBackgroundImageHasCoordinatesEnabled != showCoordinates()
         || !cachedZhash.equals(Lizzie.board.getData().zobrist)
         || Lizzie.board.inScoreMode()
         || lastInScoreMode) {
@@ -315,6 +319,7 @@ public class BoardRenderer {
 
       cachedZhash = Lizzie.board.getData().zobrist.clone();
       cachedDisplayedBranchLength = displayedBranchLength;
+      cachedBackgroundImageHasCoordinatesEnabled = showCoordinates();
       g.dispose();
       gShadow.dispose();
       lastInScoreMode = false;
@@ -748,7 +753,7 @@ public class BoardRenderer {
     int availableLength;
 
     // decrease boardLength until the availableLength will result in square board intersections
-    double margin = showCoordinates() ? MARGIN_WITH_COORDINATES : MARGIN;
+    double margin = (showCoordinates() ? 1.5 : 0.75) / (Board.boardSize + 2);
     boardLength++;
     do {
       boardLength--;

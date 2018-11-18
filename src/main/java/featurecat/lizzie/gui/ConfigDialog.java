@@ -19,6 +19,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.IntStream;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -26,6 +27,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -52,6 +54,13 @@ public class ConfigDialog extends JDialog {
   private JTextField txtEngine8;
   private JTextField txtEngine9;
   private JTextField[] txts;
+  private JRadioButton rdoBoardSize19;
+  private JRadioButton rdoBoardSize13;
+  private JRadioButton rdoBoardSize9;
+  private JRadioButton rdoBoardSize7;
+  private JRadioButton rdoBoardSize5;
+  private JRadioButton rdoBoardSize4;
+  private JRadioButton rdoBoardSizeOther;
 
   public String enginePath = "";
   public String weightPath = "";
@@ -64,6 +73,7 @@ public class ConfigDialog extends JDialog {
   private JFormattedTextField txtAnalyzeUpdateInterval;
   private JCheckBox chkPrintEngineLog;
   private JSONObject leelazConfig;
+  private JTextField txtBoardSize;
 
   public ConfigDialog() {
     setTitle(resourceBundle.getString("LizzieConfig.title.config"));
@@ -80,6 +90,7 @@ public class ConfigDialog extends JDialog {
           public void actionPerformed(ActionEvent e) {
             setVisible(false);
             saveConfig();
+            applyChange();
           }
         });
     okButton.setActionCommand("OK");
@@ -422,6 +433,64 @@ public class ConfigDialog extends JDialog {
     engineTab.add(chkPrintEngineLog);
     JPanel uiTab = new JPanel();
     tabbedPane.addTab(resourceBundle.getString("LizzieConfig.title.ui"), null, uiTab, null);
+    uiTab.setLayout(null);
+
+    JLabel lblBoardSize =
+        new JLabel(resourceBundle.getString("ConfigDialog.lblBoardSize.text")); // $NON-NLS-1$
+    lblBoardSize.setBounds(6, 6, 92, 16);
+    lblBoardSize.setHorizontalAlignment(SwingConstants.LEFT);
+    uiTab.add(lblBoardSize);
+
+    rdoBoardSize19 =
+        new JRadioButton(resourceBundle.getString("ConfigDialog.rdbtnx.text")); // $NON-NLS-1$
+    rdoBoardSize19.setBounds(85, 2, 80, 23);
+    uiTab.add(rdoBoardSize19);
+
+    rdoBoardSize13 =
+        new JRadioButton(resourceBundle.getString("ConfigDialog.rdbtnx_1.text")); // $NON-NLS-1$
+    rdoBoardSize13.setBounds(170, 2, 80, 23);
+    uiTab.add(rdoBoardSize13);
+
+    rdoBoardSize9 =
+        new JRadioButton(resourceBundle.getString("ConfigDialog.rdbtnx_2.text")); // $NON-NLS-1$
+    rdoBoardSize9.setBounds(255, 2, 80, 23);
+    uiTab.add(rdoBoardSize9);
+
+    rdoBoardSize7 =
+        new JRadioButton(resourceBundle.getString("ConfigDialog.rdbtnx_3.text")); // $NON-NLS-1$
+    rdoBoardSize7.setBounds(325, 2, 80, 23);
+    uiTab.add(rdoBoardSize7);
+
+    rdoBoardSize5 =
+        new JRadioButton(resourceBundle.getString("ConfigDialog.rdbtnx_4.text")); // $NON-NLS-1$
+    rdoBoardSize5.setBounds(395, 2, 80, 23);
+    uiTab.add(rdoBoardSize5);
+
+    rdoBoardSize4 =
+        new JRadioButton(
+            resourceBundle.getString("ConfigDialog.rdoBoardSize4.text")); // $NON-NLS-1$
+    rdoBoardSize4.setBounds(460, 2, 67, 23);
+    uiTab.add(rdoBoardSize4);
+
+    rdoBoardSizeOther = new JRadioButton(""); // $NON-NLS-1$
+    rdoBoardSizeOther.setBounds(530, 2, 36, 23);
+    uiTab.add(rdoBoardSizeOther);
+
+    ButtonGroup group = new ButtonGroup();
+    group.add(rdoBoardSize19);
+    group.add(rdoBoardSize13);
+    group.add(rdoBoardSize9);
+    group.add(rdoBoardSize7);
+    group.add(rdoBoardSize5);
+    group.add(rdoBoardSize4);
+    group.add(rdoBoardSizeOther);
+
+    txtBoardSize = new JTextField();
+    //    txtBoardSize.setText(resourceBundle.getString("ConfigDialog.textField.text"));
+    // //$NON-NLS-1$
+    txtBoardSize.setBounds(564, 1, 52, 26);
+    uiTab.add(txtBoardSize);
+    txtBoardSize.setColumns(10);
 
     JTabbedPane tabTheme = new JTabbedPane(JTabbedPane.TOP);
     tabbedPane.addTab(resourceBundle.getString("LizzieConfig.title.theme"), null, tabTheme, null);
@@ -457,6 +526,7 @@ public class ConfigDialog extends JDialog {
     chkPrintEngineLog.setSelected(leelazConfig.getBoolean("print-comms"));
     curPath = (new File("")).getAbsoluteFile().toPath();
     osName = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+    setBoardSize();
     setLocationRelativeTo(getOwner());
   }
 
@@ -555,10 +625,15 @@ public class ConfigDialog extends JDialog {
       JSONArray engines = new JSONArray();
       Arrays.asList(txts).forEach(t -> engines.put(t.getText().trim()));
       leelazConfig.put("engine-command-list", engines);
+      Lizzie.config.uiConfig.put("board-size", getBoardSize());
       Lizzie.config.save();
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  private void applyChange() {
+    Lizzie.board.reopen(getBoardSize());
   }
 
   private Integer txtFieldValue(JTextField txt) {
@@ -591,5 +666,50 @@ public class ConfigDialog extends JDialog {
 
   public boolean isWindows() {
     return osName != null && !osName.contains("darwin") && osName.contains("win");
+  }
+
+  private void setBoardSize() {
+    int size = Lizzie.config.uiConfig.optInt("board-size", 19);
+    switch (size) {
+      case 19:
+        rdoBoardSize19.setSelected(true);
+        break;
+      case 13:
+        rdoBoardSize13.setSelected(true);
+        break;
+      case 9:
+        rdoBoardSize9.setSelected(true);
+        break;
+      case 7:
+        rdoBoardSize7.setSelected(true);
+        break;
+      case 5:
+        rdoBoardSize5.setSelected(true);
+        break;
+      case 4:
+        rdoBoardSize4.setSelected(true);
+        break;
+      default:
+        txtBoardSize.setText(String.valueOf(size));
+        break;
+    }
+  }
+
+  private int getBoardSize() {
+    if (rdoBoardSize19.isSelected()) {
+      return 19;
+    } else if (rdoBoardSize13.isSelected()) {
+      return 13;
+    } else if (rdoBoardSize9.isSelected()) {
+      return 9;
+    } else if (rdoBoardSize7.isSelected()) {
+      return 7;
+    } else if (rdoBoardSize5.isSelected()) {
+      return 5;
+    } else if (rdoBoardSize4.isSelected()) {
+      return 4;
+    } else {
+      return Integer.parseInt(txtBoardSize.getText().trim());
+    }
   }
 }
