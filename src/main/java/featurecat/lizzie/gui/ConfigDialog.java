@@ -444,11 +444,11 @@ public class ConfigDialog extends JDialog {
     uiTab.add(lblBoardSize);
 
     rdoBoardSize19 = new JRadioButton("19x19");
-    rdoBoardSize19.setBounds(85, 2, 67, 23);
+    rdoBoardSize19.setBounds(85, 2, 84, 23);
     uiTab.add(rdoBoardSize19);
 
     rdoBoardSize13 = new JRadioButton("13x13");
-    rdoBoardSize13.setBounds(170, 2, 67, 23);
+    rdoBoardSize13.setBounds(170, 2, 84, 23);
     uiTab.add(rdoBoardSize13);
 
     rdoBoardSize9 = new JRadioButton("9x9");
