@@ -147,7 +147,7 @@ public class BoardRenderer {
     availableLength = calculatedPixelMargins[2];
 
     squareLength = calculateSquareLength(availableLength);
-    stoneRadius = squareLength / 2 - 1;
+    stoneRadius = squareLength < 4 ? 1 : squareLength / 2 - 1;
 
     // re-center board
     setLocation(x + (boardLength0 - boardLength) / 2, y + (boardLength0 - boardLength) / 2);
@@ -200,14 +200,13 @@ public class BoardRenderer {
       // Draw coordinates if enabled
       if (showCoordinates()) {
         g.setColor(Color.BLACK);
-        String alphabet = "ABCDEFGHJKLMNOPQRST";
         for (int i = 0; i < Board.boardSize; i++) {
           drawString(
               g,
               x + scaledMargin + squareLength * i,
               y + scaledMargin / 2,
               LizzieFrame.uiFont,
-              "" + alphabet.charAt(i),
+              Board.asName(i),
               stoneRadius * 4 / 5,
               stoneRadius);
           drawString(
@@ -215,7 +214,7 @@ public class BoardRenderer {
               x + scaledMargin + squareLength * i,
               y - scaledMargin / 2 + boardLength,
               LizzieFrame.uiFont,
-              "" + alphabet.charAt(i),
+              Board.asName(i),
               stoneRadius * 4 / 5,
               stoneRadius);
         }
@@ -753,7 +752,8 @@ public class BoardRenderer {
     int availableLength;
 
     // decrease boardLength until the availableLength will result in square board intersections
-    double margin = (showCoordinates() ? 1.5 : 0.75) / (Board.boardSize + 2);
+    double margin =
+        (showCoordinates() ? 1.5 / (Board.boardSize + 2) : 1.0d / (Board.boardSize + 1));
     boardLength++;
     do {
       boardLength--;
@@ -773,8 +773,9 @@ public class BoardRenderer {
       Graphics2D g, int centerX, int centerY, boolean isGhost, float shadowStrength) {
     if (!uiConfig.getBoolean("shadows-enabled")) return;
 
-    final int shadowSize = (int) (stoneRadius * 0.3 * Lizzie.config.shadowSize / 100);
-    final int fartherShadowSize = (int) (stoneRadius * 0.17 * Lizzie.config.shadowSize / 100);
+    double r = stoneRadius * Lizzie.config.shadowSize / 100;
+    final int shadowSize = (int) (r * 0.3) == 0 ? 1 : (int) (r * 0.3);
+    final int fartherShadowSize = (int) (r * 0.17) == 0 ? 1 : (int) (r * 0.17);
 
     final Paint TOP_GRADIENT_PAINT;
     final Paint LOWER_RIGHT_GRADIENT_PAINT;

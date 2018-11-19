@@ -31,6 +31,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -60,7 +62,6 @@ public class ConfigDialog extends JDialog {
   private JRadioButton rdoBoardSize7;
   private JRadioButton rdoBoardSize5;
   private JRadioButton rdoBoardSize4;
-  private JRadioButton rdoBoardSizeOther;
 
   public String enginePath = "";
   public String weightPath = "";
@@ -74,6 +75,7 @@ public class ConfigDialog extends JDialog {
   private JCheckBox chkPrintEngineLog;
   private JSONObject leelazConfig;
   private JTextField txtBoardSize;
+  private JRadioButton rdoBoardSizeOther;
 
   public ConfigDialog() {
     setTitle(resourceBundle.getString("LizzieConfig.title.config"));
@@ -362,9 +364,12 @@ public class ConfigDialog extends JDialog {
     lblMaxAnalyzeTimeMinutes.setBounds(213, 370, 82, 16);
     engineTab.add(lblMaxAnalyzeTimeMinutes);
 
+    NumberFormat nf = NumberFormat.getIntegerInstance();
+    nf.setGroupingUsed(false);
+
     txtMaxAnalyzeTime =
         new JFormattedTextField(
-            new InternationalFormatter(NumberFormat.getIntegerInstance()) {
+            new InternationalFormatter(nf) {
               protected DocumentFilter getDocumentFilter() {
                 return filter;
               }
@@ -385,8 +390,6 @@ public class ConfigDialog extends JDialog {
     lblMaxGameThinkingTimeSeconds.setBounds(213, 400, 82, 16);
     engineTab.add(lblMaxGameThinkingTimeSeconds);
 
-    NumberFormat nf = NumberFormat.getIntegerInstance();
-    nf.setGroupingUsed(false);
     txtMaxGameThinkingTime =
         new JFormattedTextField(
             new InternationalFormatter(nf) {
@@ -412,7 +415,7 @@ public class ConfigDialog extends JDialog {
 
     txtAnalyzeUpdateInterval =
         new JFormattedTextField(
-            new InternationalFormatter(NumberFormat.getIntegerInstance()) {
+            new InternationalFormatter(nf) {
               protected DocumentFilter getDocumentFilter() {
                 return filter;
               }
@@ -435,45 +438,47 @@ public class ConfigDialog extends JDialog {
     tabbedPane.addTab(resourceBundle.getString("LizzieConfig.title.ui"), null, uiTab, null);
     uiTab.setLayout(null);
 
-    JLabel lblBoardSize =
-        new JLabel(resourceBundle.getString("ConfigDialog.lblBoardSize.text")); // $NON-NLS-1$
-    lblBoardSize.setBounds(6, 6, 92, 16);
+    JLabel lblBoardSize = new JLabel(resourceBundle.getString("LizzieConfig.title.boardSize"));
+    lblBoardSize.setBounds(6, 6, 67, 16);
     lblBoardSize.setHorizontalAlignment(SwingConstants.LEFT);
     uiTab.add(lblBoardSize);
 
-    rdoBoardSize19 =
-        new JRadioButton(resourceBundle.getString("ConfigDialog.rdbtnx.text")); // $NON-NLS-1$
-    rdoBoardSize19.setBounds(85, 2, 80, 23);
+    rdoBoardSize19 = new JRadioButton("19x19");
+    rdoBoardSize19.setBounds(85, 2, 67, 23);
     uiTab.add(rdoBoardSize19);
 
-    rdoBoardSize13 =
-        new JRadioButton(resourceBundle.getString("ConfigDialog.rdbtnx_1.text")); // $NON-NLS-1$
-    rdoBoardSize13.setBounds(170, 2, 80, 23);
+    rdoBoardSize13 = new JRadioButton("13x13");
+    rdoBoardSize13.setBounds(170, 2, 67, 23);
     uiTab.add(rdoBoardSize13);
 
-    rdoBoardSize9 =
-        new JRadioButton(resourceBundle.getString("ConfigDialog.rdbtnx_2.text")); // $NON-NLS-1$
-    rdoBoardSize9.setBounds(255, 2, 80, 23);
+    rdoBoardSize9 = new JRadioButton("9x9");
+    rdoBoardSize9.setBounds(255, 2, 57, 23);
     uiTab.add(rdoBoardSize9);
 
-    rdoBoardSize7 =
-        new JRadioButton(resourceBundle.getString("ConfigDialog.rdbtnx_3.text")); // $NON-NLS-1$
-    rdoBoardSize7.setBounds(325, 2, 80, 23);
+    rdoBoardSize7 = new JRadioButton("7x7");
+    rdoBoardSize7.setBounds(325, 2, 67, 23);
     uiTab.add(rdoBoardSize7);
 
-    rdoBoardSize5 =
-        new JRadioButton(resourceBundle.getString("ConfigDialog.rdbtnx_4.text")); // $NON-NLS-1$
-    rdoBoardSize5.setBounds(395, 2, 80, 23);
+    rdoBoardSize5 = new JRadioButton("5x5");
+    rdoBoardSize5.setBounds(395, 2, 67, 23);
     uiTab.add(rdoBoardSize5);
 
-    rdoBoardSize4 =
-        new JRadioButton(
-            resourceBundle.getString("ConfigDialog.rdoBoardSize4.text")); // $NON-NLS-1$
+    rdoBoardSize4 = new JRadioButton("4x4");
     rdoBoardSize4.setBounds(460, 2, 67, 23);
     uiTab.add(rdoBoardSize4);
 
-    rdoBoardSizeOther = new JRadioButton(""); // $NON-NLS-1$
-    rdoBoardSizeOther.setBounds(530, 2, 36, 23);
+    rdoBoardSizeOther = new JRadioButton("");
+    rdoBoardSizeOther.addChangeListener(
+        new ChangeListener() {
+          public void stateChanged(ChangeEvent e) {
+            if (rdoBoardSizeOther.isSelected()) {
+              txtBoardSize.setEnabled(true);
+            } else {
+              txtBoardSize.setEnabled(false);
+            }
+          }
+        });
+    rdoBoardSizeOther.setBounds(530, 2, 29, 23);
     uiTab.add(rdoBoardSizeOther);
 
     ButtonGroup group = new ButtonGroup();
@@ -485,9 +490,15 @@ public class ConfigDialog extends JDialog {
     group.add(rdoBoardSize4);
     group.add(rdoBoardSizeOther);
 
-    txtBoardSize = new JTextField();
-    //    txtBoardSize.setText(resourceBundle.getString("ConfigDialog.textField.text"));
-    // //$NON-NLS-1$
+    txtBoardSize =
+        new JFormattedTextField(
+            new InternationalFormatter(nf) {
+              protected DocumentFilter getDocumentFilter() {
+                return filter;
+              }
+
+              private DocumentFilter filter = new DigitOnlyFilter();
+            });
     txtBoardSize.setBounds(564, 1, 52, 26);
     uiTab.add(txtBoardSize);
     txtBoardSize.setColumns(10);
@@ -670,6 +681,7 @@ public class ConfigDialog extends JDialog {
 
   private void setBoardSize() {
     int size = Lizzie.config.uiConfig.optInt("board-size", 19);
+    txtBoardSize.setEnabled(false);
     switch (size) {
       case 19:
         rdoBoardSize19.setSelected(true);
@@ -691,6 +703,8 @@ public class ConfigDialog extends JDialog {
         break;
       default:
         txtBoardSize.setText(String.valueOf(size));
+        rdoBoardSizeOther.setSelected(true);
+        txtBoardSize.setEnabled(true);
         break;
     }
   }
@@ -709,7 +723,11 @@ public class ConfigDialog extends JDialog {
     } else if (rdoBoardSize4.isSelected()) {
       return 4;
     } else {
-      return Integer.parseInt(txtBoardSize.getText().trim());
+      int size = Integer.parseInt(txtBoardSize.getText().trim());
+      if (size < 2) {
+        size = 19;
+      }
+      return size;
     }
   }
 }
