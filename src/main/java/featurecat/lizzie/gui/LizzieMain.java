@@ -9,10 +9,13 @@ import javax.swing.JFrame;
 import org.json.JSONArray;
 
 import featurecat.lizzie.Lizzie;
+import javax.swing.JToolBar;
+import java.awt.BorderLayout;
 
 public class LizzieMain extends JFrame {
 
   public static BoardPane boardPane;
+  public static CommentPane commentPane;
   private static final String DEFAULT_TITLE = "Lizzie - Leela Zero Interface";
 
   /**
@@ -44,8 +47,11 @@ public class LizzieMain extends JFrame {
     setSize(windowSize.getInt(0), windowSize.getInt(1));
     setLocationRelativeTo(null); // Start centered, needs to be called *after* setSize...
 
-    boardPane = new BoardPane(this);
-
+//    boardPane = new BoardPane(this);
+    Lizzie.frame = new BoardPane(this);
+    commentPane = new CommentPane(this);
+    Lizzie.frame.setBounds(getX() + getInsets().left, getY() + getInsets().top, getWidth() - getInsets().left - getInsets().right, getHeight() - getInsets().top - getInsets().bottom);
+        
     if (Lizzie.config.startMaximized) {
       setExtendedState(Frame.MAXIMIZED_BOTH);
     }
