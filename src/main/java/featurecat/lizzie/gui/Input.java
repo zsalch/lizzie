@@ -305,6 +305,8 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
       case VK_W:
         if (controlIsPressed(e)) {
           Lizzie.config.toggleLargeWinrate();
+        } else if (e.isAltDown()) {
+          Lizzie.main.toggleDesignMode();
         } else {
           Lizzie.config.toggleShowWinrate();
         }

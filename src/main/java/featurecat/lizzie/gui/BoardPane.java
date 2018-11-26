@@ -21,19 +21,14 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.FontMetrics;
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Dialog.ModalityType;
-import java.awt.Window.Type;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -48,36 +43,47 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 /** The window used to display the game. */
-public class BoardPane extends JDialog {
-  private static final ResourceBundle resourceBundle = ResourceBundle.getBundle("l10n.DisplayStrings");
+public class BoardPane extends LizziePane {
+  private static final ResourceBundle resourceBundle =
+      ResourceBundle.getBundle("l10n.DisplayStrings");
 
-  private static final String[] commands = { resourceBundle.getString("LizzieFrame.commands.keyN"),
-      resourceBundle.getString("LizzieFrame.commands.keyEnter"),
-      resourceBundle.getString("LizzieFrame.commands.keySpace"),
-      resourceBundle.getString("LizzieFrame.commands.keyUpArrow"),
-      resourceBundle.getString("LizzieFrame.commands.keyDownArrow"),
-      resourceBundle.getString("LizzieFrame.commands.rightClick"),
-      resourceBundle.getString("LizzieFrame.commands.mouseWheelScroll"),
-      resourceBundle.getString("LizzieFrame.commands.keyC"), resourceBundle.getString("LizzieFrame.commands.keyP"),
-      resourceBundle.getString("LizzieFrame.commands.keyPeriod"), resourceBundle.getString("LizzieFrame.commands.keyA"),
-      resourceBundle.getString("LizzieFrame.commands.keyM"), resourceBundle.getString("LizzieFrame.commands.keyI"),
-      resourceBundle.getString("LizzieFrame.commands.keyO"), resourceBundle.getString("LizzieFrame.commands.keyS"),
-      resourceBundle.getString("LizzieFrame.commands.keyAltC"),
-      resourceBundle.getString("LizzieFrame.commands.keyAltV"), resourceBundle.getString("LizzieFrame.commands.keyF"),
-      resourceBundle.getString("LizzieFrame.commands.keyV"), resourceBundle.getString("LizzieFrame.commands.keyW"),
-      resourceBundle.getString("LizzieFrame.commands.keyCtrlW"), resourceBundle.getString("LizzieFrame.commands.keyG"),
-      resourceBundle.getString("LizzieFrame.commands.keyR"),
-      resourceBundle.getString("LizzieFrame.commands.keyBracket"),
-      resourceBundle.getString("LizzieFrame.commands.keyT"), resourceBundle.getString("LizzieFrame.commands.keyCtrlT"),
-      resourceBundle.getString("LizzieFrame.commands.keyY"), resourceBundle.getString("LizzieFrame.commands.keyHome"),
-      resourceBundle.getString("LizzieFrame.commands.keyEnd"),
-      resourceBundle.getString("LizzieFrame.commands.keyControl"),
-      resourceBundle.getString("LizzieFrame.commands.keyDelete"),
-      resourceBundle.getString("LizzieFrame.commands.keyBackspace"), };
+  private static final String[] commands = {
+    resourceBundle.getString("LizzieFrame.commands.keyN"),
+    resourceBundle.getString("LizzieFrame.commands.keyEnter"),
+    resourceBundle.getString("LizzieFrame.commands.keySpace"),
+    resourceBundle.getString("LizzieFrame.commands.keyUpArrow"),
+    resourceBundle.getString("LizzieFrame.commands.keyDownArrow"),
+    resourceBundle.getString("LizzieFrame.commands.rightClick"),
+    resourceBundle.getString("LizzieFrame.commands.mouseWheelScroll"),
+    resourceBundle.getString("LizzieFrame.commands.keyC"),
+    resourceBundle.getString("LizzieFrame.commands.keyP"),
+    resourceBundle.getString("LizzieFrame.commands.keyPeriod"),
+    resourceBundle.getString("LizzieFrame.commands.keyA"),
+    resourceBundle.getString("LizzieFrame.commands.keyM"),
+    resourceBundle.getString("LizzieFrame.commands.keyI"),
+    resourceBundle.getString("LizzieFrame.commands.keyO"),
+    resourceBundle.getString("LizzieFrame.commands.keyS"),
+    resourceBundle.getString("LizzieFrame.commands.keyAltC"),
+    resourceBundle.getString("LizzieFrame.commands.keyAltV"),
+    resourceBundle.getString("LizzieFrame.commands.keyF"),
+    resourceBundle.getString("LizzieFrame.commands.keyV"),
+    resourceBundle.getString("LizzieFrame.commands.keyW"),
+    resourceBundle.getString("LizzieFrame.commands.keyCtrlW"),
+    resourceBundle.getString("LizzieFrame.commands.keyG"),
+    resourceBundle.getString("LizzieFrame.commands.keyR"),
+    resourceBundle.getString("LizzieFrame.commands.keyBracket"),
+    resourceBundle.getString("LizzieFrame.commands.keyT"),
+    resourceBundle.getString("LizzieFrame.commands.keyCtrlT"),
+    resourceBundle.getString("LizzieFrame.commands.keyY"),
+    resourceBundle.getString("LizzieFrame.commands.keyHome"),
+    resourceBundle.getString("LizzieFrame.commands.keyEnd"),
+    resourceBundle.getString("LizzieFrame.commands.keyControl"),
+    resourceBundle.getString("LizzieFrame.commands.keyDelete"),
+    resourceBundle.getString("LizzieFrame.commands.keyBackspace"),
+  };
   private static final String DEFAULT_TITLE = "Lizzie - Leela Zero Interface";
   private static BoardRenderer boardRenderer;
   private static BoardRenderer subBoardRenderer;
@@ -89,7 +95,7 @@ public class BoardPane extends JDialog {
 
   private final BufferStrategy bs;
 
-  private static final int[] outOfBoundCoordinate = new int[] { -1, -1 };
+  private static final int[] outOfBoundCoordinate = new int[] {-1, -1};
   public int[] mouseOverCoordinate = outOfBoundCoordinate;
   public boolean showControls = false;
   public boolean isPlayingAgainstLeelaz = false;
@@ -113,10 +119,18 @@ public class BoardPane extends JDialog {
   static {
     // load fonts
     try {
-      uiFont = Font.createFont(Font.TRUETYPE_FONT,
-          Thread.currentThread().getContextClassLoader().getResourceAsStream("fonts/OpenSans-Regular.ttf"));
-      winrateFont = Font.createFont(Font.TRUETYPE_FONT,
-          Thread.currentThread().getContextClassLoader().getResourceAsStream("fonts/OpenSans-Semibold.ttf"));
+      uiFont =
+          Font.createFont(
+              Font.TRUETYPE_FONT,
+              Thread.currentThread()
+                  .getContextClassLoader()
+                  .getResourceAsStream("fonts/OpenSans-Regular.ttf"));
+      winrateFont =
+          Font.createFont(
+              Font.TRUETYPE_FONT,
+              Thread.currentThread()
+                  .getContextClassLoader()
+                  .getResourceAsStream("fonts/OpenSans-Semibold.ttf"));
     } catch (IOException | FontFormatException e) {
       e.printStackTrace();
     }
@@ -159,13 +173,9 @@ public class BoardPane extends JDialog {
     scrollPane = new JScrollPane();
     scrollPane.setViewportView(commentPane);
     scrollPane.setBorder(null);
-    scrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+    scrollPane.setVerticalScrollBarPolicy(
+        javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
     commentRect = new Rectangle(0, 0, 0, 0);
-    setUndecorated(true);
-    setResizable(true);
-    getRootPane().setBorder(BorderFactory.createEmptyBorder());
-    // getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
-    setVisible(true);
 
     createBufferStrategy(2);
     bs = getBufferStrategy();
@@ -176,9 +186,6 @@ public class BoardPane extends JDialog {
     addKeyListener(input);
     addMouseWheelListener(input);
     addMouseMotionListener(input);
-    PaneDragListener frameDragListener = new PaneDragListener(this);
-    addMouseListener(frameDragListener);
-    addMouseMotionListener(frameDragListener);
 
     // necessary for Windows users - otherwise Lizzie shows a blank white screen on
     // startup until
@@ -186,11 +193,12 @@ public class BoardPane extends JDialog {
     // repaint();
 
     // When the window is closed: save the SGF file, then run shutdown()
-    this.addWindowListener(new WindowAdapter() {
-      public void windowClosing(WindowEvent e) {
-        Lizzie.shutdown();
-      }
-    });
+    this.addWindowListener(
+        new WindowAdapter() {
+          public void windowClosing(WindowEvent e) {
+            Lizzie.shutdown();
+          }
+        });
   }
 
   /** Clears related status from empty board. */
@@ -214,15 +222,16 @@ public class BoardPane extends JDialog {
     newGameDialog.setVisible(true);
     boolean playerIsBlack = newGameDialog.playerIsBlack();
     newGameDialog.dispose();
-    if (newGameDialog.isCancelled())
-      return;
+    if (newGameDialog.isCancelled()) return;
 
     Lizzie.board.clear();
     Lizzie.board.getHistory().setGameInfo(gameInfo);
     Lizzie.leelaz.sendCommand("komi " + gameInfo.getKomi());
 
-    Lizzie.leelaz.sendCommand("time_settings 0 "
-        + Lizzie.config.config.getJSONObject("leelaz").getInt("max-game-thinking-time-seconds") + " 1");
+    Lizzie.leelaz.sendCommand(
+        "time_settings 0 "
+            + Lizzie.config.config.getJSONObject("leelaz").getInt("max-game-thinking-time-seconds")
+            + " 1");
     Lizzie.frame.playerIsBlack = playerIsBlack;
     Lizzie.frame.isPlayingAgainstLeelaz = true;
 
@@ -230,8 +239,7 @@ public class BoardPane extends JDialog {
     if (isHandicapGame) {
       Lizzie.board.getHistory().getData().blackToPlay = false;
       Lizzie.leelaz.sendCommand("fixed_handicap " + gameInfo.getHandicap());
-      if (playerIsBlack)
-        Lizzie.leelaz.genmove("W");
+      if (playerIsBlack) Lizzie.leelaz.genmove("W");
     } else if (!playerIsBlack) {
       Lizzie.leelaz.genmove("B");
     }
@@ -257,8 +265,12 @@ public class BoardPane extends JDialog {
     if (result == JFileChooser.APPROVE_OPTION) {
       File file = chooser.getSelectedFile();
       if (file.exists()) {
-        int ret = JOptionPane.showConfirmDialog(null, resourceBundle.getString("LizzieFrame.prompt.sgfExists"),
-            "Warning", JOptionPane.OK_CANCEL_OPTION);
+        int ret =
+            JOptionPane.showConfirmDialog(
+                null,
+                resourceBundle.getString("LizzieFrame.prompt.sgfExists"),
+                "Warning",
+                JOptionPane.OK_CANCEL_OPTION);
         if (ret == JOptionPane.CANCEL_OPTION) {
           return;
         }
@@ -270,7 +282,10 @@ public class BoardPane extends JDialog {
         SGFParser.save(Lizzie.board, file.getPath());
         filesystem.put("last-folder", file.getParent());
       } catch (IOException err) {
-        JOptionPane.showConfirmDialog(null, resourceBundle.getString("LizzieFrame.prompt.failedTosaveFile"), "Error",
+        JOptionPane.showConfirmDialog(
+            null,
+            resourceBundle.getString("LizzieFrame.prompt.failedTosaveFile"),
+            "Error",
             JOptionPane.ERROR);
       }
     }
@@ -284,8 +299,7 @@ public class BoardPane extends JDialog {
     chooser.setFileFilter(filter);
     chooser.setMultiSelectionEnabled(false);
     int result = chooser.showOpenDialog(null);
-    if (result == JFileChooser.APPROVE_OPTION)
-      loadFile(chooser.getSelectedFile());
+    if (result == JFileChooser.APPROVE_OPTION) loadFile(chooser.getSelectedFile());
   }
 
   public static void loadFile(File file) {
@@ -302,7 +316,10 @@ public class BoardPane extends JDialog {
       }
       filesystem.put("last-folder", file.getParent());
     } catch (IOException err) {
-      JOptionPane.showConfirmDialog(null, resourceBundle.getString("LizzieFrame.prompt.failedToOpenFile"), "Error",
+      JOptionPane.showConfirmDialog(
+          null,
+          resourceBundle.getString("LizzieFrame.prompt.failedToOpenFile"),
+          "Error",
           JOptionPane.ERROR);
     }
   }
@@ -323,8 +340,7 @@ public class BoardPane extends JDialog {
   /**
    * Draws the game board and interface
    *
-   * @param g0
-   *          not used
+   * @param g0 not used
    */
   public void paint(Graphics g0) {
     autosaveMaybe();
@@ -333,7 +349,9 @@ public class BoardPane extends JDialog {
     int height = getHeight();
 
     Optional<Graphics2D> backgroundG;
-    if (cachedBackgroundWidth != width || cachedBackgroundHeight != height || redrawBackgroundAnyway) {
+    if (cachedBackgroundWidth != width
+        || cachedBackgroundHeight != height
+        || redrawBackgroundAnyway) {
       backgroundG = Optional.of(createBackground());
     } else {
       backgroundG = Optional.empty();
@@ -384,7 +402,8 @@ public class BoardPane extends JDialog {
       // pondering message
       double ponderingSize = .02;
       int ponderingX = leftInset;
-      int ponderingY = height - bottomInset - (int) (maxSize * 0.033) - (int) (maxBound * ponderingSize);
+      int ponderingY =
+          height - bottomInset - (int) (maxSize * 0.033) - (int) (maxBound * ponderingSize);
 
       // dynamic komi
       double dynamicKomiSize = .02;
@@ -625,8 +644,7 @@ public class BoardPane extends JDialog {
       Graphics2D g = (Graphics2D) cachedImage.getGraphics();
       g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
-      if (Lizzie.config.showStatus)
-        drawCommandString(g);
+      if (Lizzie.config.showStatus) drawCommandString(g);
 
       boardRenderer.setLocation(boardX, boardY);
       boardRenderer.setBoardLength(maxSize);
@@ -686,8 +704,7 @@ public class BoardPane extends JDialog {
         drawPonderingState(g, loadingText, loadingX, loadingY, loadingSize);
       }
 
-      if (Lizzie.config.showCaptured)
-        drawCaptured(g, capx, capy, capw, caph);
+      if (Lizzie.config.showCaptured) drawCaptured(g, capx, capy, capw, caph);
 
       // cleanup
       g.dispose();
@@ -705,9 +722,9 @@ public class BoardPane extends JDialog {
   }
 
   /**
-   * temporary measure to refresh background. ideally we shouldn't need this (but
-   * we want to release Lizzie 0.5 today, not tomorrow!). Refactor me out please!
-   * (you need to get blurring to work properly on startup).
+   * temporary measure to refresh background. ideally we shouldn't need this (but we want to release
+   * Lizzie 0.5 today, not tomorrow!). Refactor me out please! (you need to get blurring to work
+   * properly on startup).
    */
   public void refreshBackground() {
     redrawBackgroundAnyway = true;
@@ -740,8 +757,11 @@ public class BoardPane extends JDialog {
   }
 
   private void drawContainer(Graphics g, int vx, int vy, int vw, int vh) {
-    if (vw <= 0 || vh <= 0 || vx < cachedBackground.getMinX()
-        || vx + vw > cachedBackground.getMinX() + cachedBackground.getWidth() || vy < cachedBackground.getMinY()
+    if (vw <= 0
+        || vh <= 0
+        || vx < cachedBackground.getMinX()
+        || vx + vw > cachedBackground.getMinX() + cachedBackground.getWidth()
+        || vy < cachedBackground.getMinY()
         || vy + vh > cachedBackground.getMinY() + cachedBackground.getHeight()) {
       return;
     }
@@ -786,12 +806,13 @@ public class BoardPane extends JDialog {
 
     g.setColor(Color.white);
     g.setFont(font);
-    g.drawString(text, x + (width - stringWidth) / 2, y + stringHeight + (height - stringHeight) / 2);
+    g.drawString(
+        text, x + (width - stringWidth) / 2, y + stringHeight + (height - stringHeight) / 2);
   }
 
   /**
-   * @return a shorter, rounded string version of playouts. e.g. 345 -> 345, 1265
-   *         -> 1.3k, 44556 -> 45k, 133523 -> 134k, 1234567 -> 1.2m
+   * @return a shorter, rounded string version of playouts. e.g. 345 -> 345, 1265 -> 1.3k, 44556 ->
+   *     45k, 133523 -> 134k, 1234567 -> 1.2m
    */
   public String getPlayoutsString(int playouts) {
     if (playouts >= 1_000_000) {
@@ -869,14 +890,16 @@ public class BoardPane extends JDialog {
     int lineHeight = (int) (font.getSize() * 1.15);
 
     int boxWidth = min((int) (maxCmdWidth * 1.4), getWidth());
-    int boxHeight = min(commandsToShow.size() * lineHeight, getHeight() - getInsets().top - getInsets().bottom);
+    int boxHeight =
+        min(commandsToShow.size() * lineHeight, getHeight() - getInsets().top - getInsets().bottom);
 
     int commandsX = min(getWidth() / 2 - boxWidth / 2, getWidth());
     int top = this.getInsets().top;
     int commandsY = top + min((getHeight() - top) / 2 - boxHeight / 2, getHeight() - top);
 
     BufferedImage result = new BufferedImage(boxWidth, boxHeight, TYPE_INT_ARGB);
-    filter10.filter(cachedBackground.getSubimage(commandsX, commandsY, boxWidth, boxHeight), result);
+    filter10.filter(
+        cachedBackground.getSubimage(commandsX, commandsY, boxWidth, boxHeight), result);
     g.drawImage(result, commandsX, commandsY, null);
 
     g.setColor(new Color(0, 0, 0, 130));
@@ -885,12 +908,19 @@ public class BoardPane extends JDialog {
     g.setStroke(new BasicStroke(strokeRadius == 1 ? strokeRadius : 2 * strokeRadius));
     if (Lizzie.config.showBorder) {
       g.setColor(new Color(0, 0, 0, 60));
-      g.drawRect(commandsX + strokeRadius, commandsY + strokeRadius, boxWidth - 2 * strokeRadius,
+      g.drawRect(
+          commandsX + strokeRadius,
+          commandsY + strokeRadius,
+          boxWidth - 2 * strokeRadius,
           boxHeight - 2 * strokeRadius);
     }
     int verticalLineX = (int) (commandsX + boxWidth * 0.3);
     g.setColor(new Color(0, 0, 0, 60));
-    g.drawLine(verticalLineX, commandsY + 2 * strokeRadius, verticalLineX, commandsY + boxHeight - 2 * strokeRadius);
+    g.drawLine(
+        verticalLineX,
+        commandsY + 2 * strokeRadius,
+        verticalLineX,
+        commandsY + boxHeight - 2 * strokeRadius);
 
     g.setStroke(new BasicStroke(1));
 
@@ -900,7 +930,9 @@ public class BoardPane extends JDialog {
     int lineOffset = commandsY;
     for (String command : commandsToShow) {
       String[] split = command.split("\\|");
-      g.drawString(split[0], verticalLineX - metrics.stringWidth(split[0]) - strokeRadius * 4,
+      g.drawString(
+          split[0],
+          verticalLineX - metrics.stringWidth(split[0]) - strokeRadius * 4,
           font.getSize() + lineOffset);
       g.drawString(split[1], verticalLineX + strokeRadius * 4, font.getSize() + lineOffset);
       lineOffset += lineHeight;
@@ -912,8 +944,7 @@ public class BoardPane extends JDialog {
   private boolean userAlreadyKnowsAboutCommandString = false;
 
   private void drawCommandString(Graphics2D g) {
-    if (userAlreadyKnowsAboutCommandString)
-      return;
+    if (userAlreadyKnowsAboutCommandString) return;
 
     int maxSize = (int) (min(getWidth(), getHeight()) * 0.98);
 
@@ -930,7 +961,10 @@ public class BoardPane extends JDialog {
     if (Lizzie.config.showBorder) {
       g.setStroke(new BasicStroke(2 * strokeRadius));
       g.setColor(new Color(0, 0, 0, 60));
-      g.drawRect(showCommandsX + strokeRadius, showCommandsY + strokeRadius, showCommandsWidth - 2 * strokeRadius,
+      g.drawRect(
+          showCommandsX + strokeRadius,
+          showCommandsY + strokeRadius,
+          showCommandsWidth - 2 * strokeRadius,
           showCommandsHeight - 2 * strokeRadius);
     }
     g.setStroke(new BasicStroke(1));
@@ -942,8 +976,7 @@ public class BoardPane extends JDialog {
   }
 
   private void drawMoveStatistics(Graphics2D g, int posX, int posY, int width, int height) {
-    if (width < 0 || height < 0)
-      return; // we don't have enough space
+    if (width < 0 || height < 0) return; // we don't have enough space
 
     double lastWR = 50; // winrate the previous move
     boolean validLastWinrate = false; // whether it was actually calculated
@@ -956,7 +989,8 @@ public class BoardPane extends JDialog {
     Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
     double curWR = stats.maxWinrate; // winrate on this move
     boolean validWinrate = (stats.totalPlayouts > 0); // and whether it was actually calculated
-    if (isPlayingAgainstLeelaz && playerIsBlack == !Lizzie.board.getHistory().getData().blackToPlay) {
+    if (isPlayingAgainstLeelaz
+        && playerIsBlack == !Lizzie.board.getHistory().getData().blackToPlay) {
       validWinrate = false;
     }
 
@@ -979,10 +1013,18 @@ public class BoardPane extends JDialog {
     // border. does not include bottom edge
     int strokeRadius = Lizzie.config.showBorder ? 3 : 1;
     g.setStroke(new BasicStroke(strokeRadius == 1 ? strokeRadius : 2 * strokeRadius));
-    g.drawLine(posX + strokeRadius, posY + strokeRadius, posX - strokeRadius + width, posY + strokeRadius);
+    g.drawLine(
+        posX + strokeRadius, posY + strokeRadius, posX - strokeRadius + width, posY + strokeRadius);
     if (Lizzie.config.showBorder) {
-      g.drawLine(posX + strokeRadius, posY + 3 * strokeRadius, posX + strokeRadius, posY - strokeRadius + height);
-      g.drawLine(posX - strokeRadius + width, posY + 3 * strokeRadius, posX - strokeRadius + width,
+      g.drawLine(
+          posX + strokeRadius,
+          posY + 3 * strokeRadius,
+          posX + strokeRadius,
+          posY - strokeRadius + height);
+      g.drawLine(
+          posX - strokeRadius + width,
+          posY + 3 * strokeRadius,
+          posX - strokeRadius + width,
           posY - strokeRadius + height);
     }
 
@@ -1009,7 +1051,9 @@ public class BoardPane extends JDialog {
         text = String.format(": %.1f%%", 100 - lastWR - curWR);
       }
 
-      g.drawString(resourceBundle.getString("LizzieFrame.display.lastMove") + text, posX + 2 * strokeRadius,
+      g.drawString(
+          resourceBundle.getString("LizzieFrame.display.lastMove") + text,
+          posX + 2 * strokeRadius,
           posY + height - 2 * strokeRadius); // - font.getSize());
     } else {
       // I think it's more elegant to just not display anything when we don't have
@@ -1035,14 +1079,21 @@ public class BoardPane extends JDialog {
 
       // Show percentage above bars
       g.setColor(Color.WHITE);
-      g.drawString(String.format("%.1f%%", blackWR), barPosxB + 2 * strokeRadius, posY + barHeight - 2 * strokeRadius);
+      g.drawString(
+          String.format("%.1f%%", blackWR),
+          barPosxB + 2 * strokeRadius,
+          posY + barHeight - 2 * strokeRadius);
       String winString = String.format("%.1f%%", whiteWR);
       int sw = g.getFontMetrics().stringWidth(winString);
-      g.drawString(winString, barPosxB + maxBarwidth - sw - 2 * strokeRadius, posY + barHeight - 2 * strokeRadius);
+      g.drawString(
+          winString,
+          barPosxB + maxBarwidth - sw - 2 * strokeRadius,
+          posY + barHeight - 2 * strokeRadius);
 
       g.setColor(Color.GRAY);
       Stroke oldstroke = g.getStroke();
-      Stroke dashed = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 4 }, 0);
+      Stroke dashed =
+          new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] {4}, 0);
       g.setStroke(dashed);
 
       for (int i = 1; i <= winRateGridLines; i++) {
@@ -1062,14 +1113,28 @@ public class BoardPane extends JDialog {
     int strokeRadius = Lizzie.config.showBorder ? 3 : 1;
     g.setStroke(new BasicStroke(strokeRadius == 1 ? strokeRadius : 2 * strokeRadius));
     if (Lizzie.config.showBorder) {
-      g.drawLine(posX + strokeRadius, posY + strokeRadius, posX - strokeRadius + width, posY + strokeRadius);
-      g.drawLine(posX + strokeRadius, posY + 3 * strokeRadius, posX + strokeRadius, posY - strokeRadius + height);
-      g.drawLine(posX - strokeRadius + width, posY + 3 * strokeRadius, posX - strokeRadius + width,
+      g.drawLine(
+          posX + strokeRadius,
+          posY + strokeRadius,
+          posX - strokeRadius + width,
+          posY + strokeRadius);
+      g.drawLine(
+          posX + strokeRadius,
+          posY + 3 * strokeRadius,
+          posX + strokeRadius,
+          posY - strokeRadius + height);
+      g.drawLine(
+          posX - strokeRadius + width,
+          posY + 3 * strokeRadius,
+          posX - strokeRadius + width,
           posY - strokeRadius + height);
     }
 
     // Draw middle line
-    g.drawLine(posX - strokeRadius + width / 2, posY + 3 * strokeRadius, posX - strokeRadius + width / 2,
+    g.drawLine(
+        posX - strokeRadius + width / 2,
+        posY + 3 * strokeRadius,
+        posX - strokeRadius + width / 2,
         posY - strokeRadius + height);
     g.setColor(Color.white);
 
@@ -1085,10 +1150,12 @@ public class BoardPane extends JDialog {
       bdiam = smallDiam;
     }
     g.setColor(Color.black);
-    g.fillOval(posX + width / 4 - bdiam / 2, posY + height * 3 / 8 + (diam - bdiam) / 2, bdiam, bdiam);
+    g.fillOval(
+        posX + width / 4 - bdiam / 2, posY + height * 3 / 8 + (diam - bdiam) / 2, bdiam, bdiam);
 
     g.setColor(Color.WHITE);
-    g.fillOval(posX + width * 3 / 4 - wdiam / 2, posY + height * 3 / 8 + (diam - wdiam) / 2, wdiam, wdiam);
+    g.fillOval(
+        posX + width * 3 / 4 - wdiam / 2, posY + height * 3 / 8 + (diam - wdiam) / 2, wdiam, wdiam);
 
     // Draw captures
     String bval, wval;
@@ -1119,13 +1186,10 @@ public class BoardPane extends JDialog {
   }
 
   /**
-   * Checks whether or not something was clicked and performs the appropriate
-   * action
+   * Checks whether or not something was clicked and performs the appropriate action
    *
-   * @param x
-   *          x coordinate
-   * @param y
-   *          y coordinate
+   * @param x x coordinate
+   * @param y y coordinate
    */
   public void onClicked(int x, int y) {
     // Check for board click
@@ -1134,8 +1198,7 @@ public class BoardPane extends JDialog {
 
     if (boardCoordinates.isPresent()) {
       int[] coords = boardCoordinates.get();
-      if (Lizzie.board.inAnalysisMode())
-        Lizzie.board.toggleAnalysis();
+      if (Lizzie.board.inAnalysisMode()) Lizzie.board.toggleAnalysis();
       if (!isPlayingAgainstLeelaz || (playerIsBlack == Lizzie.board.getData().blackToPlay))
         Lizzie.board.place(coords[0], coords[1]);
     }
@@ -1152,8 +1215,8 @@ public class BoardPane extends JDialog {
     repaint();
   }
 
-  private final Consumer<String> placeVariation = v -> Board.asCoordinates(v)
-      .ifPresent(c -> Lizzie.board.place(c[0], c[1]));
+  private final Consumer<String> placeVariation =
+      v -> Board.asCoordinates(v).ifPresent(c -> Lizzie.board.place(c[0], c[1]));
 
   public boolean playCurrentVariation() {
     boardRenderer.variationOpt.ifPresent(vs -> vs.forEach(placeVariation));
@@ -1168,10 +1231,11 @@ public class BoardPane extends JDialog {
     mouseOverCoordinate = outOfBoundCoordinate;
     Optional<int[]> coords = boardRenderer.convertScreenToCoordinates(x, y);
     coords.filter(c -> !isMouseOver(c[0], c[1])).ifPresent(c -> repaint());
-    coords.ifPresent(c -> {
-      mouseOverCoordinate = c;
-      isReplayVariation = false;
-    });
+    coords.ifPresent(
+        c -> {
+          mouseOverCoordinate = c;
+          isReplayVariation = false;
+        });
     if (!coords.isPresent() && boardRenderer.isShowingBranch()) {
       repaint();
     }
@@ -1199,8 +1263,14 @@ public class BoardPane extends JDialog {
     if (Lizzie.config.showComment && commentRect.contains(e.getX(), e.getY())) {
       scrollPane.dispatchEvent(e);
       createCommentImage(true, commentRect.width, commentRect.height);
-      getGraphics().drawImage(cachedCommentImage, commentRect.x, commentRect.y, commentRect.width, commentRect.height,
-          null);
+      getGraphics()
+          .drawImage(
+              cachedCommentImage,
+              commentRect.x,
+              commentRect.y,
+              commentRect.width,
+              commentRect.height,
+              null);
       return true;
     } else {
       return false;
@@ -1219,7 +1289,8 @@ public class BoardPane extends JDialog {
       if (w > 0 && h > 0) {
         scrollPane.addNotify();
         scrollPane.setSize(w, h);
-        cachedCommentImage = new BufferedImage(scrollPane.getWidth(), scrollPane.getHeight(), TYPE_INT_ARGB);
+        cachedCommentImage =
+            new BufferedImage(scrollPane.getWidth(), scrollPane.getHeight(), TYPE_INT_ARGB);
         Graphics2D g2 = cachedCommentImage.createGraphics();
         scrollPane.validate();
         scrollPane.printAll(g2);
@@ -1229,7 +1300,8 @@ public class BoardPane extends JDialog {
   }
 
   private void autosaveMaybe() {
-    int interval = Lizzie.config.config.getJSONObject("ui").getInt("autosave-interval-seconds") * 1000;
+    int interval =
+        Lizzie.config.config.getJSONObject("ui").getInt("autosave-interval-seconds") * 1000;
     long currentTime = System.currentTimeMillis();
     if (interval > 0 && currentTime - lastAutosaveTime >= interval) {
       Lizzie.board.autosave();
@@ -1288,17 +1360,21 @@ public class BoardPane extends JDialog {
 
   public void pasteSgf() {
     // Get string from clipboard
-    String sgfContent = Optional.ofNullable(Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null))
-        .filter(cc -> cc.isDataFlavorSupported(DataFlavor.stringFlavor)).flatMap(cc -> {
-          try {
-            return Optional.of((String) cc.getTransferData(DataFlavor.stringFlavor));
-          } catch (UnsupportedFlavorException e) {
-            e.printStackTrace();
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-          return Optional.empty();
-        }).orElse("");
+    String sgfContent =
+        Optional.ofNullable(Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null))
+            .filter(cc -> cc.isDataFlavorSupported(DataFlavor.stringFlavor))
+            .flatMap(
+                cc -> {
+                  try {
+                    return Optional.of((String) cc.getTransferData(DataFlavor.stringFlavor));
+                  } catch (UnsupportedFlavorException e) {
+                    e.printStackTrace();
+                  } catch (IOException e) {
+                    e.printStackTrace();
+                  }
+                  return Optional.empty();
+                })
+            .orElse("");
 
     // Load game contents from sgf string
     if (!sgfContent.isEmpty()) {
@@ -1333,7 +1409,13 @@ public class BoardPane extends JDialog {
     commentPane.setSize(w, h);
     createCommentImage(!comment.equals(this.cachedComment), w, h);
     commentRect = new Rectangle(x, y, scrollPane.getWidth(), scrollPane.getHeight());
-    g.drawImage(cachedCommentImage, commentRect.x, commentRect.y, commentRect.width, commentRect.height, null);
+    g.drawImage(
+        cachedCommentImage,
+        commentRect.x,
+        commentRect.y,
+        commentRect.width,
+        commentRect.height,
+        null);
     cachedComment = comment;
   }
 
@@ -1352,7 +1434,8 @@ public class BoardPane extends JDialog {
       Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
       curWR = stats.maxWinrate;
       validWinrate = (stats.totalPlayouts > 0);
-      if (isPlayingAgainstLeelaz && playerIsBlack == !Lizzie.board.getHistory().getData().blackToPlay) {
+      if (isPlayingAgainstLeelaz
+          && playerIsBlack == !Lizzie.board.getHistory().getData().blackToPlay) {
         validWinrate = false;
       }
     } else {
@@ -1374,11 +1457,12 @@ public class BoardPane extends JDialog {
       return Color.WHITE;
     }
     double diffWinrate = lastWinrateDiff(node);
-    Optional<Double> st = diffWinrate >= 0
-        ? Lizzie.config.blunderWinrateThresholds
-            .flatMap(l -> l.stream().filter(t -> (t > 0 && t <= diffWinrate)).reduce((f, s) -> s))
-        : Lizzie.config.blunderWinrateThresholds
-            .flatMap(l -> l.stream().filter(t -> (t < 0 && t >= diffWinrate)).reduce((f, s) -> f));
+    Optional<Double> st =
+        diffWinrate >= 0
+            ? Lizzie.config.blunderWinrateThresholds.flatMap(
+                l -> l.stream().filter(t -> (t > 0 && t <= diffWinrate)).reduce((f, s) -> s))
+            : Lizzie.config.blunderWinrateThresholds.flatMap(
+                l -> l.stream().filter(t -> (t < 0 && t >= diffWinrate)).reduce((f, s) -> f));
     if (st.isPresent()) {
       return Lizzie.config.blunderNodeColors.map(m -> m.get(st.get())).get();
     } else {
@@ -1387,109 +1471,32 @@ public class BoardPane extends JDialog {
   }
 
   public void replayBranch() {
-    if (isReplayVariation)
-      return;
+    if (isReplayVariation) return;
     int replaySteps = boardRenderer.getReplayBranch();
-    if (replaySteps <= 0)
-      return; // Bad steps or no branch
+    if (replaySteps <= 0) return; // Bad steps or no branch
     int oriBranchLength = boardRenderer.getDisplayedBranchLength();
     isReplayVariation = true;
-    if (Lizzie.leelaz.isPondering())
-      Lizzie.leelaz.togglePonder();
-    Runnable runnable = new Runnable() {
-      public void run() {
-        int secs = (int) (Lizzie.config.replayBranchIntervalSeconds * 1000);
-        for (int i = 1; i < replaySteps + 1; i++) {
-          if (!isReplayVariation)
-            break;
-          setDisplayedBranchLength(i);
-          repaint();
-          try {
-            Thread.sleep(secs);
-          } catch (InterruptedException e) {
-            e.printStackTrace();
+    if (Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
+    Runnable runnable =
+        new Runnable() {
+          public void run() {
+            int secs = (int) (Lizzie.config.replayBranchIntervalSeconds * 1000);
+            for (int i = 1; i < replaySteps + 1; i++) {
+              if (!isReplayVariation) break;
+              setDisplayedBranchLength(i);
+              repaint();
+              try {
+                Thread.sleep(secs);
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+            }
+            boardRenderer.setDisplayedBranchLength(oriBranchLength);
+            isReplayVariation = false;
+            if (Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
           }
-        }
-        boardRenderer.setDisplayedBranchLength(oriBranchLength);
-        isReplayVariation = false;
-        if (Lizzie.leelaz.isPondering())
-          Lizzie.leelaz.togglePonder();
-      }
-    };
+        };
     Thread thread = new Thread(runnable);
     thread.start();
-  }
-
-  public static class PaneDragListener extends MouseAdapter {
-
-    private final Component com;
-    private int margin = 3;
-    private Point coord = null;
-    private boolean top = false;
-    private boolean down = false;
-    private boolean left = false;
-    private boolean right = false;
-    private boolean drag = false;
-    private Point draggingAnchor = null;
-
-    public PaneDragListener(Component frame) {
-      this.com = frame;
-    }
-
-    public void mouseMoved(MouseEvent e) {
-      if (e.getPoint().getY() <= margin && e.getPoint().getX() <= margin) {
-        com.setCursor(Cursor.getPredefinedCursor(Cursor.NW_RESIZE_CURSOR));
-        top = true;
-        left = true;
-      } else if (Math.abs(e.getPoint().getY() - com.getSize().getHeight()) <= margin
-          && Math.abs(e.getPoint().getX() - com.getSize().getWidth()) <= margin) {
-        com.setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
-        down = true;
-        right = true;
-      } else if (e.getPoint().getY() <= margin) {
-        com.setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
-        top = true;
-      } else if (Math.abs(e.getPoint().getY() - com.getSize().getHeight()) <= margin) {
-        com.setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
-        down = true;
-      } else if (e.getPoint().getX() <= margin) {
-        com.setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
-        left = true;
-      } else if (Math.abs(e.getPoint().getX() - com.getSize().getWidth()) <= margin) {
-        com.setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
-        right = true;
-      } else {
-        com.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        top = false;
-        down = false;
-        left = false;
-        right = false;
-        drag = true;
-      }
-    }
-
-    public void mouseReleased(MouseEvent e) {
-      coord = null;
-    }
-
-    public void mousePressed(MouseEvent e) {
-      coord = e.getPoint();
-    }
-
-    public void mouseDragged(MouseEvent e) {
-      Dimension d = com.getSize();
-      if (top) {
-        com.setBounds(com.getLocationOnScreen().x, com.getLocationOnScreen().y + e.getY(), (int)d.getWidth(), (int)(d.getHeight() - e.getY()));
-      } else if (down) {
-        com.setSize((int)d.getWidth(), (int)e.getY());
-      } else if (left) {
-        com.setBounds(com.getLocationOnScreen().x + e.getX(), com.getLocationOnScreen().y, (int)d.getWidth() - e.getX(), (int)(d.getHeight()));
-      } else if (right) {
-        com.setSize((int)e.getX(), (int)d.getHeight());
-      } else {
-        Point c = e.getLocationOnScreen();
-        com.setLocation(c.x - coord.x, c.y - coord.y);
-      }
-    }
   }
 }

@@ -1,61 +1,29 @@
 package featurecat.lizzie.gui;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
-import static java.awt.image.BufferedImage.TYPE_INT_RGB;
-import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static java.lang.Math.round;
 
 import com.jhlabs.image.GaussianFilter;
 import featurecat.lizzie.Lizzie;
-import featurecat.lizzie.analysis.GameInfo;
-import featurecat.lizzie.analysis.Leelaz;
 import featurecat.lizzie.rules.Board;
-import featurecat.lizzie.rules.BoardData;
-import featurecat.lizzie.rules.BoardHistoryNode;
-import featurecat.lizzie.rules.GIBParser;
-import featurecat.lizzie.rules.SGFParser;
 import java.awt.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontFormatException;
-import java.awt.FontMetrics;
-import java.awt.Frame;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Dialog.ModalityType;
-import java.awt.Window.Type;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.MouseWheelEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /** The window used to display the game. */
 public class CommentPane extends JWindow {
-  private static final ResourceBundle resourceBundle = ResourceBundle.getBundle("l10n.DisplayStrings");
+  private static final ResourceBundle resourceBundle =
+      ResourceBundle.getBundle("l10n.DisplayStrings");
 
-//  private final BufferStrategy bs;
+  //  private final BufferStrategy bs;
 
-  private static final int[] outOfBoundCoordinate = new int[] { -1, -1 };
+  private static final int[] outOfBoundCoordinate = new int[] {-1, -1};
   public int[] mouseOverCoordinate = outOfBoundCoordinate;
   public boolean showControls = false;
   public boolean isPlayingAgainstLeelaz = false;
@@ -97,21 +65,22 @@ public class CommentPane extends JWindow {
     commentPane = new JTextPane();
     commentPane.setText("Comment Pane");
     commentPane.setEditable(true);
-//    commentPane.setMargin(new Insets(5, 5, 5, 5));
+    //    commentPane.setMargin(new Insets(5, 5, 5, 5));
     commentPane.setBackground(Lizzie.config.commentBackgroundColor);
     commentPane.setForeground(Lizzie.config.commentFontColor);
     scrollPane = new JScrollPane();
     scrollPane.setBorder(null);
-    scrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+    scrollPane.setVerticalScrollBarPolicy(
+        javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
     getContentPane().add(scrollPane);
     scrollPane.setViewportView(commentPane);
-//    setUndecorated(true);
+    //    setUndecorated(true);
     // getRootPane().setBorder(BorderFactory.createEmptyBorder());
-//     getRootPane().setWindowDecorationStyle(JRootPane.PLAIN_DIALOG);
+    //     getRootPane().setWindowDecorationStyle(JRootPane.PLAIN_DIALOG);
     setVisible(true);
 
-//    createBufferStrategy(2);
-//    bs = getBufferStrategy();
+    //    createBufferStrategy(2);
+    //    bs = getBufferStrategy();
   }
 
   private BufferedImage cachedImage;
@@ -132,8 +101,8 @@ public class CommentPane extends JWindow {
 
   private boolean userAlreadyKnowsAboutCommandString = false;
 
-  private final Consumer<String> placeVariation = v -> Board.asCoordinates(v)
-      .ifPresent(c -> Lizzie.board.place(c[0], c[1]));
+  private final Consumer<String> placeVariation =
+      v -> Board.asCoordinates(v).ifPresent(c -> Lizzie.board.place(c[0], c[1]));
 
   /**
    * Process Comment Mouse Wheel Moved
@@ -144,8 +113,14 @@ public class CommentPane extends JWindow {
     if (Lizzie.config.showComment && commentRect.contains(e.getX(), e.getY())) {
       scrollPane.dispatchEvent(e);
       createCommentImage(true, commentRect.width, commentRect.height);
-      getGraphics().drawImage(cachedCommentImage, commentRect.x, commentRect.y, commentRect.width, commentRect.height,
-          null);
+      getGraphics()
+          .drawImage(
+              cachedCommentImage,
+              commentRect.x,
+              commentRect.y,
+              commentRect.width,
+              commentRect.height,
+              null);
       return true;
     } else {
       return false;
@@ -164,7 +139,8 @@ public class CommentPane extends JWindow {
       if (w > 0 && h > 0) {
         scrollPane.addNotify();
         scrollPane.setSize(w, h);
-        cachedCommentImage = new BufferedImage(scrollPane.getWidth(), scrollPane.getHeight(), TYPE_INT_ARGB);
+        cachedCommentImage =
+            new BufferedImage(scrollPane.getWidth(), scrollPane.getHeight(), TYPE_INT_ARGB);
         Graphics2D g2 = cachedCommentImage.createGraphics();
         scrollPane.validate();
         scrollPane.printAll(g2);
@@ -196,7 +172,13 @@ public class CommentPane extends JWindow {
     commentPane.setSize(w, h);
     createCommentImage(!comment.equals(this.cachedComment), w, h);
     commentRect = new Rectangle(x, y, scrollPane.getWidth(), scrollPane.getHeight());
-    g.drawImage(cachedCommentImage, commentRect.x, commentRect.y, commentRect.width, commentRect.height, null);
+    g.drawImage(
+        cachedCommentImage,
+        commentRect.x,
+        commentRect.y,
+        commentRect.width,
+        commentRect.height,
+        null);
     cachedComment = comment;
   }
 }

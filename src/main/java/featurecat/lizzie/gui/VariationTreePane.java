@@ -21,12 +21,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.FontMetrics;
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Dialog.ModalityType;
-import java.awt.Window.Type;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -143,19 +140,23 @@ public class VariationTreePane extends JDialog {
   /** Creates a window */
   public VariationTreePane(JFrame owner) {
     super(owner);
-//    setModal(true);
+    //    setModal(true);
 
-//    setModalityType(ModalityType.APPLICATION_MODAL);
-    
+    //    setModalityType(ModalityType.APPLICATION_MODAL);
+
     boardRenderer = new BoardRenderer(true);
     subBoardRenderer = new BoardRenderer(false);
     variationTree = new VariationTree();
     winrateGraph = new WinrateGraph();
 
-//    setMinimumSize(new Dimension(640, 400));
+    //    setMinimumSize(new Dimension(640, 400));
     JSONArray windowSize = Lizzie.config.uiConfig.getJSONArray("window-size");
-//    setSize(windowSize.getInt(0), windowSize.getInt(1));
-    setBounds(owner.getInsets().left, owner.getInsets().top, windowSize.getInt(0) - owner.getInsets().left - owner.getInsets().right, windowSize.getInt(1) - owner.getInsets().top - owner.getInsets().bottom);
+    //    setSize(windowSize.getInt(0), windowSize.getInt(1));
+    setBounds(
+        owner.getInsets().left,
+        owner.getInsets().top,
+        windowSize.getInt(0) - owner.getInsets().left - owner.getInsets().right,
+        windowSize.getInt(1) - owner.getInsets().top - owner.getInsets().bottom);
     setLocationRelativeTo(null); // Start centered, needs to be called *after* setSize...
 
     // Allow change font in the config
@@ -167,7 +168,7 @@ public class VariationTreePane extends JDialog {
     }
 
     if (Lizzie.config.startMaximized) {
-//      setExtendedState(Frame.MAXIMIZED_BOTH);
+      //      setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 
     commentPane = new JTextPane();
@@ -182,8 +183,8 @@ public class VariationTreePane extends JDialog {
         javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
     commentRect = new Rectangle(0, 0, 0, 0);
     setUndecorated(true);
-//    getRootPane().setBorder(BorderFactory.createEmptyBorder());
-//    getRootPane().setWindowDecorationStyle(JRootPane.FRAME);    
+    //    getRootPane().setBorder(BorderFactory.createEmptyBorder());
+    //    getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
     setVisible(true);
 
     createBufferStrategy(2);
@@ -198,7 +199,7 @@ public class VariationTreePane extends JDialog {
 
     // necessary for Windows users - otherwise Lizzie shows a blank white screen on startup until
     // updates occur.
-//    repaint();
+    //    repaint();
 
     // When the window is closed: save the SGF file, then run shutdown()
     this.addWindowListener(
