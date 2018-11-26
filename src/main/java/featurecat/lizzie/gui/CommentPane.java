@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 import javax.swing.*;
 
 /** The window used to display the game. */
-public class CommentPane extends JWindow {
+public class CommentPane extends LizziePane {
   private static final ResourceBundle resourceBundle =
       ResourceBundle.getBundle("l10n.DisplayStrings");
 

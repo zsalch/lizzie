@@ -9,6 +9,8 @@ import org.json.JSONArray;
 
 public class LizzieMain extends JFrame {
 
+  
+  public static Input input;
   public static BoardPane boardPane;
   public static CommentPane commentPane;
   public static boolean designMode;
@@ -55,7 +57,7 @@ public class LizzieMain extends JFrame {
 
     setVisible(true);
 
-    Input input = new Input();
+    input = new Input();
 
     addMouseListener(input);
     addKeyListener(input);
@@ -66,5 +68,6 @@ public class LizzieMain extends JFrame {
   public void toggleDesignMode() {
     this.designMode = !this.designMode;
     Lizzie.frame.setDesignMode(designMode);
+    commentPane.setDesignMode(designMode);
   }
 }

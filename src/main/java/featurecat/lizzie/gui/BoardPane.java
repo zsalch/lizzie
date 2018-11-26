@@ -137,7 +137,7 @@ public class BoardPane extends LizziePane {
   }
 
   /** Creates a window */
-  public BoardPane(JFrame owner) {
+  public BoardPane(LizzieMain owner) {
     super(owner);
     // setModal(true);
 
@@ -165,22 +165,22 @@ public class BoardPane extends LizziePane {
       // setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 
-    commentPane = new JTextPane();
-    commentPane.setEditable(false);
-    commentPane.setMargin(new Insets(5, 5, 5, 5));
-    commentPane.setBackground(Lizzie.config.commentBackgroundColor);
-    commentPane.setForeground(Lizzie.config.commentFontColor);
-    scrollPane = new JScrollPane();
-    scrollPane.setViewportView(commentPane);
-    scrollPane.setBorder(null);
-    scrollPane.setVerticalScrollBarPolicy(
-        javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-    commentRect = new Rectangle(0, 0, 0, 0);
+//    commentPane = new JTextPane();
+//    commentPane.setEditable(false);
+//    commentPane.setMargin(new Insets(5, 5, 5, 5));
+//    commentPane.setBackground(Lizzie.config.commentBackgroundColor);
+//    commentPane.setForeground(Lizzie.config.commentFontColor);
+//    scrollPane = new JScrollPane();
+//    scrollPane.setViewportView(commentPane);
+//    scrollPane.setBorder(null);
+//    scrollPane.setVerticalScrollBarPolicy(
+//        javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+//    commentRect = new Rectangle(0, 0, 0, 0);
 
     createBufferStrategy(2);
     bs = getBufferStrategy();
 
-    Input input = new Input();
+    Input input = owner.input;
 
     addMouseListener(input);
     addKeyListener(input);
@@ -193,12 +193,12 @@ public class BoardPane extends LizziePane {
     // repaint();
 
     // When the window is closed: save the SGF file, then run shutdown()
-    this.addWindowListener(
-        new WindowAdapter() {
-          public void windowClosing(WindowEvent e) {
-            Lizzie.shutdown();
-          }
-        });
+//    this.addWindowListener(
+//        new WindowAdapter() {
+//          public void windowClosing(WindowEvent e) {
+//            Lizzie.shutdown();
+//          }
+//        });
   }
 
   /** Clears related status from empty board. */
@@ -686,7 +686,7 @@ public class BoardPane extends LizziePane {
             variationTree.draw(g, treex, treey, treew, treeh);
           }
           if (Lizzie.config.showComment) {
-            drawComment(g, cx, cy, cw, ch);
+//            drawComment(g, cx, cy, cw, ch);
           }
         }
 
@@ -1318,7 +1318,7 @@ public class BoardPane extends LizziePane {
     StringBuilder sb = new StringBuilder(DEFAULT_TITLE);
     sb.append(playerTitle);
     sb.append(" [" + Lizzie.leelaz.engineCommand() + "]");
-    setTitle(sb.toString());
+//    setTitle(sb.toString());
   }
 
   private void setDisplayedBranchLength(int n) {

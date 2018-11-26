@@ -16,9 +16,10 @@ import java.awt.image.BufferStrategy;
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JWindow;
 
 /** The window used to display the game. */
-public class LizziePane extends JDialog {
+public class LizziePane extends JWindow {
 
   /** Keys to lookup borders in defaults table. */
   private static final int[] cursorMapping =
@@ -76,14 +77,14 @@ public class LizziePane extends JDialog {
     // setMinimumSize(new Dimension(640, 400));
     // JSONArray windowSize = Lizzie.config.uiConfig.getJSONArray("window-size");
     // setSize(windowSize.getInt(0), windowSize.getInt(1));
-    setLocationRelativeTo(owner);
+//    setLocationRelativeTo(owner);
 
     if (Lizzie.config.startMaximized) {
       // setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 
-    setUndecorated(true);
-    setResizable(true);
+//    setUndecorated(true);
+//    setResizable(true);
     getRootPane().setBorder(BorderFactory.createEmptyBorder());
     // getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
     setVisible(true);
@@ -134,23 +135,25 @@ public class LizziePane extends JDialog {
     public void mouseMoved(MouseEvent e) {
       Window w = (Window) e.getSource();
 
-      Frame f = null;
-      Dialog d = null;
+      JWindow f = null;
+      JDialog d = null;
 
-      if (w instanceof Frame) {
-        f = (Frame) w;
-      } else if (w instanceof Dialog) {
-        d = (Dialog) w;
+      if (w instanceof JWindow) {
+        f = (JWindow) w;
+      } else if (w instanceof JDialog) {
+        d = (JDialog) w;
       }
 
       // Update the cursor
       int cursor = getCursor(calculateCorner(w, e.getX(), e.getY()));
 
       if (cursor != 0
-          && ((f != null && (f.isResizable() && (f.getExtendedState() & Frame.MAXIMIZED_BOTH) == 0))
+          && ((f != null) //&& (f.isResizable() && (f.getExtendedState() & Frame.MAXIMIZED_BOTH) == 0))
               || (d != null && d.isResizable()))) {
+        isMovingWindow = false;
         w.setCursor(Cursor.getPredefinedCursor(cursor));
       } else {
+        isMovingWindow = true;
         w.setCursor(lastCursor);
       }
     }
@@ -173,18 +176,18 @@ public class LizziePane extends JDialog {
         w.toFront();
       }
 
-      Frame f = null;
-      Dialog d = null;
+      JWindow f = null;
+      JDialog d = null;
 
-      if (w instanceof Frame) {
-        f = (Frame) w;
-      } else if (w instanceof Dialog) {
-        d = (Dialog) w;
+      if (w instanceof JWindow) {
+        f = (JWindow) w;
+      } else if (w instanceof JDialog) {
+        d = (JDialog) w;
       }
 
-      int frameState = (f != null) ? f.getExtendedState() : 0;
+//      int frameState = (f != null) ? f.getExtendedState() : 0;
 
-      if (f != null && f.isResizable() && ((frameState & Frame.MAXIMIZED_BOTH) == 0)
+      if (f != null   //&& f.isResizable() && ((frameState & Frame.MAXIMIZED_BOTH) == 0)
           || (d != null && d.isResizable())) {
         dragOffsetX = dragWindowOffset.x;
         dragOffsetY = dragWindowOffset.y;
