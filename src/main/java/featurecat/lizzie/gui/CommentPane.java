@@ -45,7 +45,7 @@ public class CommentPane extends LizziePane {
   private Rectangle commentRect;
 
   /** Creates a window */
-  public CommentPane(JFrame owner) {
+  public CommentPane(LizzieMain owner) {
     super(owner);
     // setModal(true);
 
@@ -53,8 +53,8 @@ public class CommentPane extends LizziePane {
 
     // setMinimumSize(new Dimension(640, 400));
     // JSONArray windowSize = Lizzie.config.uiConfig.getJSONArray("window-size");
-    setSize(200, 300);
-    commentRect = new Rectangle(0, 0, 200, 300);
+    //    setBounds(200, 300, 200, 300);
+    //    commentRect = new Rectangle(0, 0, 100, 150);
 
     // setBounds(owner.getInsets().left, owner.getInsets().top, windowSize.getInt(0)
     // - owner.getInsets().left - owner.getInsets().right, windowSize.getInt(1) -
@@ -64,7 +64,7 @@ public class CommentPane extends LizziePane {
 
     commentPane = new JTextPane();
     commentPane.setText("Comment Pane");
-    commentPane.setEditable(true);
+    commentPane.setEditable(false);
     //    commentPane.setMargin(new Insets(5, 5, 5, 5));
     commentPane.setBackground(Lizzie.config.commentBackgroundColor);
     commentPane.setForeground(Lizzie.config.commentFontColor);
@@ -180,5 +180,16 @@ public class CommentPane extends LizziePane {
         commentRect.height,
         null);
     cachedComment = comment;
+  }
+
+  public void setDesignMode(boolean mode) {
+    super.setDesignMode(mode);
+    if (mode) {
+      this.commentPane.setVisible(false);
+      this.scrollPane.setVisible(false);
+    } else {
+      this.commentPane.setVisible(true);
+      this.scrollPane.setVisible(true);
+    }
   }
 }

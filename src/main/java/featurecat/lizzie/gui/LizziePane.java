@@ -1,10 +1,9 @@
 package featurecat.lizzie.gui;
 
 import featurecat.lizzie.Lizzie;
+import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Dialog;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -15,7 +14,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JWindow;
 
 /** The window used to display the game. */
@@ -63,13 +61,24 @@ public class LizziePane extends JWindow {
    */
   private Cursor lastCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
 
-  PaneDragListener dragListener;
+  protected PaneDragListener dragListener;
+  protected Input input;
+  private BufferStrategy bs;
 
-  private final BufferStrategy bs;
+  public LizziePane() {
+    super();
+  }
 
   /** Creates a window */
-  public LizziePane(JFrame owner) {
+  public LizziePane(LizzieMain owner) {
     super(owner);
+    initCompotents();
+    input = owner.input;
+    installInputListeners();
+  }
+
+  private void initCompotents() {
+
     // setModal(true);
 
     // setModalityType(ModalityType.APPLICATION_MODAL);
@@ -77,14 +86,14 @@ public class LizziePane extends JWindow {
     // setMinimumSize(new Dimension(640, 400));
     // JSONArray windowSize = Lizzie.config.uiConfig.getJSONArray("window-size");
     // setSize(windowSize.getInt(0), windowSize.getInt(1));
-//    setLocationRelativeTo(owner);
+    // setLocationRelativeTo(owner);
 
     if (Lizzie.config.startMaximized) {
       // setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 
-//    setUndecorated(true);
-//    setResizable(true);
+    // setUndecorated(true);
+    // setResizable(true);
     getRootPane().setBorder(BorderFactory.createEmptyBorder());
     // getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
     setVisible(true);
@@ -103,6 +112,31 @@ public class LizziePane extends JWindow {
     // Lizzie.shutdown();
     // }
     // });
+  }
+
+  public void updateComponentSize() {
+    try {
+      int width = this.getWidth();
+      int height = this.getHeight();
+      Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+      int screenWidth = screenSize.width;
+      int screenHeight = screenSize.height;
+      float proportionW = screenWidth / width;
+      float proportionH = screenHeight / height;
+      Component[] components = this.getRootPane().getContentPane().getComponents();
+      for (Component co : components) {
+        float x = co.getX() * proportionW;
+        float y = co.getY() * proportionH;
+        float w = co.getWidth() * proportionW;
+        float h = co.getHeight() * proportionH;
+        co.setBounds((int) x, (int) y, (int) w, (int) h);
+        // int size = (int) (co.getFont().getSize() * proportionH);
+        // Font font = new Font(co.getFont().getFontName(), co.getFont().getStyle(),
+        // size);
+        // co.setFont(font);
+      }
+    } catch (Exception e) {
+    }
   }
 
   private class PaneDragListener extends MouseAdapter {
@@ -148,12 +182,11 @@ public class LizziePane extends JWindow {
       int cursor = getCursor(calculateCorner(w, e.getX(), e.getY()));
 
       if (cursor != 0
-          && ((f != null) //&& (f.isResizable() && (f.getExtendedState() & Frame.MAXIMIZED_BOTH) == 0))
+          && ((f != null) // && (f.isResizable() && (f.getExtendedState() & Frame.MAXIMIZED_BOTH)
+              // == 0))
               || (d != null && d.isResizable()))) {
-        isMovingWindow = false;
         w.setCursor(Cursor.getPredefinedCursor(cursor));
       } else {
-        isMovingWindow = true;
         w.setCursor(lastCursor);
       }
     }
@@ -185,9 +218,17 @@ public class LizziePane extends JWindow {
         d = (JDialog) w;
       }
 
-//      int frameState = (f != null) ? f.getExtendedState() : 0;
+      // int frameState = (f != null) ? f.getExtendedState() : 0;
 
-      if (f != null   //&& f.isResizable() && ((frameState & Frame.MAXIMIZED_BOTH) == 0)
+      if (((f != null) // && ((frameState & Frame.MAXIMIZED_BOTH) == 0)
+              || (d != null))
+          && dragWindowOffset.y >= BORDER_DRAG_THICKNESS
+          && dragWindowOffset.x >= BORDER_DRAG_THICKNESS
+          && dragWindowOffset.x < w.getWidth() - BORDER_DRAG_THICKNESS) {
+        isMovingWindow = true;
+        dragOffsetX = dragWindowOffset.x;
+        dragOffsetY = dragWindowOffset.y;
+      } else if (f != null // && f.isResizable() && ((frameState & Frame.MAXIMIZED_BOTH) == 0)
           || (d != null && d.isResizable())) {
         dragOffsetX = dragWindowOffset.x;
         dragOffsetY = dragWindowOffset.y;
@@ -332,7 +373,7 @@ public class LizziePane extends JWindow {
     }
   }
 
-  private void installWindowListeners() {
+  protected void installDesignListeners() {
     if (dragListener == null) {
       dragListener = new PaneDragListener(this);
     }
@@ -340,16 +381,32 @@ public class LizziePane extends JWindow {
     addMouseMotionListener(dragListener);
   }
 
-  private void uninstallWindowListeners() {
+  protected void uninstallDesignListeners() {
     removeMouseListener(dragListener);
     removeMouseMotionListener(dragListener);
   }
 
+  protected void installInputListeners() {
+    addMouseListener(input);
+    addKeyListener(input);
+    addMouseWheelListener(input);
+    addMouseMotionListener(input);
+  }
+
+  protected void uninstallInputListeners() {
+    removeMouseListener(input);
+    removeKeyListener(input);
+    removeMouseWheelListener(input);
+    removeMouseMotionListener(input);
+  }
+
   public void setDesignMode(boolean mode) {
     if (mode) {
-      installWindowListeners();
+      uninstallInputListeners();
+      installDesignListeners();
     } else {
-      uninstallWindowListeners();
+      uninstallDesignListeners();
+      installInputListeners();
     }
   }
 }

@@ -29,9 +29,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -165,27 +162,27 @@ public class BoardPane extends LizziePane {
       // setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 
-//    commentPane = new JTextPane();
-//    commentPane.setEditable(false);
-//    commentPane.setMargin(new Insets(5, 5, 5, 5));
-//    commentPane.setBackground(Lizzie.config.commentBackgroundColor);
-//    commentPane.setForeground(Lizzie.config.commentFontColor);
-//    scrollPane = new JScrollPane();
-//    scrollPane.setViewportView(commentPane);
-//    scrollPane.setBorder(null);
-//    scrollPane.setVerticalScrollBarPolicy(
-//        javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-//    commentRect = new Rectangle(0, 0, 0, 0);
+    //    commentPane = new JTextPane();
+    //    commentPane.setEditable(false);
+    //    commentPane.setMargin(new Insets(5, 5, 5, 5));
+    //    commentPane.setBackground(Lizzie.config.commentBackgroundColor);
+    //    commentPane.setForeground(Lizzie.config.commentFontColor);
+    //    scrollPane = new JScrollPane();
+    //    scrollPane.setViewportView(commentPane);
+    //    scrollPane.setBorder(null);
+    //    scrollPane.setVerticalScrollBarPolicy(
+    //        javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+    //    commentRect = new Rectangle(0, 0, 0, 0);
 
     createBufferStrategy(2);
     bs = getBufferStrategy();
-
-    Input input = owner.input;
-
-    addMouseListener(input);
-    addKeyListener(input);
-    addMouseWheelListener(input);
-    addMouseMotionListener(input);
+    //
+    //    Input input = owner.input;
+    //
+    //    addMouseListener(input);
+    //    addKeyListener(input);
+    //    addMouseWheelListener(input);
+    //    addMouseMotionListener(input);
 
     // necessary for Windows users - otherwise Lizzie shows a blank white screen on
     // startup until
@@ -193,12 +190,12 @@ public class BoardPane extends LizziePane {
     // repaint();
 
     // When the window is closed: save the SGF file, then run shutdown()
-//    this.addWindowListener(
-//        new WindowAdapter() {
-//          public void windowClosing(WindowEvent e) {
-//            Lizzie.shutdown();
-//          }
-//        });
+    //    this.addWindowListener(
+    //        new WindowAdapter() {
+    //          public void windowClosing(WindowEvent e) {
+    //            Lizzie.shutdown();
+    //          }
+    //        });
   }
 
   /** Clears related status from empty board. */
@@ -686,7 +683,7 @@ public class BoardPane extends LizziePane {
             variationTree.draw(g, treex, treey, treew, treeh);
           }
           if (Lizzie.config.showComment) {
-//            drawComment(g, cx, cy, cw, ch);
+            //            drawComment(g, cx, cy, cw, ch);
           }
         }
 
@@ -1255,29 +1252,6 @@ public class BoardPane extends LizziePane {
   }
 
   /**
-   * Process Comment Mouse Wheel Moved
-   *
-   * @return true when the scroll event was processed by this method
-   */
-  public boolean processCommentMouseWheelMoved(MouseWheelEvent e) {
-    if (Lizzie.config.showComment && commentRect.contains(e.getX(), e.getY())) {
-      scrollPane.dispatchEvent(e);
-      createCommentImage(true, commentRect.width, commentRect.height);
-      getGraphics()
-          .drawImage(
-              cachedCommentImage,
-              commentRect.x,
-              commentRect.y,
-              commentRect.width,
-              commentRect.height,
-              null);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  /**
    * Create comment cached image
    *
    * @param forceRefresh
@@ -1318,7 +1292,7 @@ public class BoardPane extends LizziePane {
     StringBuilder sb = new StringBuilder(DEFAULT_TITLE);
     sb.append(playerTitle);
     sb.append(" [" + Lizzie.leelaz.engineCommand() + "]");
-//    setTitle(sb.toString());
+    //    setTitle(sb.toString());
   }
 
   private void setDisplayedBranchLength(int n) {
