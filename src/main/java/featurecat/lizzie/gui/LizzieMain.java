@@ -1,18 +1,31 @@
 package featurecat.lizzie.gui;
 
+import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
+import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-
-import featurecat.lizzie.Lizzie;
-import featurecat.lizzie.rules.Board;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Frame;
-import java.awt.Toolkit;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.TexturePaint;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.Optional;
 import javax.swing.JFrame;
 import org.json.JSONArray;
+import featurecat.lizzie.Lizzie;
+import featurecat.lizzie.rules.Board;
+import java.awt.event.WindowStateListener;
+import java.awt.event.WindowEvent;
 
 public class LizzieMain extends JFrame {
 
@@ -20,7 +33,53 @@ public class LizzieMain extends JFrame {
   public static BoardPane boardPane;
   public static CommentPane commentPane;
   public static boolean designMode;
+
+  private int originX;
+  private int originY;
+  private int originW;
+  private int originH;
+
   private static final String DEFAULT_TITLE = "Lizzie - Leela Zero Interface";
+
+  public static Font uiFont;
+  public static Font winrateFont;
+
+  private final BufferStrategy bs;
+
+  private static final BufferedImage emptyImage = new BufferedImage(1, 1, TYPE_INT_ARGB);
+  private BufferedImage cachedImage;
+
+  private BufferedImage cachedBackground;
+
+  private BufferedImage cachedWallpaperImage = emptyImage;
+  private int cachedBackgroundWidth = 0, cachedBackgroundHeight = 0;
+  private boolean cachedBackgroundShowControls = false;
+  private boolean cachedShowWinrate = true;
+  private boolean cachedShowVariationGraph = true;
+  private boolean cachedShowLargeSubBoard = true;
+  private boolean cachedLargeWinrate = true;
+  private boolean cachedShowComment = true;
+  private boolean redrawBackgroundAnyway = false;
+
+  static {
+    // load fonts
+    try {
+      uiFont =
+          Font.createFont(
+              Font.TRUETYPE_FONT,
+              Thread.currentThread()
+                  .getContextClassLoader()
+                  .getResourceAsStream("fonts/OpenSans-Regular.ttf"));
+      winrateFont =
+          Font.createFont(
+              Font.TRUETYPE_FONT,
+              Thread.currentThread()
+                  .getContextClassLoader()
+                  .getResourceAsStream("fonts/OpenSans-Semibold.ttf"));
+    } catch (IOException | FontFormatException e) {
+      e.printStackTrace();
+    }
+  }
 
   /** Launch the application. */
   public static void main(String[] args) {
@@ -40,6 +99,11 @@ public class LizzieMain extends JFrame {
   /** Create the frame. */
   public LizzieMain() {
     super(DEFAULT_TITLE);
+    addWindowStateListener(new WindowStateListener() {
+      public void windowStateChanged(WindowEvent e) {
+        updateComponentSize();
+      }
+    });
 
     input = new Input();
 
@@ -55,22 +119,28 @@ public class LizzieMain extends JFrame {
     setSize(windowSize.getInt(0), windowSize.getInt(1));
     setLocationRelativeTo(null); // Start centered, needs to be called *after* setSize...
 
+    // Allow change font in the config
+    if (Lizzie.config.uiFontName != null) {
+      uiFont = new Font(Lizzie.config.uiFontName, Font.PLAIN, 12);
+    }
+    if (Lizzie.config.winrateFontName != null) {
+      winrateFont = new Font(Lizzie.config.winrateFontName, Font.BOLD, 12);
+    }
+
+    if (Lizzie.config.startMaximized) {
+      //      setExtendedState(Frame.MAXIMIZED_BOTH);
+    }
+
     // boardPane = new BoardPane(this);
     boardPane = new BoardPane(this);
     Lizzie.frame = boardPane;
     commentPane = new CommentPane(this);
-    Lizzie.frame.setBounds(
-        getX() + getInsets().left,
-        getY() + getInsets().top,
-        getWidth() - getInsets().left - getInsets().right,
-        getHeight() - getInsets().top - getInsets().bottom);
-
-    if (Lizzie.config.startMaximized) {
-      setExtendedState(Frame.MAXIMIZED_BOTH);
-    }
 
     setVisible(true);
 
+    createBufferStrategy(2);
+    bs = getBufferStrategy();
+    
     addComponentListener(
         new ComponentAdapter() {
           @Override
@@ -83,19 +153,141 @@ public class LizzieMain extends JFrame {
             updateComponentSize();
           }
         });
+
+    repaint();
+
+  }
+  /**
+   * Draws the game board and interface
+   *
+   * @param g0 not used
+   */
+  public void paint(Graphics g0) {
+    int width = getWidth();
+    int height = getHeight();
+
+    Optional<Graphics2D> backgroundG;
+    if (cachedBackgroundWidth != width
+        || cachedBackgroundHeight != height
+        || redrawBackgroundAnyway) {
+      backgroundG = Optional.of(createBackground());
+    } else {
+      backgroundG = Optional.empty();
+    }
+
+    cachedImage = new BufferedImage(width, height, TYPE_INT_ARGB);
+    Graphics2D g = (Graphics2D) cachedImage.getGraphics();
+    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+    // cleanup
+    g.dispose();
+
+    // draw the image
+    Graphics2D bsGraphics = (Graphics2D) bs.getDrawGraphics();
+    bsGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+    bsGraphics.drawImage(cachedBackground, 0, 0, null);
+    bsGraphics.drawImage(cachedImage, 0, 0, null);
+
+    // cleanup
+    bsGraphics.dispose();
+    bs.show();
+  }
+
+  /**
+   * temporary measure to refresh background. ideally we shouldn't need this (but we want to release
+   * Lizzie 0.5 today, not tomorrow!). Refactor me out please! (you need to get blurring to work
+   * properly on startup).
+   */
+  public void refreshBackground() {
+    redrawBackgroundAnyway = true;
+  }
+
+  public BufferedImage getWallpaper() {
+    if (cachedWallpaperImage == emptyImage) {
+      cachedWallpaperImage = Lizzie.config.theme.background();
+    }
+    return cachedWallpaperImage;
+  }
+
+  private Graphics2D createBackground() {
+    cachedBackground = new BufferedImage(getWidth(), getHeight(), TYPE_INT_RGB);
+    cachedBackgroundWidth = cachedBackground.getWidth();
+    cachedBackgroundHeight = cachedBackground.getHeight();
+    //    cachedBackgroundShowControls = showControls;
+    cachedShowWinrate = Lizzie.config.showWinrate;
+    cachedShowVariationGraph = Lizzie.config.showVariationGraph;
+    cachedShowLargeSubBoard = Lizzie.config.showLargeSubBoard();
+    cachedLargeWinrate = Lizzie.config.showLargeWinrate();
+    cachedShowComment = Lizzie.config.showComment;
+
+    redrawBackgroundAnyway = false;
+
+    Graphics2D g = cachedBackground.createGraphics();
+    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+    BufferedImage wallpaper = getWallpaper();
+    int drawWidth = max(wallpaper.getWidth(), getWidth());
+    int drawHeight = max(wallpaper.getHeight(), getHeight());
+    // Support seamless texture
+    drawTextureImage(g, wallpaper, 0, 0, drawWidth, drawHeight);
+
+    return g;
+  }
+
+  /** Draw texture image */
+  public void drawTextureImage(
+      Graphics2D g, BufferedImage img, int x, int y, int width, int height) {
+    TexturePaint paint =
+        new TexturePaint(img, new Rectangle(0, 0, img.getWidth(), img.getHeight()));
+    g.setPaint(paint);
+    g.fill(new Rectangle(x, y, width, height));
   }
 
   public void updateComponentSize() {
+    if (originW <= 0 || originH <= 0) {
+      defaultLayout();
+      return;
+    }
+    int x = this.getX();
+    int y = this.getY();
+    int width = this.getWidth();
+    int height = this.getHeight();
+    float proportionW = (float) originW / width;
+    float proportionH = (float) originH / height;
+    int offsetX = x - originX;
+    int offsetY = y - originY;
+
+    Rectangle br = boardPane.getBounds();
+    int boardSize = (int) Math.min(br.width / proportionW, br.height / proportionH);
+    boardPane.setBounds(
+        x + (int) ((br.x - originX) / proportionW),
+        y + (int) (br.y - originY / proportionH),
+        boardSize,
+        boardSize);
+    Rectangle cr = commentPane.getBounds();
+    commentPane.setBounds(
+        x + cr.x + (int) (offsetX / proportionW),
+        y + cr.y + (int) (offsetY / proportionH),
+        (int) (cr.width / proportionW),
+        (int) (cr.height / proportionH));
+
+    originX = x;
+    originY = y;
+    originW = width;
+    originH = height;
+  }
+
+  public void defaultLayout() {
 
     int x = this.getX();
     int y = this.getY();
     int width = this.getWidth();
     int height = this.getHeight();
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    int screenWidth = screenSize.width;
-    int screenHeight = screenSize.height;
-    float proportionW = screenWidth / width;
-    float proportionH = screenHeight / height;
+
+    originX = x;
+    originY = y;
+    originW = width;
+    originH = height;
 
     // layout parameters
 
