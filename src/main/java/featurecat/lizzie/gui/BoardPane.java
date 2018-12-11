@@ -342,14 +342,14 @@ public class BoardPane extends LizziePane {
     int width = getWidth();
     int height = getHeight();
 
-//    Optional<Graphics2D> backgroundG;
-//    if (cachedBackgroundWidth != width
-//        || cachedBackgroundHeight != height
-//        || redrawBackgroundAnyway) {
-//      backgroundG = Optional.of(createBackground());
-//    } else {
-//      backgroundG = Optional.empty();
-//    }
+    //    Optional<Graphics2D> backgroundG;
+    //    if (cachedBackgroundWidth != width
+    //        || cachedBackgroundHeight != height
+    //        || redrawBackgroundAnyway) {
+    //      backgroundG = Optional.of(createBackground());
+    //    } else {
+    //      backgroundG = Optional.empty();
+    //    }
 
     if (!showControls) {
       // layout parameters
@@ -366,271 +366,271 @@ public class BoardPane extends LizziePane {
       int boardX = (width - maxSize) / 8 * BoardPositionProportion;
       int boardY = topInset + (height - topInset - bottomInset - maxSize) / 2;
 
-//      int panelMargin = (int) (maxSize * 0.02);
-//
-//      // captured stones
-//      int capx = leftInset;
-//      int capy = topInset;
-//      int capw = boardX - panelMargin - leftInset;
-//      int caph = boardY + maxSize / 8 - topInset;
-//
-//      // move statistics (winrate bar)
-//      // boardX equals width of space on each side
-//      int statx = capx;
-//      int staty = capy + caph;
-//      int statw = capw;
-//      int stath = maxSize / 10;
-//
-//      // winrate graph
-//      int grx = statx;
-//      int gry = staty + stath;
-//      int grw = statw;
-//      int grh = maxSize / 3;
-//
-//      // variation tree container
-//      int vx = boardX + maxSize + panelMargin;
-//      int vy = capy;
-//      int vw = width - vx - rightInset;
-//      int vh = height - vy - bottomInset;
-//
-//      // pondering message
-//      double ponderingSize = .02;
-//      int ponderingX = leftInset;
-//      int ponderingY =
-//          height - bottomInset - (int) (maxSize * 0.033) - (int) (maxBound * ponderingSize);
-//
-//      // dynamic komi
-//      double dynamicKomiSize = .02;
-//      int dynamicKomiX = leftInset;
-//      int dynamicKomiY = ponderingY - (int) (maxBound * dynamicKomiSize);
-//      int dynamicKomiLabelX = leftInset;
-//      int dynamicKomiLabelY = dynamicKomiY - (int) (maxBound * dynamicKomiSize);
-//
-//      // loading message;
-//      double loadingSize = 0.03;
-//      int loadingX = ponderingX;
-//      int loadingY = ponderingY - (int) (maxBound * (loadingSize - ponderingSize));
-//
-//      // subboard
-//      int subBoardY = gry + grh;
-//      int subBoardWidth = grw;
-//      int subBoardHeight = ponderingY - subBoardY;
-//      int subBoardLength = min(subBoardWidth, subBoardHeight);
-//      int subBoardX = statx + (statw - subBoardLength) / 2;
-//
-//      if (width >= height) {
-//        // Landscape mode
-//        if (Lizzie.config.showLargeSubBoard()) {
-//          boardX = width - maxSize - panelMargin;
-//          int spaceW = boardX - panelMargin - leftInset;
-//          int spaceH = height - topInset - bottomInset;
-//          int panelW = spaceW / 2;
-//          int panelH = spaceH / 4;
-//
-//          // captured stones
-//          capw = panelW;
-//          caph = (int) (panelH * 0.2);
-//          // move statistics (winrate bar)
-//          staty = capy + caph;
-//          statw = capw;
-//          stath = (int) (panelH * 0.4);
-//          // winrate graph
-//          gry = staty + stath;
-//          grw = statw;
-//          grh = panelH - caph - stath;
-//          // variation tree container
-//          vx = statx + statw;
-//          vw = panelW;
-//          vh = panelH;
-//          // subboard
-//          subBoardY = gry + grh;
-//          subBoardWidth = spaceW;
-//          subBoardHeight = ponderingY - subBoardY;
-//          subBoardLength = Math.min(subBoardWidth, subBoardHeight);
-//          subBoardX = statx + (statw + vw - subBoardLength) / 2;
-//        } else if (Lizzie.config.showLargeWinrate()) {
-//          boardX = width - maxSize - panelMargin;
-//          int spaceW = boardX - panelMargin - leftInset;
-//          int spaceH = height - topInset - bottomInset;
-//          int panelW = spaceW / 2;
-//          int panelH = spaceH / 4;
-//
-//          // captured stones
-//          capy = topInset + panelH + 1;
-//          capw = spaceW;
-//          caph = (int) ((ponderingY - topInset - panelH) * 0.15);
-//          // move statistics (winrate bar)
-//          staty = capy + caph;
-//          statw = capw;
-//          stath = caph;
-//          // winrate graph
-//          gry = staty + stath;
-//          grw = statw;
-//          grh = ponderingY - gry;
-//          // variation tree container
-//          vx = leftInset + panelW;
-//          vw = panelW;
-//          vh = panelH;
-//          // subboard
-//          subBoardY = topInset;
-//          subBoardWidth = panelW - leftInset;
-//          subBoardHeight = panelH;
-//          subBoardLength = Math.min(subBoardWidth, subBoardHeight);
-//          subBoardX = statx + (vw - subBoardLength) / 2;
-//        }
-//      } else {
-//        // Portrait mode
-//        if (Lizzie.config.showLargeSubBoard()) {
-//          // board
-//          maxSize = (int) (maxSize * 0.8);
-//          boardY = height - maxSize - bottomInset;
-//          int spaceW = width - leftInset - rightInset;
-//          int spaceH = boardY - panelMargin - topInset;
-//          int panelW = spaceW / 2;
-//          int panelH = spaceH / 2;
-//          boardX = (spaceW - maxSize) / 2 + leftInset;
-//
-//          // captured stones
-//          capw = panelW / 2;
-//          caph = panelH / 2;
-//          // move statistics (winrate bar)
-//          staty = capy + caph;
-//          statw = capw;
-//          stath = caph;
-//          // winrate graph
-//          gry = staty + stath;
-//          grw = statw;
-//          grh = spaceH - caph - stath;
-//          // variation tree container
-//          vx = capx + capw;
-//          vw = panelW / 2;
-//          vh = spaceH;
-//          // subboard
-//          subBoardX = vx + vw;
-//          subBoardWidth = panelW;
-//          subBoardHeight = boardY - topInset;
-//          subBoardLength = Math.min(subBoardWidth, subBoardHeight);
-//          subBoardY = capy + (gry + grh - capy - subBoardLength) / 2;
-//          // pondering message
-//          ponderingY = height;
-//        } else if (Lizzie.config.showLargeWinrate()) {
-//          // board
-//          maxSize = (int) (maxSize * 0.8);
-//          boardY = height - maxSize - bottomInset;
-//          int spaceW = width - leftInset - rightInset;
-//          int spaceH = boardY - panelMargin - topInset;
-//          int panelW = spaceW / 2;
-//          int panelH = spaceH / 2;
-//          boardX = (spaceW - maxSize) / 2 + leftInset;
-//
-//          // captured stones
-//          capw = panelW / 2;
-//          caph = panelH / 4;
-//          // move statistics (winrate bar)
-//          statx = capx + capw;
-//          staty = capy;
-//          statw = capw;
-//          stath = caph;
-//          // winrate graph
-//          gry = staty + stath;
-//          grw = spaceW;
-//          grh = boardY - gry - 1;
-//          // variation tree container
-//          vx = statx + statw;
-//          vy = capy;
-//          vw = panelW / 2;
-//          vh = caph;
-//          // subboard
-//          subBoardY = topInset;
-//          subBoardWidth = panelW / 2;
-//          subBoardHeight = gry - topInset;
-//          subBoardLength = Math.min(subBoardWidth, subBoardHeight);
-//          subBoardX = vx + vw;
-//          // pondering message
-//          ponderingY = height;
-//        } else {
-//          // Normal
-//          // board
-//          boardY = (height - maxSize + topInset - bottomInset) / 2;
-//          int spaceW = width - leftInset - rightInset;
-//          int spaceH = boardY - panelMargin - topInset;
-//          int panelW = spaceW / 2;
-//          int panelH = spaceH / 2;
-//
-//          // captured stones
-//          capw = panelW * 3 / 4;
-//          caph = panelH / 2;
-//          // move statistics (winrate bar)
-//          statx = capx + capw;
-//          staty = capy;
-//          statw = capw;
-//          stath = caph;
-//          // winrate graph
-//          grx = capx;
-//          gry = staty + stath;
-//          grw = capw + statw;
-//          grh = boardY - gry;
-//          // subboard
-//          subBoardX = grx + grw;
-//          subBoardWidth = panelW / 2;
-//          subBoardHeight = boardY - topInset;
-//          subBoardLength = Math.min(subBoardWidth, subBoardHeight);
-//          subBoardY = capy + (boardY - topInset - subBoardLength) / 2;
-//          // variation tree container
-//          vx = leftInset + panelW;
-//          vy = boardY + maxSize;
-//          vw = panelW;
-//          vh = height - vy - bottomInset;
-//        }
-//      }
-//
-//      // graph container
-//      int contx = statx;
-//      int conty = staty;
-//      int contw = statw;
-//      int conth = stath + grh;
-//      if (width < height) {
-//        contw = grw;
-//        if (Lizzie.config.showLargeWinrate()) {
-//          contx = grx;
-//          conty = gry;
-//          conth = grh;
-//        } else {
-//          contx = capx;
-//          conty = capy;
-//          conth = stath + grh;
-//        }
-//      }
-//
-//      // variation tree
-//      int treex = vx;
-//      int treey = vy;
-//      int treew = vw;
-//      int treeh = vh;
-//
-//      // comment panel
-//      int cx = vx, cy = vy, cw = vw, ch = vh;
-//      if (Lizzie.config.showComment) {
-//        if (width >= height) {
-//          if (Lizzie.config.showVariationGraph) {
-//            treeh = vh / 2;
-//            cy = vy + treeh;
-//            ch = treeh;
-//          }
-//        } else {
-//          if (Lizzie.config.showVariationGraph) {
-//            if (Lizzie.config.showLargeSubBoard()) {
-//              treeh = vh / 2;
-//              cy = vy + treeh;
-//              ch = treeh;
-//            } else {
-//              treew = vw / 2;
-//              cx = vx + treew;
-//              cw = treew;
-//            }
-//          }
-//        }
-//      }
+      //      int panelMargin = (int) (maxSize * 0.02);
+      //
+      //      // captured stones
+      //      int capx = leftInset;
+      //      int capy = topInset;
+      //      int capw = boardX - panelMargin - leftInset;
+      //      int caph = boardY + maxSize / 8 - topInset;
+      //
+      //      // move statistics (winrate bar)
+      //      // boardX equals width of space on each side
+      //      int statx = capx;
+      //      int staty = capy + caph;
+      //      int statw = capw;
+      //      int stath = maxSize / 10;
+      //
+      //      // winrate graph
+      //      int grx = statx;
+      //      int gry = staty + stath;
+      //      int grw = statw;
+      //      int grh = maxSize / 3;
+      //
+      //      // variation tree container
+      //      int vx = boardX + maxSize + panelMargin;
+      //      int vy = capy;
+      //      int vw = width - vx - rightInset;
+      //      int vh = height - vy - bottomInset;
+      //
+      //      // pondering message
+      //      double ponderingSize = .02;
+      //      int ponderingX = leftInset;
+      //      int ponderingY =
+      //          height - bottomInset - (int) (maxSize * 0.033) - (int) (maxBound * ponderingSize);
+      //
+      //      // dynamic komi
+      //      double dynamicKomiSize = .02;
+      //      int dynamicKomiX = leftInset;
+      //      int dynamicKomiY = ponderingY - (int) (maxBound * dynamicKomiSize);
+      //      int dynamicKomiLabelX = leftInset;
+      //      int dynamicKomiLabelY = dynamicKomiY - (int) (maxBound * dynamicKomiSize);
+      //
+      //      // loading message;
+      //      double loadingSize = 0.03;
+      //      int loadingX = ponderingX;
+      //      int loadingY = ponderingY - (int) (maxBound * (loadingSize - ponderingSize));
+      //
+      //      // subboard
+      //      int subBoardY = gry + grh;
+      //      int subBoardWidth = grw;
+      //      int subBoardHeight = ponderingY - subBoardY;
+      //      int subBoardLength = min(subBoardWidth, subBoardHeight);
+      //      int subBoardX = statx + (statw - subBoardLength) / 2;
+      //
+      //      if (width >= height) {
+      //        // Landscape mode
+      //        if (Lizzie.config.showLargeSubBoard()) {
+      //          boardX = width - maxSize - panelMargin;
+      //          int spaceW = boardX - panelMargin - leftInset;
+      //          int spaceH = height - topInset - bottomInset;
+      //          int panelW = spaceW / 2;
+      //          int panelH = spaceH / 4;
+      //
+      //          // captured stones
+      //          capw = panelW;
+      //          caph = (int) (panelH * 0.2);
+      //          // move statistics (winrate bar)
+      //          staty = capy + caph;
+      //          statw = capw;
+      //          stath = (int) (panelH * 0.4);
+      //          // winrate graph
+      //          gry = staty + stath;
+      //          grw = statw;
+      //          grh = panelH - caph - stath;
+      //          // variation tree container
+      //          vx = statx + statw;
+      //          vw = panelW;
+      //          vh = panelH;
+      //          // subboard
+      //          subBoardY = gry + grh;
+      //          subBoardWidth = spaceW;
+      //          subBoardHeight = ponderingY - subBoardY;
+      //          subBoardLength = Math.min(subBoardWidth, subBoardHeight);
+      //          subBoardX = statx + (statw + vw - subBoardLength) / 2;
+      //        } else if (Lizzie.config.showLargeWinrate()) {
+      //          boardX = width - maxSize - panelMargin;
+      //          int spaceW = boardX - panelMargin - leftInset;
+      //          int spaceH = height - topInset - bottomInset;
+      //          int panelW = spaceW / 2;
+      //          int panelH = spaceH / 4;
+      //
+      //          // captured stones
+      //          capy = topInset + panelH + 1;
+      //          capw = spaceW;
+      //          caph = (int) ((ponderingY - topInset - panelH) * 0.15);
+      //          // move statistics (winrate bar)
+      //          staty = capy + caph;
+      //          statw = capw;
+      //          stath = caph;
+      //          // winrate graph
+      //          gry = staty + stath;
+      //          grw = statw;
+      //          grh = ponderingY - gry;
+      //          // variation tree container
+      //          vx = leftInset + panelW;
+      //          vw = panelW;
+      //          vh = panelH;
+      //          // subboard
+      //          subBoardY = topInset;
+      //          subBoardWidth = panelW - leftInset;
+      //          subBoardHeight = panelH;
+      //          subBoardLength = Math.min(subBoardWidth, subBoardHeight);
+      //          subBoardX = statx + (vw - subBoardLength) / 2;
+      //        }
+      //      } else {
+      //        // Portrait mode
+      //        if (Lizzie.config.showLargeSubBoard()) {
+      //          // board
+      //          maxSize = (int) (maxSize * 0.8);
+      //          boardY = height - maxSize - bottomInset;
+      //          int spaceW = width - leftInset - rightInset;
+      //          int spaceH = boardY - panelMargin - topInset;
+      //          int panelW = spaceW / 2;
+      //          int panelH = spaceH / 2;
+      //          boardX = (spaceW - maxSize) / 2 + leftInset;
+      //
+      //          // captured stones
+      //          capw = panelW / 2;
+      //          caph = panelH / 2;
+      //          // move statistics (winrate bar)
+      //          staty = capy + caph;
+      //          statw = capw;
+      //          stath = caph;
+      //          // winrate graph
+      //          gry = staty + stath;
+      //          grw = statw;
+      //          grh = spaceH - caph - stath;
+      //          // variation tree container
+      //          vx = capx + capw;
+      //          vw = panelW / 2;
+      //          vh = spaceH;
+      //          // subboard
+      //          subBoardX = vx + vw;
+      //          subBoardWidth = panelW;
+      //          subBoardHeight = boardY - topInset;
+      //          subBoardLength = Math.min(subBoardWidth, subBoardHeight);
+      //          subBoardY = capy + (gry + grh - capy - subBoardLength) / 2;
+      //          // pondering message
+      //          ponderingY = height;
+      //        } else if (Lizzie.config.showLargeWinrate()) {
+      //          // board
+      //          maxSize = (int) (maxSize * 0.8);
+      //          boardY = height - maxSize - bottomInset;
+      //          int spaceW = width - leftInset - rightInset;
+      //          int spaceH = boardY - panelMargin - topInset;
+      //          int panelW = spaceW / 2;
+      //          int panelH = spaceH / 2;
+      //          boardX = (spaceW - maxSize) / 2 + leftInset;
+      //
+      //          // captured stones
+      //          capw = panelW / 2;
+      //          caph = panelH / 4;
+      //          // move statistics (winrate bar)
+      //          statx = capx + capw;
+      //          staty = capy;
+      //          statw = capw;
+      //          stath = caph;
+      //          // winrate graph
+      //          gry = staty + stath;
+      //          grw = spaceW;
+      //          grh = boardY - gry - 1;
+      //          // variation tree container
+      //          vx = statx + statw;
+      //          vy = capy;
+      //          vw = panelW / 2;
+      //          vh = caph;
+      //          // subboard
+      //          subBoardY = topInset;
+      //          subBoardWidth = panelW / 2;
+      //          subBoardHeight = gry - topInset;
+      //          subBoardLength = Math.min(subBoardWidth, subBoardHeight);
+      //          subBoardX = vx + vw;
+      //          // pondering message
+      //          ponderingY = height;
+      //        } else {
+      //          // Normal
+      //          // board
+      //          boardY = (height - maxSize + topInset - bottomInset) / 2;
+      //          int spaceW = width - leftInset - rightInset;
+      //          int spaceH = boardY - panelMargin - topInset;
+      //          int panelW = spaceW / 2;
+      //          int panelH = spaceH / 2;
+      //
+      //          // captured stones
+      //          capw = panelW * 3 / 4;
+      //          caph = panelH / 2;
+      //          // move statistics (winrate bar)
+      //          statx = capx + capw;
+      //          staty = capy;
+      //          statw = capw;
+      //          stath = caph;
+      //          // winrate graph
+      //          grx = capx;
+      //          gry = staty + stath;
+      //          grw = capw + statw;
+      //          grh = boardY - gry;
+      //          // subboard
+      //          subBoardX = grx + grw;
+      //          subBoardWidth = panelW / 2;
+      //          subBoardHeight = boardY - topInset;
+      //          subBoardLength = Math.min(subBoardWidth, subBoardHeight);
+      //          subBoardY = capy + (boardY - topInset - subBoardLength) / 2;
+      //          // variation tree container
+      //          vx = leftInset + panelW;
+      //          vy = boardY + maxSize;
+      //          vw = panelW;
+      //          vh = height - vy - bottomInset;
+      //        }
+      //      }
+      //
+      //      // graph container
+      //      int contx = statx;
+      //      int conty = staty;
+      //      int contw = statw;
+      //      int conth = stath + grh;
+      //      if (width < height) {
+      //        contw = grw;
+      //        if (Lizzie.config.showLargeWinrate()) {
+      //          contx = grx;
+      //          conty = gry;
+      //          conth = grh;
+      //        } else {
+      //          contx = capx;
+      //          conty = capy;
+      //          conth = stath + grh;
+      //        }
+      //      }
+      //
+      //      // variation tree
+      //      int treex = vx;
+      //      int treey = vy;
+      //      int treew = vw;
+      //      int treeh = vh;
+      //
+      //      // comment panel
+      //      int cx = vx, cy = vy, cw = vw, ch = vh;
+      //      if (Lizzie.config.showComment) {
+      //        if (width >= height) {
+      //          if (Lizzie.config.showVariationGraph) {
+      //            treeh = vh / 2;
+      //            cy = vy + treeh;
+      //            ch = treeh;
+      //          }
+      //        } else {
+      //          if (Lizzie.config.showVariationGraph) {
+      //            if (Lizzie.config.showLargeSubBoard()) {
+      //              treeh = vh / 2;
+      //              cy = vy + treeh;
+      //              ch = treeh;
+      //            } else {
+      //              treew = vw / 2;
+      //              cx = vx + treew;
+      //              cw = treew;
+      //            }
+      //          }
+      //        }
+      //      }
 
       // initialize
 
@@ -638,68 +638,72 @@ public class BoardPane extends LizziePane {
       Graphics2D g = (Graphics2D) cachedImage.getGraphics();
       g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
-//      if (Lizzie.config.showStatus) drawCommandString(g);
+      //      if (Lizzie.config.showStatus) drawCommandString(g);
 
       boardRenderer.setLocation(boardX, boardY);
       boardRenderer.setBoardLength(maxSize);
       boardRenderer.draw(g);
 
-//      if (Lizzie.leelaz.isLoaded()) {
-//        if (Lizzie.config.showStatus) {
-//          String statusKey = "LizzieFrame.display." + (Lizzie.leelaz.isPondering() ? "on" : "off");
-//          String statusText = resourceBundle.getString(statusKey);
-//          String ponderingText = resourceBundle.getString("LizzieFrame.display.pondering");
-//          String switching = resourceBundle.getString("LizzieFrame.prompt.switching");
-//          String switchingText = Lizzie.leelaz.switching() ? switching : "";
-//          String weightText = Lizzie.leelaz.currentWeight();
-//          String text = ponderingText + " " + statusText + " " + weightText + " " + switchingText;
-//          drawPonderingState(g, text, ponderingX, ponderingY, ponderingSize);
-//        }
-//
-//        Optional<String> dynamicKomi = Lizzie.leelaz.getDynamicKomi();
-//        if (Lizzie.config.showDynamicKomi && dynamicKomi.isPresent()) {
-//          String text = resourceBundle.getString("LizzieFrame.display.dynamic-komi");
-//          drawPonderingState(g, text, dynamicKomiLabelX, dynamicKomiLabelY, dynamicKomiSize);
-//          drawPonderingState(g, dynamicKomi.get(), dynamicKomiX, dynamicKomiY, dynamicKomiSize);
-//        }
-//
-//        // Todo: Make board move over when there is no space beside the board
-//        if (Lizzie.config.showWinrate) {
-//          if (backgroundG.isPresent()) {
-//            drawContainer(backgroundG.get(), contx, conty, contw, conth);
-//          }
-//          drawMoveStatistics(g, statx, staty, statw, stath);
-//          winrateGraph.draw(g, grx, gry, grw, grh);
-//        }
-//
-//        if (Lizzie.config.showVariationGraph || Lizzie.config.showComment) {
-//          if (backgroundG.isPresent()) {
-//            drawContainer(backgroundG.get(), vx, vy, vw, vh);
-//          }
-//          if (Lizzie.config.showVariationGraph) {
-//            variationTree.draw(g, treex, treey, treew, treeh);
-//          }
-//          if (Lizzie.config.showComment) {
-//            //            drawComment(g, cx, cy, cw, ch);
-//          }
-//        }
-//
-//        if (Lizzie.config.showSubBoard) {
-//          try {
-//            subBoardRenderer.setLocation(subBoardX, subBoardY);
-//            subBoardRenderer.setBoardLength(subBoardLength);
-//            subBoardRenderer.draw(g);
-//          } catch (Exception e) {
-//            // This can happen when no space is left for subboard.
-//          }
-//        }
-//      } else if (Lizzie.config.showStatus) {
-//        String loadingText = resourceBundle.getString("LizzieFrame.display.loading");
-//        drawPonderingState(g, loadingText, loadingX, loadingY, loadingSize);
-//      }
-//
-//      if (Lizzie.config.showCaptured) drawCaptured(g, capx, capy, capw, caph);
-//
+      //      if (Lizzie.leelaz.isLoaded()) {
+      //        if (Lizzie.config.showStatus) {
+      //          String statusKey = "LizzieFrame.display." + (Lizzie.leelaz.isPondering() ? "on" :
+      // "off");
+      //          String statusText = resourceBundle.getString(statusKey);
+      //          String ponderingText = resourceBundle.getString("LizzieFrame.display.pondering");
+      //          String switching = resourceBundle.getString("LizzieFrame.prompt.switching");
+      //          String switchingText = Lizzie.leelaz.switching() ? switching : "";
+      //          String weightText = Lizzie.leelaz.currentWeight();
+      //          String text = ponderingText + " " + statusText + " " + weightText + " " +
+      // switchingText;
+      //          drawPonderingState(g, text, ponderingX, ponderingY, ponderingSize);
+      //        }
+      //
+      //        Optional<String> dynamicKomi = Lizzie.leelaz.getDynamicKomi();
+      //        if (Lizzie.config.showDynamicKomi && dynamicKomi.isPresent()) {
+      //          String text = resourceBundle.getString("LizzieFrame.display.dynamic-komi");
+      //          drawPonderingState(g, text, dynamicKomiLabelX, dynamicKomiLabelY,
+      // dynamicKomiSize);
+      //          drawPonderingState(g, dynamicKomi.get(), dynamicKomiX, dynamicKomiY,
+      // dynamicKomiSize);
+      //        }
+      //
+      //        // Todo: Make board move over when there is no space beside the board
+      //        if (Lizzie.config.showWinrate) {
+      //          if (backgroundG.isPresent()) {
+      //            drawContainer(backgroundG.get(), contx, conty, contw, conth);
+      //          }
+      //          drawMoveStatistics(g, statx, staty, statw, stath);
+      //          winrateGraph.draw(g, grx, gry, grw, grh);
+      //        }
+      //
+      //        if (Lizzie.config.showVariationGraph || Lizzie.config.showComment) {
+      //          if (backgroundG.isPresent()) {
+      //            drawContainer(backgroundG.get(), vx, vy, vw, vh);
+      //          }
+      //          if (Lizzie.config.showVariationGraph) {
+      //            variationTree.draw(g, treex, treey, treew, treeh);
+      //          }
+      //          if (Lizzie.config.showComment) {
+      //            //            drawComment(g, cx, cy, cw, ch);
+      //          }
+      //        }
+      //
+      //        if (Lizzie.config.showSubBoard) {
+      //          try {
+      //            subBoardRenderer.setLocation(subBoardX, subBoardY);
+      //            subBoardRenderer.setBoardLength(subBoardLength);
+      //            subBoardRenderer.draw(g);
+      //          } catch (Exception e) {
+      //            // This can happen when no space is left for subboard.
+      //          }
+      //        }
+      //      } else if (Lizzie.config.showStatus) {
+      //        String loadingText = resourceBundle.getString("LizzieFrame.display.loading");
+      //        drawPonderingState(g, loadingText, loadingX, loadingY, loadingSize);
+      //      }
+      //
+      //      if (Lizzie.config.showCaptured) drawCaptured(g, capx, capy, capw, caph);
+      //
       // cleanup
       g.dispose();
     }
@@ -707,7 +711,7 @@ public class BoardPane extends LizziePane {
     // draw the image
     Graphics2D bsGraphics = (Graphics2D) bs.getDrawGraphics();
     bsGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-//    bsGraphics.drawImage(cachedBackground, 0, 0, null);
+    //    bsGraphics.drawImage(cachedBackground, 0, 0, null);
     bsGraphics.drawImage(cachedImage, 0, 0, null);
 
     // cleanup
@@ -865,7 +869,7 @@ public class BoardPane extends LizziePane {
     cachedImage = new BufferedImage(getWidth(), getHeight(), TYPE_INT_ARGB);
 
     // redraw background
-//    createBackground();
+    //    createBackground();
 
     List<String> commandsToShow = new ArrayList<>(Arrays.asList(commands));
     if (Lizzie.leelaz.getDynamicKomi().isPresent()) {
