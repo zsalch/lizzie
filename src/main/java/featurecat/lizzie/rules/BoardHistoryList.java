@@ -230,10 +230,10 @@ public class BoardHistoryList {
   }
 
   public BoardHistoryNode getEnd() {
-      BoardHistoryNode e = head;
-      while (e.next().isPresent()) {
-        e = e.next().get();
-      }
-      return e;
+    BoardHistoryNode e = head;
+    while (e.next().isPresent()) {
+      e = e.next().get();
+    }
+    return e;
   }
 }
