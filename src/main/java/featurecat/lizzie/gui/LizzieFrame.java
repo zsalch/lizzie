@@ -121,7 +121,7 @@ public class LizzieFrame extends JFrame {
   private String cachedComment;
   private Rectangle commentRect;
 
-  // Show the playouts in the title 
+  // Show the playouts in the title
   private ScheduledExecutorService showPlayouts = Executors.newScheduledThreadPool(1);
   private long lastPlayouts = 0;
   private String visitsString = "";
@@ -210,24 +210,33 @@ public class LizzieFrame extends JFrame {
         });
 
     // Show the playouts in the title
-    showPlayouts.scheduleAtFixedRate(new Runnable() {
-      @Override
-      public void run() {
-        if (!isDrawVisitsInTitle) {
-          visitsString = "";
-          return;
-        }
-        if (Lizzie.leelaz == null) return;
-        try {
-          Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
-          if (stats.totalPlayouts <= 0) return;
-          visitsString = String.format(" %d visits/second", (stats.totalPlayouts > lastPlayouts) ? stats.totalPlayouts - lastPlayouts : 0);
-          updateTitle();
-          lastPlayouts = stats.totalPlayouts;
-        } catch (Exception e) {
-        }
-      }
-    }, 1, 1, TimeUnit.SECONDS);
+    showPlayouts.scheduleAtFixedRate(
+        new Runnable() {
+          @Override
+          public void run() {
+            if (!isDrawVisitsInTitle) {
+              visitsString = "";
+              return;
+            }
+            if (Lizzie.leelaz == null) return;
+            try {
+              Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
+              if (stats.totalPlayouts <= 0) return;
+              visitsString =
+                  String.format(
+                      " %d visits/second",
+                      (stats.totalPlayouts > lastPlayouts)
+                          ? stats.totalPlayouts - lastPlayouts
+                          : 0);
+              updateTitle();
+              lastPlayouts = stats.totalPlayouts;
+            } catch (Exception e) {
+            }
+          }
+        },
+        1,
+        1,
+        TimeUnit.SECONDS);
   }
 
   /** Clears related status from empty board. */
@@ -771,7 +780,7 @@ public class LizzieFrame extends JFrame {
     cachedShowComment = Lizzie.config.showComment;
     cachedBoardPositionProportion = BoardPositionProportion;
 
-//    redrawBackgroundAnyway = false;
+    //    redrawBackgroundAnyway = false;
 
     Graphics2D g = cachedBackground.createGraphics();
     g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);

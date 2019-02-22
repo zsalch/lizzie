@@ -12,6 +12,8 @@ import org.json.JSONArray;
 /** Main class. */
 public class Lizzie {
   public static Config config;
+  //  public static LizzieMain main;
+  //  public static BoardPane frame;
   public static LizzieFrame frame;
   public static Board board;
   public static Leelaz leelaz;
@@ -24,6 +26,7 @@ public class Lizzie {
     mainArgs = args;
     config = new Config();
     board = new Board();
+    //    main = new LizzieMain();
     frame = new LizzieFrame();
     try {
       leelaz = new Leelaz();
