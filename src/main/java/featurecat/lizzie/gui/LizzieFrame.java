@@ -208,7 +208,7 @@ public class LizzieFrame extends JFrame {
             Lizzie.shutdown();
           }
         });
-    
+
     // Show the playouts in the title
     showPlayouts.scheduleAtFixedRate(new Runnable() {
       @Override
@@ -218,11 +218,14 @@ public class LizzieFrame extends JFrame {
           return;
         }
         if (Lizzie.leelaz == null) return;
-        Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
-        if (stats.totalPlayouts <= 0) return;
-        visitsString = String.format(" %d visits/second", (stats.totalPlayouts > lastPlayouts) ? stats.totalPlayouts - lastPlayouts : 0);
-        updateTitle();
-        lastPlayouts = stats.totalPlayouts;
+        try {
+          Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
+          if (stats.totalPlayouts <= 0) return;
+          visitsString = String.format(" %d visits/second", (stats.totalPlayouts > lastPlayouts) ? stats.totalPlayouts - lastPlayouts : 0);
+          updateTitle();
+          lastPlayouts = stats.totalPlayouts;
+        } catch (Exception e) {
+        }
       }
     }, 1, 1, TimeUnit.SECONDS);
   }
