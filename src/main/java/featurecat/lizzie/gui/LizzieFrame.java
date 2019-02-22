@@ -41,6 +41,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -117,6 +120,12 @@ public class LizzieFrame extends JFrame {
   private BufferedImage cachedCommentImage = new BufferedImage(1, 1, TYPE_INT_ARGB);
   private String cachedComment;
   private Rectangle commentRect;
+
+  // Show the playouts in the title 
+  private ScheduledExecutorService showPlayouts = Executors.newScheduledThreadPool(1);
+  private long lastPlayouts = 0;
+  private String visitsString = "";
+  public boolean isDrawVisitsInTitle = true;
 
   static {
     // load fonts
@@ -199,6 +208,23 @@ public class LizzieFrame extends JFrame {
             Lizzie.shutdown();
           }
         });
+    
+    // Show the playouts in the title
+    showPlayouts.scheduleAtFixedRate(new Runnable() {
+      @Override
+      public void run() {
+        if (!isDrawVisitsInTitle) {
+          visitsString = "";
+          return;
+        }
+        if (Lizzie.leelaz == null) return;
+        Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
+        if (stats.totalPlayouts <= 0) return;
+        visitsString = String.format(" %d visits/second", (stats.totalPlayouts > lastPlayouts) ? stats.totalPlayouts - lastPlayouts : 0);
+        updateTitle();
+        lastPlayouts = stats.totalPlayouts;
+      }
+    }, 1, 1, TimeUnit.SECONDS);
   }
 
   /** Clears related status from empty board. */
@@ -1313,6 +1339,7 @@ public class LizzieFrame extends JFrame {
     StringBuilder sb = new StringBuilder(DEFAULT_TITLE);
     sb.append(playerTitle);
     sb.append(" [" + Lizzie.leelaz.engineCommand() + "]");
+    sb.append(visitsString);
     setTitle(sb.toString());
   }
 
