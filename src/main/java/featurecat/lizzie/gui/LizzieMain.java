@@ -18,15 +18,12 @@ import java.awt.RenderingHints;
 import java.awt.TexturePaint;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowStateListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Optional;
 import javax.swing.JFrame;
 import org.json.JSONArray;
-import java.awt.CardLayout;
 
 public class LizzieMain extends JFrame {
 
@@ -39,7 +36,7 @@ public class LizzieMain extends JFrame {
   private int originY;
   private int originW;
   private int originH;
-  
+
   private LizzieLayout layout;
 
   private static final String DEFAULT_TITLE = "Lizzie - Leela Zero Interface";
@@ -102,12 +99,12 @@ public class LizzieMain extends JFrame {
   /** Create the frame. */
   public LizzieMain() {
     super(DEFAULT_TITLE);
-//    addWindowStateListener(
-//        new WindowStateListener() {
-//          public void windowStateChanged(WindowEvent e) {
-//            updateComponentSize();
-//          }
-//        });
+    //    addWindowStateListener(
+    //        new WindowStateListener() {
+    //          public void windowStateChanged(WindowEvent e) {
+    //            updateComponentSize();
+    //          }
+    //        });
 
     input = new Input();
 
@@ -137,7 +134,7 @@ public class LizzieMain extends JFrame {
 
     // boardPane = new BoardPane(this);
     boardPane = new BoardPane(this);
-    Lizzie.frame = boardPane;
+    // TODO   Lizzie.frame = boardPane;
     commentPane = new CommentPane(this);
     layout = new LizzieLayout();
     layout.addLayoutComponent(LizzieLayout.MAIN_BOARD, boardPane);
@@ -151,18 +148,18 @@ public class LizzieMain extends JFrame {
 
     addComponentListener(
         new ComponentAdapter() {
-//          @Override
-//          public void componentResized(ComponentEvent e) {
-//            updateComponentSize();
-//          }
-//
+          //          @Override
+          //          public void componentResized(ComponentEvent e) {
+          //            updateComponentSize();
+          //          }
+          //
           @Override
           public void componentMoved(ComponentEvent e) {
             updateComponentSize();
           }
         });
 
-//    repaint();
+    //    repaint();
   }
   /**
    * Draws the game board and interface
@@ -177,7 +174,7 @@ public class LizzieMain extends JFrame {
     originY = getY();
     originW = width;
     originH = height;
-    
+
     Optional<Graphics2D> backgroundG;
     if (cachedBackgroundWidth != width
         || cachedBackgroundHeight != height
@@ -257,7 +254,7 @@ public class LizzieMain extends JFrame {
 
   public void updateComponentSize() {
     if (originW <= 0 || originH <= 0) {
-//      defaultLayout();
+      //      defaultLayout();
       return;
     }
     int x = this.getX();
@@ -587,7 +584,7 @@ public class LizzieMain extends JFrame {
 
   public void toggleDesignMode() {
     this.designMode = !this.designMode;
-    Lizzie.frame.setDesignMode(designMode);
+    // TODO   Lizzie.frame.setDesignMode(designMode);
     commentPane.setDesignMode(designMode);
   }
 }

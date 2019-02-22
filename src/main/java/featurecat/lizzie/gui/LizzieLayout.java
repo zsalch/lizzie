@@ -3,14 +3,13 @@ package featurecat.lizzie.gui;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+import featurecat.lizzie.Lizzie;
+import featurecat.lizzie.rules.Board;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.LayoutManager2;
-
-import featurecat.lizzie.Lizzie;
-import featurecat.lizzie.rules.Board;
 
 public class LizzieLayout implements LayoutManager2, java.io.Serializable {
   private int hgap;
@@ -304,9 +303,7 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
     return 0.5f;
   }
 
-  public void invalidateLayout(Container target) {
-    
-  }
+  public void invalidateLayout(Container target) {}
 
   public void layoutContainer(Container target) {
     synchronized (target.getTreeLock()) {
@@ -599,16 +596,16 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
       }
 
       mainBoard.setBounds(x + boardX, y + boardY, maxSize, maxSize);
-//      subBoard.setBounds(x + subBoardX, y + subBoardY, subBoardLength, subBoardLength);
+      //      subBoard.setBounds(x + subBoardX, y + subBoardY, subBoardLength, subBoardLength);
       commentPane.setBounds(x + cx, y + cy, cw, ch);
-//
-//      Component mainBoard;
-//      Component subBoard;
-//      Component winratePane;
-//      Component variationPane;
-//      Component basicInfoPane;
-//      Component commentPane;
-//      Component consolePane;
+      //
+      //      Component mainBoard;
+      //      Component subBoard;
+      //      Component winratePane;
+      //      Component variationPane;
+      //      Component basicInfoPane;
+      //      Component commentPane;
+      //      Component consolePane;
       //        int top = insets.top;
       //        int bottom = target.height - insets.bottom;
       //        int left = insets.left;
@@ -679,7 +676,7 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
   public String toString() {
     return getClass().getName() + "[hgap=" + hgap + ",vgap=" + vgap + "]";
   }
-  
+
   private Container getMain(Container target) {
     Container p = (target != null) ? target.getParent() : null;
     while (p != null && !(p instanceof LizzieMain)) {
