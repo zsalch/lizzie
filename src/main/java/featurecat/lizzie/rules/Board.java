@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.*;
+
 import org.json.JSONException;
 
 public class Board implements LeelazListener {
@@ -58,8 +59,10 @@ public class Board implements LeelazListener {
   /**
    * Calculates the array index of a stone stored at (x, y)
    *
-   * @param x the x coordinate
-   * @param y the y coordinate
+   * @param x
+   *          the x coordinate
+   * @param y
+   *          the y coordinate
    * @return the array index
    */
   public static int getIndex(int x, int y) {
@@ -69,8 +72,9 @@ public class Board implements LeelazListener {
   /**
    * Converts a named coordinate eg C16, T5, K10, etc to an x and y coordinate
    *
-   * @param namedCoordinate a capitalized version of the named coordinate. Must be a valid 19x19 Go
-   *     coordinate, without I
+   * @param namedCoordinate
+   *          a capitalized version of the named coordinate. Must be a valid 19x19
+   *          Go coordinate, without I
    * @return an optional array of coordinates, empty for pass and resign
    */
   public static Optional<int[]> asCoordinates(String namedCoordinate) {
@@ -85,7 +89,7 @@ public class Board implements LeelazListener {
     if (m.find() && m.groupCount() == 2) {
       int x = asDigit(m.group(1));
       int y = boardSize - Integer.parseInt(m.group(2));
-      return Optional.of(new int[] {x, y});
+      return Optional.of(new int[] { x, y });
     }
     return Optional.empty();
   }
@@ -130,8 +134,10 @@ public class Board implements LeelazListener {
   /**
    * Converts a x and y coordinate to a named coordinate eg C16, T5, K10, etc
    *
-   * @param x x coordinate -- must be valid
-   * @param y y coordinate -- must be valid
+   * @param x
+   *          x coordinate -- must be valid
+   * @param y
+   *          y coordinate -- must be valid
    * @return a string representing the coordinate
    */
   public static String convertCoordinatesToName(int x, int y) {
@@ -142,8 +148,10 @@ public class Board implements LeelazListener {
   /**
    * Checks if a coordinate is valid
    *
-   * @param x x coordinate
-   * @param y y coordinate
+   * @param x
+   *          x coordinate
+   * @param y
+   *          y coordinate
    * @return whether or not this coordinate is part of the board
    */
   public static boolean isValid(int x, int y) {
@@ -166,6 +174,62 @@ public class Board implements LeelazListener {
     }
   }
 
+  /**
+   * 
+   * @return
+   */
+  public boolean changeMove(int moveNumber, String changeMove) {
+    Optional<int[]> changeCoord = asCoordinates(changeMove);
+    if ("pass".equalsIgnoreCase(changeMove)) {
+      changeMove(moveNumber, (int[]) null);
+      return true;
+    } else if ("swap".equalsIgnoreCase(changeMove)) {
+//      swapMove(moveNumber);
+      return true;
+    } else if (changeCoord.isPresent() && Board.isValid(changeCoord.get()[0], changeCoord.get()[1])) {
+      changeCoord.map( c -> changeMove(moveNumber, c));
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public boolean changeMove(int moveNumber, int[] coords) {
+    if (moveNumber <= 0) {
+      return false;
+    }
+
+    int endMoveNumber = history.getEnd().moveNumberOfNode();
+    if (moveNumber > endMoveNumber) {
+      return false;
+    }
+
+    int currentMoveNumber = history.getMoveNumber();
+
+    goToMoveNumber(moveNumber - 1);
+
+    Optional<BoardHistoryNode> changeNode = history.getCurrentHistoryNode().next();
+    Optional<BoardHistoryNode> relink = changeNode.flatMap(n -> n.next());
+
+    // TODO
+    
+
+    if (relink.isPresent()) {
+      if (relink.get().getData().lastMove.isPresent()) {
+        int[] m = relink.get().getData().lastMove.get();
+        if (Board.isValid(m[0], m[1])) {
+          place(m[0], m[1]);
+        } else {
+          pass();
+        };
+      }
+    }
+
+    goToMoveNumber(currentMoveNumber);
+    
+    return true;
+  }
+
   public boolean isForceRefresh() {
     return forceRefresh;
   }
@@ -177,7 +241,8 @@ public class Board implements LeelazListener {
   /**
    * The comment. Thread safe
    *
-   * @param comment the comment of stone
+   * @param comment
+   *          the comment of stone
    */
   public void comment(String comment) {
     synchronized (this) {
@@ -188,7 +253,8 @@ public class Board implements LeelazListener {
   /**
    * Update the move number. Thread safe
    *
-   * @param moveNumber the move number of stone
+   * @param moveNumber
+   *          the move number of stone
    */
   public void moveNumber(int moveNumber) {
     synchronized (this) {
@@ -201,8 +267,7 @@ public class Board implements LeelazListener {
           BoardData nodeData = node.get().getData();
           if (nodeData.lastMove.isPresent() && nodeData.moveNumber >= moveNumber) {
             moveNumber = (moveNumber > 1) ? moveNumber - 1 : 0;
-            moveNumberList[Board.getIndex(nodeData.lastMove.get()[0], nodeData.lastMove.get()[1])] =
-                moveNumber;
+            moveNumberList[Board.getIndex(nodeData.lastMove.get()[0], nodeData.lastMove.get()[1])] = moveNumber;
           }
           node = node.get().previous();
         }
@@ -213,13 +278,17 @@ public class Board implements LeelazListener {
   /**
    * Add a stone to the board representation. Thread safe
    *
-   * @param x x coordinate
-   * @param y y coordinate
-   * @param color the type of stone to place
+   * @param x
+   *          x coordinate
+   * @param y
+   *          y coordinate
+   * @param color
+   *          the type of stone to place
    */
   public void addStone(int x, int y, Stone color) {
     synchronized (this) {
-      if (!isValid(x, y) || history.getStones()[getIndex(x, y)] != Stone.EMPTY) return;
+      if (!isValid(x, y) || history.getStones()[getIndex(x, y)] != Stone.EMPTY)
+        return;
 
       Stone[] stones = history.getData().stones;
       Zobrist zobrist = history.getData().zobrist;
@@ -235,13 +304,17 @@ public class Board implements LeelazListener {
   /**
    * Remove a stone from the board representation. Thread safe
    *
-   * @param x x coordinate
-   * @param y y coordinate
-   * @param color the type of stone to place
+   * @param x
+   *          x coordinate
+   * @param y
+   *          y coordinate
+   * @param color
+   *          the type of stone to place
    */
   public void removeStone(int x, int y, Stone color) {
     synchronized (this) {
-      if (!isValid(x, y) || history.getStones()[getIndex(x, y)] == Stone.EMPTY) return;
+      if (!isValid(x, y) || history.getStones()[getIndex(x, y)] == Stone.EMPTY)
+        return;
 
       BoardData data = history.getData();
       Stone[] stones = data.stones;
@@ -286,7 +359,8 @@ public class Board implements LeelazListener {
   /**
    * The pass. Thread safe
    *
-   * @param color the type of pass
+   * @param color
+   *          the type of pass
    */
   public void pass(Stone color) {
     pass(color, false, false);
@@ -295,15 +369,18 @@ public class Board implements LeelazListener {
   /**
    * The pass. Thread safe
    *
-   * @param color the type of pass
-   * @param newBranch add a new branch
+   * @param color
+   *          the type of pass
+   * @param newBranch
+   *          add a new branch
    */
   public void pass(Stone color, boolean newBranch, boolean dummy) {
     synchronized (this) {
 
       // check to see if this move is being replayed in history
       if (history.getNext().map(n -> !n.lastMove.isPresent()).orElse(false) && !newBranch) {
-        // this is the next move in history. Just increment history so that we don't erase the
+        // this is the next move in history. Just increment history so that we don't
+        // erase the
         // redo's
         history.next();
         Lizzie.leelaz.playMove(color, "pass");
@@ -316,25 +393,12 @@ public class Board implements LeelazListener {
       Stone[] stones = history.getStones().clone();
       Zobrist zobrist = history.getZobrist();
       int moveNumber = history.getMoveNumber() + 1;
-      int[] moveNumberList =
-          newBranch && history.getNext().isPresent()
-              ? new int[Board.boardSize * Board.boardSize]
-              : history.getMoveNumberList().clone();
+      int[] moveNumberList = newBranch && history.getNext().isPresent() ? new int[Board.boardSize * Board.boardSize]
+          : history.getMoveNumberList().clone();
 
       // build the new game state
-      BoardData newState =
-          new BoardData(
-              stones,
-              Optional.empty(),
-              color,
-              color.equals(Stone.WHITE),
-              zobrist,
-              moveNumber,
-              moveNumberList,
-              history.getData().blackCaptures,
-              history.getData().whiteCaptures,
-              0,
-              0);
+      BoardData newState = new BoardData(stones, Optional.empty(), color, color.equals(Stone.WHITE), zobrist,
+          moveNumber, moveNumberList, history.getData().blackCaptures, history.getData().whiteCaptures, 0, 0);
       newState.dummy = dummy;
 
       // update leelaz with pass
@@ -357,9 +421,12 @@ public class Board implements LeelazListener {
   /**
    * Places a stone onto the board representation. Thread safe
    *
-   * @param x x coordinate
-   * @param y y coordinate
-   * @param color the type of stone to place
+   * @param x
+   *          x coordinate
+   * @param y
+   *          y coordinate
+   * @param color
+   *          the type of stone to place
    */
   public void place(int x, int y, Stone color) {
     place(x, y, color, false);
@@ -368,10 +435,14 @@ public class Board implements LeelazListener {
   /**
    * Places a stone onto the board representation. Thread safe
    *
-   * @param x x coordinate
-   * @param y y coordinate
-   * @param color the type of stone to place
-   * @param newBranch add a new branch
+   * @param x
+   *          x coordinate
+   * @param y
+   *          y coordinate
+   * @param color
+   *          the type of stone to place
+   * @param newBranch
+   *          add a new branch
    */
   public void place(int x, int y, Stone color, boolean newBranch) {
     synchronized (this) {
@@ -387,17 +458,18 @@ public class Board implements LeelazListener {
 
       updateWinrate();
       double nextWinrate = -100;
-      if (history.getData().winrate >= 0) nextWinrate = 100 - history.getData().winrate;
+      if (history.getData().winrate >= 0)
+        nextWinrate = 100 - history.getData().winrate;
 
       // check to see if this coordinate is being replayed in history
       Optional<int[]> nextLast = history.getNext().flatMap(n -> n.lastMove);
       if (nextLast.isPresent() && nextLast.get()[0] == x && nextLast.get()[1] == y && !newBranch) {
-        // this is the next coordinate in history. Just increment history so that we don't erase the
+        // this is the next coordinate in history. Just increment history so that we
+        // don't erase the
         // redo's
         history.next();
         // should be opposite from the bottom case
-        if (Lizzie.frame.isPlayingAgainstLeelaz
-            && Lizzie.frame.playerIsBlack != getData().blackToPlay) {
+        if (Lizzie.frame.isPlayingAgainstLeelaz && Lizzie.frame.playerIsBlack != getData().blackToPlay) {
           Lizzie.leelaz.playMove(color, convertCoordinatesToName(x, y));
           Lizzie.leelaz.genmove((Lizzie.board.getData().blackToPlay ? "W" : "B"));
         } else if (!Lizzie.frame.isPlayingAgainstLeelaz) {
@@ -409,14 +481,11 @@ public class Board implements LeelazListener {
       // load a copy of the data at the current node of history
       Stone[] stones = history.getStones().clone();
       Zobrist zobrist = history.getZobrist();
-      Optional<int[]> lastMove = Optional.of(new int[] {x, y});
+      Optional<int[]> lastMove = Optional.of(new int[] { x, y });
       int moveNumber = history.getMoveNumber() + 1;
-      int moveMNNumber =
-          history.getMoveMNNumber() > -1 && !newBranch ? history.getMoveMNNumber() + 1 : -1;
-      int[] moveNumberList =
-          newBranch && history.getNext().isPresent()
-              ? new int[Board.boardSize * Board.boardSize]
-              : history.getMoveNumberList().clone();
+      int moveMNNumber = history.getMoveMNNumber() > -1 && !newBranch ? history.getMoveMNNumber() + 1 : -1;
+      int[] moveNumberList = newBranch && history.getNext().isPresent() ? new int[Board.boardSize * Board.boardSize]
+          : history.getMoveNumberList().clone();
 
       moveNumberList[Board.getIndex(x, y)] = moveMNNumber > -1 ? moveMNNumber : moveNumber;
 
@@ -442,29 +511,20 @@ public class Board implements LeelazListener {
 
       int bc = history.getData().blackCaptures;
       int wc = history.getData().whiteCaptures;
-      if (color.isBlack()) bc += capturedStones;
-      else wc += capturedStones;
-      BoardData newState =
-          new BoardData(
-              stones,
-              lastMove,
-              color,
-              color.equals(Stone.WHITE),
-              zobrist,
-              moveNumber,
-              moveNumberList,
-              bc,
-              wc,
-              nextWinrate,
-              0);
+      if (color.isBlack())
+        bc += capturedStones;
+      else
+        wc += capturedStones;
+      BoardData newState = new BoardData(stones, lastMove, color, color.equals(Stone.WHITE), zobrist, moveNumber,
+          moveNumberList, bc, wc, nextWinrate, 0);
       newState.moveMNNumber = moveMNNumber;
 
       // don't make this coordinate if it is suicidal or violates superko
-      if (isSuicidal > 0 || history.violatesKoRule(newState)) return;
+      if (isSuicidal > 0 || history.violatesKoRule(newState))
+        return;
 
       // update leelaz with board position
-      if (Lizzie.frame.isPlayingAgainstLeelaz
-          && Lizzie.frame.playerIsBlack == getData().blackToPlay) {
+      if (Lizzie.frame.isPlayingAgainstLeelaz && Lizzie.frame.playerIsBlack == getData().blackToPlay) {
         Lizzie.leelaz.playMove(color, convertCoordinatesToName(x, y));
         Lizzie.leelaz.genmove((Lizzie.board.getData().blackToPlay ? "W" : "B"));
       } else if (!Lizzie.frame.isPlayingAgainstLeelaz) {
@@ -481,18 +541,21 @@ public class Board implements LeelazListener {
   /**
    * overloaded method for place(), chooses color in an alternating pattern
    *
-   * @param x x coordinate
-   * @param y y coordinate
+   * @param x
+   *          x coordinate
+   * @param y
+   *          y coordinate
    */
   public void place(int x, int y) {
     place(x, y, history.isBlacksTurn() ? Stone.BLACK : Stone.WHITE);
   }
 
   /**
-   * overloaded method for place. To be used by the LeelaZ engine. Color is then assumed to be
-   * alternating
+   * overloaded method for place. To be used by the LeelaZ engine. Color is then
+   * assumed to be alternating
    *
-   * @param namedCoordinate the coordinate to place a stone,
+   * @param namedCoordinate
+   *          the coordinate to place a stone,
    */
   public void place(String namedCoordinate) {
     Optional<int[]> coords = asCoordinates(namedCoordinate);
@@ -509,35 +572,29 @@ public class Board implements LeelazListener {
     boolean blackToPlay = history.isBlacksTurn();
     Zobrist zobrist = history.getZobrist().clone();
     BoardHistoryList oldHistory = history;
-    history =
-        new BoardHistoryList(
-            new BoardData(
-                stones,
-                Optional.empty(),
-                Stone.EMPTY,
-                blackToPlay,
-                zobrist,
-                0,
-                new int[boardSize * boardSize],
-                0,
-                0,
-                0.0,
-                0));
+    history = new BoardHistoryList(new BoardData(stones, Optional.empty(), Stone.EMPTY, blackToPlay, zobrist, 0,
+        new int[boardSize * boardSize], 0, 0, 0.0, 0));
     history.setGameInfo(oldHistory.getGameInfo());
   }
 
   /**
    * Removes a chain if it has no liberties
    *
-   * @param x x coordinate -- needn't be valid
-   * @param y y coordinate -- needn't be valid
-   * @param color the color of the chain to remove
-   * @param stones the stones array to modify
-   * @param zobrist the zobrist object to modify
+   * @param x
+   *          x coordinate -- needn't be valid
+   * @param y
+   *          y coordinate -- needn't be valid
+   * @param color
+   *          the color of the chain to remove
+   * @param stones
+   *          the stones array to modify
+   * @param zobrist
+   *          the zobrist object to modify
    * @return number of removed stones
    */
   private int removeDeadChain(int x, int y, Stone color, Stone[] stones, Zobrist zobrist) {
-    if (!isValid(x, y) || stones[getIndex(x, y)] != color) return 0;
+    if (!isValid(x, y) || stones[getIndex(x, y)] != color)
+      return 0;
 
     boolean hasLiberties = hasLibertiesHelper(x, y, color, stones);
 
@@ -546,31 +603,36 @@ public class Board implements LeelazListener {
   }
 
   /**
-   * Recursively determines if a chain has liberties. Alters the state of stones, so it must be
-   * counteracted
+   * Recursively determines if a chain has liberties. Alters the state of stones,
+   * so it must be counteracted
    *
-   * @param x x coordinate -- needn't be valid
-   * @param y y coordinate -- needn't be valid
-   * @param color the color of the chain to be investigated
-   * @param stones the stones array to modify
+   * @param x
+   *          x coordinate -- needn't be valid
+   * @param y
+   *          y coordinate -- needn't be valid
+   * @param color
+   *          the color of the chain to be investigated
+   * @param stones
+   *          the stones array to modify
    * @return whether or not this chain has liberties
    */
   private boolean hasLibertiesHelper(int x, int y, Stone color, Stone[] stones) {
-    if (!isValid(x, y)) return false;
+    if (!isValid(x, y))
+      return false;
 
-    if (stones[getIndex(x, y)] == Stone.EMPTY) return true; // a liberty was found
+    if (stones[getIndex(x, y)] == Stone.EMPTY)
+      return true; // a liberty was found
     else if (stones[getIndex(x, y)] != color)
       return false; // we are either neighboring an enemy stone, or one we've already recursed on
 
-    // set this index to be the recursed color to keep track of where we've already searched
+    // set this index to be the recursed color to keep track of where we've already
+    // searched
     stones[getIndex(x, y)] = color.recursed();
 
-    // set removeDeadChain to true if any recursive calls return true. Recurse in all 4 directions
-    boolean hasLiberties =
-        hasLibertiesHelper(x + 1, y, color, stones)
-            || hasLibertiesHelper(x, y + 1, color, stones)
-            || hasLibertiesHelper(x - 1, y, color, stones)
-            || hasLibertiesHelper(x, y - 1, color, stones);
+    // set removeDeadChain to true if any recursive calls return true. Recurse in
+    // all 4 directions
+    boolean hasLiberties = hasLibertiesHelper(x + 1, y, color, stones) || hasLibertiesHelper(x, y + 1, color, stones)
+        || hasLibertiesHelper(x - 1, y, color, stones) || hasLibertiesHelper(x, y - 1, color, stones);
 
     return hasLiberties;
   }
@@ -578,19 +640,26 @@ public class Board implements LeelazListener {
   /**
    * cleans up what hasLibertyHelper does to the board state
    *
-   * @param x x coordinate -- needn't be valid
-   * @param y y coordinate -- needn't be valid
-   * @param color color to clean up. Must be a recursed stone type
-   * @param stones the stones array to modify
-   * @param zobrist the zobrist object to modify
-   * @param removeStones if true, we will remove all these stones. otherwise, we will set them to
-   *     their unrecursed version
+   * @param x
+   *          x coordinate -- needn't be valid
+   * @param y
+   *          y coordinate -- needn't be valid
+   * @param color
+   *          color to clean up. Must be a recursed stone type
+   * @param stones
+   *          the stones array to modify
+   * @param zobrist
+   *          the zobrist object to modify
+   * @param removeStones
+   *          if true, we will remove all these stones. otherwise, we will set
+   *          them to their unrecursed version
    * @return number of removed stones
    */
-  private int cleanupHasLibertiesHelper(
-      int x, int y, Stone color, Stone[] stones, Zobrist zobrist, boolean removeStones) {
+  private int cleanupHasLibertiesHelper(int x, int y, Stone color, Stone[] stones, Zobrist zobrist,
+      boolean removeStones) {
     int removed = 0;
-    if (!isValid(x, y) || stones[getIndex(x, y)] != color) return 0;
+    if (!isValid(x, y) || stones[getIndex(x, y)] != color)
+      return 0;
 
     stones[getIndex(x, y)] = removeStones ? Stone.EMPTY : color.unrecursed();
     if (removeStones) {
@@ -666,7 +735,8 @@ public class Board implements LeelazListener {
   /**
    * Goes to the next coordinate, thread safe
    *
-   * @param fromBackChildren by back children branch
+   * @param fromBackChildren
+   *          by back children branch
    * @return true when has next variation
    */
   public boolean nextMove(int fromBackChildren) {
@@ -676,7 +746,10 @@ public class Board implements LeelazListener {
     }
   }
 
-  /** Save the move number for restore If in the branch, save the back routing from children */
+  /**
+   * Save the move number for restore If in the branch, save the back routing from
+   * children
+   */
   public void saveMoveNumber() {
     BoardHistoryNode currentNode = history.getCurrentHistoryNode();
     int curMoveNum = currentNode.getData().moveNumber;
@@ -776,7 +849,8 @@ public class Board implements LeelazListener {
   /** Goes to the next variation, thread safe */
   public boolean nextVariation(int idx) {
     synchronized (this) {
-      // Don't update winrate here as this is usually called when jumping between variations
+      // Don't update winrate here as this is usually called when jumping between
+      // variations
       if (history.nextVariation(idx).isPresent()) {
         // Update leelaz board position, before updating to next node
         Optional<int[]> lastMoveOpt = history.getData().lastMove;
@@ -795,8 +869,9 @@ public class Board implements LeelazListener {
   }
 
   /**
-   * Returns all the nodes at the given depth in the history tree, always including a node from the
-   * main variation (possibly less deep that the given depth).
+   * Returns all the nodes at the given depth in the history tree, always
+   * including a node from the main variation (possibly less deep that the given
+   * depth).
    *
    * @return the list of candidate nodes
    */
@@ -821,8 +896,8 @@ public class Board implements LeelazListener {
   }
 
   /**
-   * Moves to next variation (variation to the right) if possible. The variation must have a move
-   * with the same move number as the current move in it.
+   * Moves to next variation (variation to the right) if possible. The variation
+   * must have a move with the same move number as the current move in it.
    *
    * @return true if there exist a target variation
    */
@@ -847,11 +922,14 @@ public class Board implements LeelazListener {
   }
 
   /**
-   * Moves to previous variation (variation to the left) if possible, or back to main trunk To move
-   * to another variation, the variation must have the same number of moves in it.
+   * Moves to previous variation (variation to the left) if possible, or back to
+   * main trunk To move to another variation, the variation must have the same
+   * number of moves in it.
    *
-   * <p>Note: This method will always move back to main trunk, even if variation has more moves than
-   * main trunk (if this case it will move to the last move in the trunk).
+   * <p>
+   * Note: This method will always move back to main trunk, even if variation has
+   * more moves than main trunk (if this case it will move to the last move in the
+   * trunk).
    *
    * @return true if there exist a target variation
    */
@@ -876,27 +954,27 @@ public class Board implements LeelazListener {
   /**
    * Jump anywhere in the board history tree.
    *
-   * @param targetNode history node to be located
+   * @param targetNode
+   *          history node to be located
    * @return void
    */
   public void moveToAnyPosition(BoardHistoryNode targetNode) {
     List<Integer> targetParents = new ArrayList<Integer>();
     List<Integer> sourceParents = new ArrayList<Integer>();
 
-    BiConsumer<BoardHistoryNode, List<Integer>> populateParent =
-        (node, parentList) -> {
-          Optional<BoardHistoryNode> prevNode = node.previous();
-          while (prevNode.isPresent()) {
-            BoardHistoryNode p = prevNode.get();
-            for (int m = 0; m < p.numberOfChildren(); m++) {
-              if (p.getVariation(m).get() == node) {
-                parentList.add(m);
-              }
-            }
-            node = p;
-            prevNode = p.previous();
+    BiConsumer<BoardHistoryNode, List<Integer>> populateParent = (node, parentList) -> {
+      Optional<BoardHistoryNode> prevNode = node.previous();
+      while (prevNode.isPresent()) {
+        BoardHistoryNode p = prevNode.get();
+        for (int m = 0; m < p.numberOfChildren(); m++) {
+          if (p.getVariation(m).get() == node) {
+            parentList.add(m);
           }
-        };
+        }
+        node = p;
+        prevNode = p.previous();
+      }
+    };
 
     // Compute the path from the current node to the root
     populateParent.accept(history.getCurrentHistoryNode(), sourceParents);
@@ -945,12 +1023,8 @@ public class Board implements LeelazListener {
       BoardHistoryNode currentNode = history.getCurrentHistoryNode();
       if (currentNode.next().isPresent()) {
         // Will delete more than one move, ask for confirmation
-        int ret =
-            JOptionPane.showConfirmDialog(
-                null,
-                "This will delete all moves and branches after this move",
-                "Delete",
-                JOptionPane.OK_CANCEL_OPTION);
+        int ret = JOptionPane.showConfirmDialog(null, "This will delete all moves and branches after this move",
+            "Delete", JOptionPane.OK_CANCEL_OPTION);
         if (ret != JOptionPane.OK_OPTION) {
           return;
         }
@@ -996,7 +1070,8 @@ public class Board implements LeelazListener {
   /** Goes to the previous coordinate, thread safe */
   public boolean previousMove() {
     synchronized (this) {
-      if (inScoreMode()) setScoreMode(false);
+      if (inScoreMode())
+        setScoreMode(false);
       updateWinrate();
       if (history.previous().isPresent()) {
         Lizzie.leelaz.undo();
@@ -1010,8 +1085,10 @@ public class Board implements LeelazListener {
   public boolean undoToChildOfPreviousWithVariation() {
     BoardHistoryNode start = history.getCurrentHistoryNode();
     Optional<BoardHistoryNode> goal = start.findChildOfPreviousWithVariation();
-    if (!goal.isPresent() || start == goal.get()) return false;
-    while (history.getCurrentHistoryNode() != goal.get() && previousMove()) ;
+    if (!goal.isPresent() || start == goal.get())
+      return false;
+    while (history.getCurrentHistoryNode() != goal.get() && previousMove())
+      ;
     return true;
   }
 
@@ -1026,41 +1103,40 @@ public class Board implements LeelazListener {
   }
 
   /*
-   * Starting at position stonex, stoney, remove all stones with same color within an area bordered by stones
-   * of opposite color (AKA captured stones)
+   * Starting at position stonex, stoney, remove all stones with same color within
+   * an area bordered by stones of opposite color (AKA captured stones)
    */
   private void toggleLiveStatus(Stone[] stones, int stonex, int stoney) {
     Stone[] shdwstones = stones.clone();
     Stone toggle = stones[getIndex(stonex, stoney)];
     Stone toggleToo;
     switch (toggle) {
-      case BLACK:
-        toggleToo = Stone.BLACK_CAPTURED;
-        break;
-      case BLACK_CAPTURED:
-        toggleToo = Stone.BLACK;
-        break;
-      case WHITE:
-        toggleToo = Stone.WHITE_CAPTURED;
-        break;
-      case WHITE_CAPTURED:
-        toggleToo = Stone.WHITE;
-        break;
-      default:
-        return;
+    case BLACK:
+      toggleToo = Stone.BLACK_CAPTURED;
+      break;
+    case BLACK_CAPTURED:
+      toggleToo = Stone.BLACK;
+      break;
+    case WHITE:
+      toggleToo = Stone.WHITE_CAPTURED;
+      break;
+    case WHITE_CAPTURED:
+      toggleToo = Stone.WHITE;
+      break;
+    default:
+      return;
     }
     boolean lastup, lastdown;
     // This is using a flood fill algorithm that uses a Q instead of being recursive
     Queue<int[]> visitQ = new ArrayDeque<>();
-    visitQ.add(new int[] {stonex, stoney});
+    visitQ.add(new int[] { stonex, stoney });
     while (!visitQ.isEmpty()) {
       int[] curpos = visitQ.remove();
       int x = curpos[0];
       int y = curpos[1];
 
       // Move all the way left
-      while (x > 0
-          && (stones[getIndex(x - 1, y)] == Stone.EMPTY || stones[getIndex(x - 1, y)] == toggle)) {
+      while (x > 0 && (stones[getIndex(x - 1, y)] == Stone.EMPTY || stones[getIndex(x - 1, y)] == toggle)) {
         x--;
       }
 
@@ -1075,19 +1151,18 @@ public class Board implements LeelazListener {
           break;
         }
         // Check above
-        if (y - 1 >= 0
-            && (shdwstones[getIndex(x, y - 1)] == Stone.EMPTY
-                || stones[getIndex(x, y - 1)] == toggle)) {
-          if (!lastup) visitQ.add(new int[] {x, y - 1});
+        if (y - 1 >= 0 && (shdwstones[getIndex(x, y - 1)] == Stone.EMPTY || stones[getIndex(x, y - 1)] == toggle)) {
+          if (!lastup)
+            visitQ.add(new int[] { x, y - 1 });
           lastup = true;
         } else {
           lastup = false;
         }
         // Check below
         if (y + 1 < boardSize
-            && (shdwstones[getIndex(x, y + 1)] == Stone.EMPTY
-                || stones[getIndex(x, y + 1)] == toggle)) {
-          if (!lastdown) visitQ.add(new int[] {x, y + 1});
+            && (shdwstones[getIndex(x, y + 1)] == Stone.EMPTY || stones[getIndex(x, y + 1)] == toggle)) {
+          if (!lastdown)
+            visitQ.add(new int[] { x, y + 1 });
           lastdown = true;
         } else {
           lastdown = false;
@@ -1103,15 +1178,16 @@ public class Board implements LeelazListener {
    */
   private boolean emptyOrCaptured(Stone[] stones, int x, int y) {
     int curidx = getIndex(x, y);
-    if (stones[curidx] == Stone.EMPTY
-        || stones[curidx] == Stone.BLACK_CAPTURED
-        || stones[curidx] == Stone.WHITE_CAPTURED) return true;
+    if (stones[curidx] == Stone.EMPTY || stones[curidx] == Stone.BLACK_CAPTURED
+        || stones[curidx] == Stone.WHITE_CAPTURED)
+      return true;
     return false;
   }
 
   /*
-   * Starting from startx, starty, mark all empty points within area as either white, black or dame.
-   * If two stones of opposite color (neither marked as captured) is encountered, the area is dame.
+   * Starting from startx, starty, mark all empty points within area as either
+   * white, black or dame. If two stones of opposite color (neither marked as
+   * captured) is encountered, the area is dame.
    *
    * @return A stone with color white, black or dame
    */
@@ -1121,7 +1197,7 @@ public class Board implements LeelazListener {
     Stone found = Stone.EMPTY;
     boolean lastup, lastdown;
     Queue<int[]> visitQ = new ArrayDeque<>();
-    visitQ.add(new int[] {startx, starty});
+    visitQ.add(new int[] { startx, starty });
     Deque<Integer> allPoints = new ArrayDeque<>();
     // Check one line at the time, new lines added to visitQ
     while (!visitQ.isEmpty()) {
@@ -1137,8 +1213,10 @@ public class Board implements LeelazListener {
       }
       // Are we on the border, or do we have a stone to the left?
       if (x > 0 && shdwstones[getIndex(x - 1, y)] != found) {
-        if (found == Stone.EMPTY) found = shdwstones[getIndex(x - 1, y)];
-        else found = Stone.DAME;
+        if (found == Stone.EMPTY)
+          found = shdwstones[getIndex(x - 1, y)];
+        else
+          found = Stone.DAME;
       }
 
       lastup = lastdown = false;
@@ -1146,7 +1224,8 @@ public class Board implements LeelazListener {
         // Check above
         if (y - 1 >= 0 && shdwstones[getIndex(x, y - 1)] != Stone.DAME) {
           if (emptyOrCaptured(shdwstones, x, y - 1)) {
-            if (!lastup) visitQ.add(new int[] {x, y - 1});
+            if (!lastup)
+              visitQ.add(new int[] { x, y - 1 });
             lastup = true;
           } else {
             lastup = false;
@@ -1163,7 +1242,7 @@ public class Board implements LeelazListener {
         if (y + 1 < boardSize && shdwstones[getIndex(x, y + 1)] != Stone.DAME) {
           if (emptyOrCaptured(shdwstones, x, y + 1)) {
             if (!lastdown) {
-              visitQ.add(new int[] {x, y + 1});
+              visitQ.add(new int[] { x, y + 1 });
             }
             lastdown = true;
           } else {
@@ -1178,7 +1257,8 @@ public class Board implements LeelazListener {
           }
         }
         // Add current stone to empty area and mark as visited
-        if (shdwstones[getIndex(x, y)] == Stone.EMPTY) allPoints.add(getIndex(x, y));
+        if (shdwstones[getIndex(x, y)] == Stone.EMPTY)
+          allPoints.add(getIndex(x, y));
 
         // Use dame stone to mark as visited
         shdwstones[getIndex(x, y)] = Stone.DAME;
@@ -1186,13 +1266,18 @@ public class Board implements LeelazListener {
       }
       // At this point x is at the edge of the board or on a stone
       if (x < boardSize && shdwstones[getIndex(x, y)] != found) {
-        if (found == Stone.EMPTY) found = shdwstones[getIndex(x, y)];
-        else found = Stone.DAME;
+        if (found == Stone.EMPTY)
+          found = shdwstones[getIndex(x, y)];
+        else
+          found = Stone.DAME;
       }
     }
-    // Finally mark all points as black or white captured if they were surronded by white or black
-    if (found == Stone.WHITE) found = Stone.WHITE_POINT;
-    else if (found == Stone.BLACK) found = Stone.BLACK_POINT;
+    // Finally mark all points as black or white captured if they were surronded by
+    // white or black
+    if (found == Stone.WHITE)
+      found = Stone.WHITE_POINT;
+    else if (found == Stone.BLACK)
+      found = Stone.BLACK_POINT;
     // else found == DAME and will be set as this.
     while (!allPoints.isEmpty()) {
       int idx = allPoints.remove();
@@ -1222,26 +1307,24 @@ public class Board implements LeelazListener {
    * Count score for whole board, including komi and captured stones
    */
   public double[] getScore(Stone[] scoreStones) {
-    double score[] =
-        new double[] {
-          getData().blackCaptures, getData().whiteCaptures + getHistory().getGameInfo().getKomi()
-        };
+    double score[] = new double[] { getData().blackCaptures,
+        getData().whiteCaptures + getHistory().getGameInfo().getKomi() };
     for (int i = 0; i < boardSize; i++) {
       for (int j = 0; j < boardSize; j++) {
         switch (scoreStones[getIndex(i, j)]) {
-          case BLACK_POINT:
-            score[0]++;
-            break;
-          case BLACK_CAPTURED:
-            score[1] += 2;
-            break;
+        case BLACK_POINT:
+          score[0]++;
+          break;
+        case BLACK_CAPTURED:
+          score[1] += 2;
+          break;
 
-          case WHITE_POINT:
-            score[1]++;
-            break;
-          case WHITE_CAPTURED:
-            score[0] += 2;
-            break;
+        case WHITE_POINT:
+          score[1]++;
+          break;
+        case WHITE_CAPTURED:
+          score[0] += 2;
+          break;
         }
       }
     }
@@ -1261,10 +1344,9 @@ public class Board implements LeelazListener {
       Lizzie.leelaz.removeListener(this);
       analysisMode = false;
     } else {
-      if (!getNextMove().isPresent()) return;
-      String answer =
-          JOptionPane.showInputDialog(
-              "# playouts for analysis (e.g. 100 (fast) or 50000 (slow)): ");
+      if (!getNextMove().isPresent())
+        return;
+      String answer = JOptionPane.showInputDialog("# playouts for analysis (e.g. 100 (fast) or 50000 (slow)): ");
       try {
         playoutsAnalysis = Integer.parseInt(answer);
       } catch (NumberFormatException err) {
@@ -1273,16 +1355,15 @@ public class Board implements LeelazListener {
       }
       Lizzie.leelaz.addListener(this);
       analysisMode = true;
-      if (!Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
+      if (!Lizzie.leelaz.isPondering())
+        Lizzie.leelaz.togglePonder();
     }
   }
 
   public void bestMoveNotification(List<MoveData> bestMoves) {
     if (analysisMode) {
-      boolean isSuccessivePass =
-          (history.getPrevious().isPresent()
-              && !history.getPrevious().get().lastMove.isPresent()
-              && !getLastMove().isPresent());
+      boolean isSuccessivePass = (history.getPrevious().isPresent() && !history.getPrevious().get().lastMove.isPresent()
+          && !getLastMove().isPresent());
       // Note: We cannot replace this history.getNext() with getNextMove()
       // because the latter returns null if the next move is "pass".
       if (!history.getNext().isPresent() || isSuccessivePass) {
@@ -1328,7 +1409,8 @@ public class Board implements LeelazListener {
   public void resumePreviousGame() {
     try {
       SGFParser.loadFromString(Lizzie.config.persisted.getString("autosave"));
-      while (nextMove()) ;
+      while (nextMove())
+        ;
     } catch (JSONException err) {
     }
   }
