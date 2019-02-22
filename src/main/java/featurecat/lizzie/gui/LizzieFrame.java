@@ -771,7 +771,7 @@ public class LizzieFrame extends JFrame {
     cachedShowComment = Lizzie.config.showComment;
     cachedBoardPositionProportion = BoardPositionProportion;
 
-    redrawBackgroundAnyway = false;
+//    redrawBackgroundAnyway = false;
 
     Graphics2D g = cachedBackground.createGraphics();
     g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -794,7 +794,7 @@ public class LizzieFrame extends JFrame {
         || vy + vh > cachedBackground.getMinY() + cachedBackground.getHeight()) {
       return;
     }
-
+    redrawBackgroundAnyway = false;
     BufferedImage result = new BufferedImage(vw, vh, TYPE_INT_ARGB);
     filter20.filter(cachedBackground.getSubimage(vx, vy, vw, vh), result);
     g.drawImage(result, vx, vy, null);
