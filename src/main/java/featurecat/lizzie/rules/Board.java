@@ -203,15 +203,19 @@ public class Board implements LeelazListener {
 
     // TODO
 
-    if (relink.isPresent()) {
-      if (relink.get().getData().lastMove.isPresent()) {
-        int[] m = relink.get().getData().lastMove.get();
+    //    relink.map(r -> r.getData().lastMove).map(m -> (Board.isValid(m[0], m[1])) ? place(m[0],
+    // m[1]) : pass() );
+    Optional<BoardHistoryNode> node = relink;
+    while (node.isPresent()) {
+      Optional<int[]> lastMove = node.get().getData().lastMove;
+      if (lastMove.isPresent()) {
+        int[] m = lastMove.get();
         if (Board.isValid(m[0], m[1])) {
           place(m[0], m[1]);
         } else {
           pass();
         }
-        ;
+        node = node.get().next();
       }
     }
 
