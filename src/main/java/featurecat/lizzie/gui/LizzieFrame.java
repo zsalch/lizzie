@@ -252,6 +252,11 @@ public class LizzieFrame extends JFrame {
     //    configDialog.dispose();
   }
 
+  public static void openChangeMoveDialog() {
+    ChangeMoveDialog changeMoveDialog = new ChangeMoveDialog();
+    changeMoveDialog.setVisible(true);
+  }
+
   public static void startNewGame() {
     GameInfo gameInfo = Lizzie.board.getHistory().getGameInfo();
 
