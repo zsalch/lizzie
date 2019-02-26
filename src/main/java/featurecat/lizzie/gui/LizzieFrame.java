@@ -105,6 +105,7 @@ public class LizzieFrame extends JFrame {
   public boolean showControls = false;
   public boolean isPlayingAgainstLeelaz = false;
   public boolean playerIsBlack = true;
+  public boolean isNewGame = false;
   public int winRateGridLines = 3;
   public int BoardPositionProportion = 4;
 
@@ -264,10 +265,13 @@ public class LizzieFrame extends JFrame {
     newGameDialog.setGameInfo(gameInfo);
     newGameDialog.setVisible(true);
     boolean playerIsBlack = newGameDialog.playerIsBlack();
+    boolean isNewGame = newGameDialog.isNewGame();
     newGameDialog.dispose();
     if (newGameDialog.isCancelled()) return;
 
-    Lizzie.board.clear();
+    if (isNewGame) {
+      Lizzie.board.clear();
+    }
     Lizzie.board.getHistory().setGameInfo(gameInfo);
     Lizzie.leelaz.sendCommand("komi " + gameInfo.getKomi());
 
@@ -276,15 +280,22 @@ public class LizzieFrame extends JFrame {
             + Lizzie.config.config.getJSONObject("leelaz").getInt("max-game-thinking-time-seconds")
             + " 1");
     Lizzie.frame.playerIsBlack = playerIsBlack;
+    Lizzie.frame.isNewGame = isNewGame;
     Lizzie.frame.isPlayingAgainstLeelaz = true;
 
     boolean isHandicapGame = gameInfo.getHandicap() != 0;
-    if (isHandicapGame) {
-      Lizzie.board.getHistory().getData().blackToPlay = false;
-      Lizzie.leelaz.sendCommand("fixed_handicap " + gameInfo.getHandicap());
-      if (playerIsBlack) Lizzie.leelaz.genmove("W");
-    } else if (!playerIsBlack) {
-      Lizzie.leelaz.genmove("B");
+    if (isNewGame) {
+      if (isHandicapGame) {
+        Lizzie.board.getHistory().getData().blackToPlay = false;
+        Lizzie.leelaz.sendCommand("fixed_handicap " + gameInfo.getHandicap());
+        if (playerIsBlack) Lizzie.leelaz.genmove("W");
+      } else if (!playerIsBlack) {
+        Lizzie.leelaz.genmove("B");
+      }
+    } else {
+      if (Lizzie.frame.playerIsBlack != Lizzie.board.getHistory().getData().blackToPlay) {
+        Lizzie.leelaz.genmove((Lizzie.board.getData().blackToPlay ? "W" : "B"));
+      }
     }
   }
 
