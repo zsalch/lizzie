@@ -293,8 +293,10 @@ public class LizzieFrame extends JFrame {
         Lizzie.leelaz.genmove("B");
       }
     } else {
-      if (Lizzie.frame.playerIsBlack != Lizzie.board.getHistory().getData().blackToPlay) {
-        Lizzie.leelaz.genmove((Lizzie.board.getData().blackToPlay ? "W" : "B"));
+      if (Lizzie.frame.playerIsBlack != Lizzie.board.getData().blackToPlay) {
+        if (!Lizzie.leelaz.isThinking) {
+          Lizzie.leelaz.genmove((Lizzie.board.getData().blackToPlay ? "B" : "W"));
+        }
       }
     }
   }
