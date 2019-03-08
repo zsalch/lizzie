@@ -266,13 +266,16 @@ public class LizzieFrame extends JFrame {
     newGameDialog.setVisible(true);
     boolean playerIsBlack = newGameDialog.playerIsBlack();
     boolean isNewGame = newGameDialog.isNewGame();
-    newGameDialog.dispose();
+//    newGameDialog.dispose();
     if (newGameDialog.isCancelled()) return;
 
     if (isNewGame) {
       Lizzie.board.clear();
+    } else {
+      Lizzie.board.saveMoveNumber();
+      Lizzie.leelaz.sendCommand("clear_board");
+      Lizzie.frame.resetTitle();
     }
-    Lizzie.board.getHistory().setGameInfo(gameInfo);
     Lizzie.leelaz.sendCommand("komi " + gameInfo.getKomi());
 
     Lizzie.leelaz.sendCommand(
@@ -285,6 +288,7 @@ public class LizzieFrame extends JFrame {
 
     boolean isHandicapGame = gameInfo.getHandicap() != 0;
     if (isNewGame) {
+      Lizzie.board.getHistory().setGameInfo(gameInfo);
       if (isHandicapGame) {
         Lizzie.board.getHistory().getData().blackToPlay = false;
         Lizzie.leelaz.sendCommand("fixed_handicap " + gameInfo.getHandicap());
@@ -293,6 +297,8 @@ public class LizzieFrame extends JFrame {
         Lizzie.leelaz.genmove("B");
       }
     } else {
+      Lizzie.board.restoreMoveNumber();
+      Lizzie.board.getHistory().setGameInfo(gameInfo);
       if (Lizzie.frame.playerIsBlack != Lizzie.board.getData().blackToPlay) {
         if (!Lizzie.leelaz.isThinking) {
           Lizzie.leelaz.genmove((Lizzie.board.getData().blackToPlay ? "B" : "W"));

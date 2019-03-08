@@ -220,6 +220,9 @@ public class Leelaz {
    */
   private void parseLine(String line) {
     synchronized (this) {
+      if (!isPondering) {
+        System.out.print(line);
+      }
       if (line.startsWith("komi=")) {
         try {
           dynamicKomi = Float.parseFloat(line.substring("komi=".length()).trim());
