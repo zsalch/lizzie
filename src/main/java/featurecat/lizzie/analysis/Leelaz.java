@@ -220,8 +220,8 @@ public class Leelaz {
    */
   private void parseLine(String line) {
     synchronized (this) {
-      if (!isPondering) {
-        System.out.print(line);
+      if (printCommunication) {
+        Lizzie.gtpConsole.addLine(line);
       }
       if (line.startsWith("komi=")) {
         try {
@@ -272,6 +272,7 @@ public class Leelaz {
       } else if (line.startsWith("=") || line.startsWith("?")) {
         if (printCommunication) {
           System.out.print(line);
+          Lizzie.gtpConsole.addLine(line);
         }
         String[] params = line.trim().split(" ");
         currentCmdNum = Integer.parseInt(params[0].substring(1).trim());
@@ -397,11 +398,12 @@ public class Leelaz {
    */
   private void sendCommandToLeelaz(String command) {
     if (command.startsWith("fixed_handicap")) isSettingHandicap = true;
+    if (printCommunication) {
+      System.out.printf("> %d %s\n", cmdNumber, command);
+      Lizzie.gtpConsole.addCommand(command, cmdNumber);
+    }
     command = cmdNumber + " " + command;
     cmdNumber++;
-    if (printCommunication) {
-      System.out.printf("> %s\n", command);
-    }
     try {
       outputStream.write((command + "\n").getBytes());
       outputStream.flush();
