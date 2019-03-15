@@ -266,14 +266,14 @@ public class LizzieFrame extends JFrame {
     newGameDialog.setVisible(true);
     boolean playerIsBlack = newGameDialog.playerIsBlack();
     boolean isNewGame = newGameDialog.isNewGame();
-//    newGameDialog.dispose();
+    //    newGameDialog.dispose();
     if (newGameDialog.isCancelled()) return;
 
     if (isNewGame) {
       Lizzie.board.clear();
     } else {
       Lizzie.board.saveMoveNumber();
-      Lizzie.leelaz.sendCommand("clear_board");
+      Lizzie.leelaz.clear();
       Lizzie.frame.resetTitle();
     }
     Lizzie.leelaz.sendCommand("komi " + gameInfo.getKomi());

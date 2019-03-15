@@ -456,6 +456,14 @@ public class Leelaz {
     isPondering = false;
   }
 
+  public void clear() {
+    synchronized (this) {
+      sendCommand("clear_board");
+      bestMoves = new ArrayList<>();
+      if (isPondering) ponder();
+    }
+  }
+
   public void undo() {
     synchronized (this) {
       sendCommand("undo");
