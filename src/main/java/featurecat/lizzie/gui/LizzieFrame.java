@@ -282,16 +282,13 @@ public class LizzieFrame extends JFrame {
     if (isNewGame) {
       Lizzie.board.clear();
     } else {
-      Lizzie.board.saveMoveNumber();
-      Lizzie.leelaz.clear();
-      Lizzie.frame.resetTitle();
+//      Lizzie.board.saveMoveNumber();
+//      Lizzie.leelaz.clear();
+//      Lizzie.frame.resetTitle();
     }
     Lizzie.leelaz.sendCommand("komi " + gameInfo.getKomi());
 
-    Lizzie.leelaz.sendCommand(
-        "time_settings 0 "
-            + Lizzie.config.config.getJSONObject("leelaz").getInt("max-game-thinking-time-seconds")
-            + " 1");
+    Lizzie.leelaz.time_settings();
     Lizzie.frame.playerIsBlack = playerIsBlack;
     Lizzie.frame.isNewGame = isNewGame;
     Lizzie.frame.isPlayingAgainstLeelaz = true;
@@ -307,7 +304,7 @@ public class LizzieFrame extends JFrame {
         Lizzie.leelaz.genmove("B");
       }
     } else {
-      Lizzie.board.restoreMoveNumber();
+//      Lizzie.board.restoreMoveNumber();
       Lizzie.board.getHistory().setGameInfo(gameInfo);
       if (Lizzie.frame.playerIsBlack != Lizzie.board.getData().blackToPlay) {
         if (!Lizzie.leelaz.isThinking) {

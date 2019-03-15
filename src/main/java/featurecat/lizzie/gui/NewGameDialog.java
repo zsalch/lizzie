@@ -5,10 +5,16 @@
 package featurecat.lizzie.gui;
 
 import featurecat.lizzie.analysis.GameInfo;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -17,14 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
 
 /** @author unknown */
 public class NewGameDialog extends JDialog {
@@ -205,15 +203,15 @@ public class NewGameDialog extends JDialog {
     return cancelled;
   }
 
-//  public static void main(String[] args) {
-//    EventQueue.invokeLater(
-//        () -> {
-//          try {
-//            NewGameDialog window = new NewGameDialog();
-//            window.setVisible(true);
-//          } catch (Exception e) {
-//            e.printStackTrace();
-//          }
-//        });
-//  }
+  //  public static void main(String[] args) {
+  //    EventQueue.invokeLater(
+  //        () -> {
+  //          try {
+  //            NewGameDialog window = new NewGameDialog();
+  //            window.setVisible(true);
+  //          } catch (Exception e) {
+  //            e.printStackTrace();
+  //          }
+  //        });
+  //  }
 }
