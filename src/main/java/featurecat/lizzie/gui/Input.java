@@ -160,6 +160,9 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
     boolean shouldDisableAnalysis = true;
 
     switch (e.getKeyCode()) {
+      case VK_E:
+        Lizzie.frame.toggleGtpConsole();
+        break;
       case VK_RIGHT:
         if (e.isShiftDown()) {
           moveBranchDown();

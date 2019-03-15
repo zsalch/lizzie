@@ -31,7 +31,7 @@ public class Lizzie {
     //    main = new LizzieMain();
     frame = new LizzieFrame();
     gtpConsole = new GtpConsolePane(frame);
-    gtpConsole.setVisible(true);
+    gtpConsole.setVisible(config.leelazConfig.optBoolean("print-comms", false));
     try {
       leelaz = new Leelaz();
 

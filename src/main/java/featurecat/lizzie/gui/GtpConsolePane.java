@@ -1,12 +1,17 @@
 package featurecat.lizzie.gui;
 
+import featurecat.lizzie.Lizzie;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -28,47 +33,54 @@ public class GtpConsolePane extends JDialog {
   private JTextPane console;
   private String command;
   private boolean isAnalyzeCommand = false;
-  private final JTextField textField = new JTextField();
+  private final JTextField txtCommand = new JTextField();
+  private JLabel lblCommand = new JLabel();
+  private JPanel pnlCommand = new JPanel();
 
   /** Creates a Gtp Console Window */
   public GtpConsolePane(Window owner) {
     super(owner);
     setTitle("Gtp Console");
 
-    setBounds(0, owner.getY(), owner.getX(), owner.getHeight());
+    setBounds(0, owner.getY(), Math.max(owner.getX(), 400), Math.max(owner.getHeight(), 300));
 
     htmlKit = new HTMLEditorKit();
     htmlDoc = (HTMLDocument) htmlKit.createDefaultDocument();
     htmlStyle = htmlKit.getStyleSheet();
-    htmlStyle.addRule(
-        "body {background:#000000; color:#d0d0d0; font-family:Consolas, Menlo, Monospace; margin: 4px; }");
-    htmlStyle.addRule(".coord {color: #ffffff;}");
-    //    getContentPane().setLayout(new BorderLayout(0, 0));
+    htmlStyle.addRule(Lizzie.config.gtpConsoleStyle);
 
     console = new JTextPane();
     console.setBorder(BorderFactory.createEmptyBorder());
     console.setEditable(false);
     console.setEditorKit(htmlKit);
     console.setDocument(htmlDoc);
-    // console.setBackground(Lizzie.config.commentBackgroundColor);
-    // console.setForeground(Lizzie.config.commentFontColor);
     scrollPane = new JScrollPane();
     scrollPane.setBorder(BorderFactory.createEmptyBorder());
-    textField.setBackground(Color.DARK_GRAY);
+    txtCommand.setBackground(Color.DARK_GRAY);
+    txtCommand.setForeground(Color.WHITE);
+    lblCommand.setFont(new Font("Tahoma", Font.BOLD, 11));
+    lblCommand.setOpaque(true);
+    lblCommand.setBackground(Color.DARK_GRAY);
+    lblCommand.setForeground(Color.WHITE);
+    lblCommand.setText(Lizzie.leelaz == null ? "GTP>" : Lizzie.leelaz.currentShortWeight() + ">");
+    pnlCommand.setLayout(new BorderLayout(0, 0));
+    pnlCommand.add(lblCommand, BorderLayout.WEST);
+    pnlCommand.add(txtCommand);
     getContentPane().add(scrollPane, BorderLayout.CENTER);
-    getContentPane().add(textField, BorderLayout.SOUTH);
-    //    scrollPane.setVerticalScrollBarPolicy(
-    //        javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+    getContentPane().add(pnlCommand, BorderLayout.SOUTH);
     scrollPane.setViewportView(console);
     getRootPane().setBorder(BorderFactory.createEmptyBorder());
     getRootPane().setWindowDecorationStyle(JRootPane.PLAIN_DIALOG);
     setVisible(true);
+
+    txtCommand.addActionListener(e -> postCommand(e));
   }
 
   public void addCommand(String command, int commandNumber) {
     if (command == null || command.trim().length() == 0) {
       return;
     }
+    lblCommand.setText(Lizzie.leelaz == null ? "GTP>" : Lizzie.leelaz.currentShortWeight() + ">");
     this.command = command;
     this.isAnalyzeCommand =
         command.startsWith("lz-analyze") || command.startsWith("lz-genmove_analyze");
@@ -92,18 +104,62 @@ public class GtpConsolePane extends JDialog {
   }
 
   public String formatCommand(String command, int commandNumber) {
-    return String.format("<b>GTP> %d %s </b><br />", commandNumber, command);
+    return String.format(
+        "<span class=\"command\">"
+            + (Lizzie.leelaz == null ? "GTP" : Lizzie.leelaz.currentShortWeight())
+            + "> %d %s </span><br />",
+        commandNumber,
+        command);
   }
 
   public String format(String text) {
     StringBuilder sb = new StringBuilder();
-    // TODO
+    // TODO need better performance
     text =
-        text.replaceAll("\\b([a-hj-zA-HJ-Z][1-9][0-9]?)\\b", "<b class=\"coord\">$1</b>")
+        text.replaceAll("\\b([0-9]{1,3}\\.*[0-9]{0,2}%)", "<span class=\"winrate\">$1</span>")
+            .replaceAll("\\b([A-HJ-Z][1-9][0-9]?)\\b", "<span class=\"coord\">$1</span>")
             .replaceAll(" (info move)", "<br />$1")
             .replaceAll("(\r\n)|(\n)", "<br />")
             .replaceAll(" ", "&nbsp;");
     sb.append("<b>   </b>").append(text);
     return sb.toString();
+  }
+
+  private void postCommand(ActionEvent e) {
+    String command = txtCommand.getText();
+    txtCommand.setText("");
+
+    if (Lizzie.leelaz != null) {
+      if (command.startsWith("genmove")
+          || command.startsWith("lz-genmove")
+          || command.startsWith("play")) {
+        String cmdParams[] = command.split(" ");
+        if (cmdParams.length >= 2) {
+          String param1 = cmdParams[1].toUpperCase();
+          boolean needPass = (Lizzie.board.getData().blackToPlay != "B".equals(param1));
+          if (needPass) {
+            Lizzie.board.pass();
+          }
+          if (command.startsWith("genmove") || command.startsWith("lz-genmove")) {
+            if (!Lizzie.leelaz.isThinking) {
+              Lizzie.leelaz.time_settings();
+              Lizzie.leelaz.isInputCommand = true;
+              if (command.startsWith("genmove")) {
+                Lizzie.leelaz.genmove(param1);
+              } else {
+                Lizzie.leelaz.genmove_analyze(param1);
+              }
+            }
+          } else {
+            if (cmdParams.length >= 3) {
+              String param2 = cmdParams[2].toUpperCase();
+              Lizzie.board.place(param2);
+            }
+          }
+        }
+      } else {
+        Lizzie.leelaz.sendCommand(command);
+      }
+    }
   }
 }

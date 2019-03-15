@@ -71,6 +71,9 @@ public class Config {
   public Optional<Map<Double, Color>> blunderNodeColors;
   public int nodeColorMode = 0;
   public boolean appendWinrateToComment = false;
+  public String gtpConsoleStyle = "";
+  private final String defaultGtpConsoleStyle =
+      "body {background:#000000; color:#d0d0d0; font-family:Consolas, Menlo, Monaco, 'Ubuntu Mono', monospace; margin:4px;} .command {color:#ffffff;font-weight:bold;} .winrate {color:#ffffff;font-weight:bold;} .coord {color:#ffffff;font-weight:bold;}";
 
   private JSONObject loadAndMergeConfig(
       JSONObject defaultCfg, String fileName, boolean needValidation) throws IOException {
@@ -197,6 +200,8 @@ public class Config {
     blunderWinrateThresholds = theme.blunderWinrateThresholds();
     blunderNodeColors = theme.blunderNodeColors();
     nodeColorMode = theme.nodeColorMode();
+
+    gtpConsoleStyle = uiConfig.optString("gtp-console-style", defaultGtpConsoleStyle);
   }
 
   // Modifies config by adding in values from default_config that are missing.
@@ -372,6 +377,7 @@ public class Config {
     ui.put("new-move-number-in-branch", true);
     ui.put("append-winrate-to-comment", false);
     ui.put("replay-branch-interval-seconds", 1.0);
+    ui.put("gtp-console-style", defaultGtpConsoleStyle);
     config.put("ui", ui);
     return config;
   }

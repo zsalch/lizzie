@@ -258,6 +258,16 @@ public class LizzieFrame extends JFrame {
     changeMoveDialog.setVisible(true);
   }
 
+  public void toggleGtpConsole() {
+    Lizzie.leelaz.toggleGtpConsole();
+    if (Lizzie.gtpConsole != null) {
+      Lizzie.gtpConsole.setVisible(!Lizzie.gtpConsole.isVisible());
+    } else {
+      Lizzie.gtpConsole = new GtpConsolePane(this);
+      Lizzie.gtpConsole.setVisible(true);
+    }
+  }
+
   public static void startNewGame() {
     GameInfo gameInfo = Lizzie.board.getHistory().getGameInfo();
 
