@@ -40,11 +40,11 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
   @Override
   public void keyTyped(KeyEvent e) {}
 
-  private void undo() {
+  public static void undo() {
     undo(1);
   }
 
-  private void undo(int movesToAdvance) {
+  public static void undo(int movesToAdvance) {
     if (Lizzie.board.inAnalysisMode()) Lizzie.board.toggleAnalysis();
     if (Lizzie.frame.isPlayingAgainstLeelaz) {
       Lizzie.frame.isPlayingAgainstLeelaz = false;

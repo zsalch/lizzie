@@ -126,7 +126,10 @@ public class GtpConsolePane extends JDialog {
   }
 
   private void postCommand(ActionEvent e) {
-    String command = txtCommand.getText();
+    if (txtCommand.getText() == null || txtCommand.getText().trim().isEmpty()) {
+      return;
+    }
+    String command = txtCommand.getText().trim();
     txtCommand.setText("");
 
     if (Lizzie.leelaz != null) {
@@ -157,6 +160,10 @@ public class GtpConsolePane extends JDialog {
             }
           }
         }
+      } else if ("clear_board".equals(command)) {
+        Lizzie.board.clear();
+      } else if ("undo".equals(command)) {
+        Input.undo();
       } else {
         Lizzie.leelaz.sendCommand(command);
       }
