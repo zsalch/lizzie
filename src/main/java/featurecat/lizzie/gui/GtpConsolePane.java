@@ -4,6 +4,7 @@ import featurecat.lizzie.Lizzie;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -42,7 +43,12 @@ public class GtpConsolePane extends JDialog {
     super(owner);
     setTitle("Gtp Console");
 
-    setBounds(0, owner.getY(), Math.max(owner.getX(), 400), Math.max(owner.getHeight(), 300));
+    Insets oi = owner.getInsets();
+    setBounds(
+        0,
+        owner.getY() - oi.top,
+        Math.max(owner.getX() - oi.left, 400),
+        Math.max(owner.getHeight() + oi.top + oi.bottom, 300));
 
     htmlKit = new HTMLEditorKit();
     htmlDoc = (HTMLDocument) htmlKit.createDefaultDocument();
