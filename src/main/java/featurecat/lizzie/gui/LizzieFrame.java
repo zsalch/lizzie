@@ -158,9 +158,18 @@ public class LizzieFrame extends JFrame {
     winrateGraph = new WinrateGraph();
 
     setMinimumSize(new Dimension(640, 400));
-    JSONArray windowSize = Lizzie.config.uiConfig.getJSONArray("window-size");
-    setSize(windowSize.getInt(0), windowSize.getInt(1));
-    setLocationRelativeTo(null); // Start centered, needs to be called *after* setSize...
+    boolean persisted =
+        Lizzie.config.persistedUi != null
+            && Lizzie.config.persistedUi.getJSONArray("main-window-position") != null;
+    if (persisted) {
+      JSONArray pos = Lizzie.config.persistedUi.getJSONArray("main-window-position");
+      this.setBounds(pos.getInt(0), pos.getInt(1), pos.getInt(2), pos.getInt(3));
+      this.BoardPositionProportion = Lizzie.config.persistedUi.optInt("board-postion-propotion", 4);
+    } else {
+      JSONArray windowSize = Lizzie.config.uiConfig.getJSONArray("window-size");
+      setSize(windowSize.getInt(0), windowSize.getInt(1));
+      setLocationRelativeTo(null); // Start centered, needs to be called *after* setSize...
+    }
 
     // Allow change font in the config
     if (Lizzie.config.uiFontName != null) {
@@ -170,7 +179,7 @@ public class LizzieFrame extends JFrame {
       winrateFont = new Font(Lizzie.config.winrateFontName, Font.BOLD, 12);
     }
 
-    if (Lizzie.config.startMaximized) {
+    if (Lizzie.config.startMaximized && !persisted) {
       setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 

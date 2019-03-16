@@ -21,6 +21,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
+import org.json.JSONArray;
 
 public class GtpConsolePane extends JDialog {
   private static final ResourceBundle resourceBundle =
@@ -43,12 +44,20 @@ public class GtpConsolePane extends JDialog {
     super(owner);
     setTitle("Gtp Console");
 
-    Insets oi = owner.getInsets();
-    setBounds(
-        0,
-        owner.getY() - oi.top,
-        Math.max(owner.getX() - oi.left, 400),
-        Math.max(owner.getHeight() + oi.top + oi.bottom, 300));
+    boolean persisted =
+        Lizzie.config.persistedUi != null
+            && Lizzie.config.persistedUi.getJSONArray("main-window-position") != null;
+    if (persisted) {
+      JSONArray pos = Lizzie.config.persistedUi.getJSONArray("gtp-console-position");
+      this.setBounds(pos.getInt(0), pos.getInt(1), pos.getInt(2), pos.getInt(3));
+    } else {
+      Insets oi = owner.getInsets();
+      setBounds(
+          0,
+          owner.getY() - oi.top,
+          Math.max(owner.getX() - oi.left, 400),
+          Math.max(owner.getHeight() + oi.top + oi.bottom, 300));
+    }
 
     htmlKit = new HTMLEditorKit();
     htmlDoc = (HTMLDocument) htmlKit.createDefaultDocument();
