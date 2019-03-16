@@ -107,7 +107,7 @@ public class LizzieFrame extends JFrame {
   public boolean playerIsBlack = true;
   public boolean isNewGame = false;
   public int winRateGridLines = 3;
-  public int BoardPositionProportion = 4;
+  public int BoardPositionProportion = Lizzie.config.boardPositionProportion;
 
   private long lastAutosaveTime = System.currentTimeMillis();
   private boolean isReplayVariation = false;

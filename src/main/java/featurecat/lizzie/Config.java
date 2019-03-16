@@ -71,6 +71,7 @@ public class Config {
   public Optional<Map<Double, Color>> blunderNodeColors;
   public int nodeColorMode = 0;
   public boolean appendWinrateToComment = false;
+  public int boardPositionProportion = 4;
   public String gtpConsoleStyle = "";
   private final String defaultGtpConsoleStyle =
       "body {background:#000000; color:#d0d0d0; font-family:Consolas, Menlo, Monaco, 'Ubuntu Mono', monospace; margin:4px;} .command {color:#ffffff;font-weight:bold;} .winrate {color:#ffffff;font-weight:bold;} .coord {color:#ffffff;font-weight:bold;}";
@@ -181,6 +182,7 @@ public class Config {
     appendWinrateToComment = uiConfig.optBoolean("append-winrate-to-comment");
     showCoordinates = uiConfig.optBoolean("show-coordinates");
     replayBranchIntervalSeconds = uiConfig.optDouble("replay-branch-interval-seconds", 1.0);
+    boardPositionProportion = uiConfig.optInt("board-postion-proportion", 4);
 
     winrateStrokeWidth = theme.winrateStrokeWidth();
     minimumBlunderBarWidth = theme.minimumBlunderBarWidth();
