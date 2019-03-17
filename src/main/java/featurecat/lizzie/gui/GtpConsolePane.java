@@ -46,7 +46,8 @@ public class GtpConsolePane extends JDialog {
 
     boolean persisted =
         Lizzie.config.persistedUi != null
-            && Lizzie.config.persistedUi.getJSONArray("main-window-position") != null;
+            && Lizzie.config.persistedUi.optJSONArray("gtp-console-position") != null
+            && Lizzie.config.persistedUi.optJSONArray("gtp-console-position").length() == 4;
     if (persisted) {
       JSONArray pos = Lizzie.config.persistedUi.getJSONArray("gtp-console-position");
       this.setBounds(pos.getInt(0), pos.getInt(1), pos.getInt(2), pos.getInt(3));

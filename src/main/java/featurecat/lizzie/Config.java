@@ -408,7 +408,6 @@ public class Config {
     // Main Window Position & Size
     ui.put("main-window-position", new JSONArray("[]"));
     ui.put("gtp-console-position", new JSONArray("[]"));
-    ui.put("board-postion-propotion", "");
 
     config.put("filesystem", filesys);
 
