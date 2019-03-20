@@ -34,12 +34,12 @@ public class AvoidMoveDialog extends JDialog {
     setTitle(resourceBundle.getString("LizzieAvoidMove.title.config"));
     setModalityType(ModalityType.APPLICATION_MODAL);
     setType(Type.POPUP);
-    setBounds(100, 100, 385, 270);
+    setBounds(100, 100, 398, 270);
     getContentPane().setLayout(new BorderLayout());
     JPanel buttonPane = new JPanel();
     getContentPane().add(buttonPane, BorderLayout.CENTER);
     JButton okButton = new JButton(resourceBundle.getString("LizzieAvoidMove.button.ok"));
-    okButton.setBounds(90, 208, 65, 23);
+    okButton.setBounds(112, 208, 74, 29);
     okButton.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
@@ -53,7 +53,7 @@ public class AvoidMoveDialog extends JDialog {
     getRootPane().setDefaultButton(okButton);
 
     JButton cancelButton = new JButton(resourceBundle.getString("LizzieAvoidMove.button.cancel"));
-    cancelButton.setBounds(206, 208, 65, 23);
+    cancelButton.setBounds(206, 208, 74, 29);
     cancelButton.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
@@ -64,7 +64,7 @@ public class AvoidMoveDialog extends JDialog {
     buttonPane.add(cancelButton);
 
     JLabel lblCoordList = new JLabel(resourceBundle.getString("LizzieAvoidMove.title.coordList"));
-    lblCoordList.setBounds(10, 87, 74, 14);
+    lblCoordList.setBounds(10, 87, 101, 14);
     buttonPane.add(lblCoordList);
     lblCoordList.setHorizontalAlignment(SwingConstants.LEFT);
 
@@ -72,19 +72,19 @@ public class AvoidMoveDialog extends JDialog {
     nf.setGroupingUsed(false);
 
     txtCoordList = new JFormattedTextField();
-    txtCoordList.setBounds(90, 84, 269, 20);
+    txtCoordList.setBounds(110, 84, 283, 20);
     buttonPane.add(txtCoordList);
     txtCoordList.setColumns(10);
 
     ButtonGroup group = new ButtonGroup();
 
     rdoAllow = new JRadioButton(resourceBundle.getString("LizzieAvoidMove.rdoAllow.text"));
-    rdoAllow.setBounds(155, 32, 55, 23);
+    rdoAllow.setBounds(187, 32, 69, 23);
     buttonPane.add(rdoAllow);
     group.add(rdoAllow);
 
     rdoAvoid = new JRadioButton(resourceBundle.getString("LizzieAvoidMove.rdoAvoid.text"));
-    rdoAvoid.setBounds(90, 32, 55, 23);
+    rdoAvoid.setBounds(112, 32, 74, 23);
     rdoAvoid.setSelected(true);
     buttonPane.add(rdoAvoid);
     group.add(rdoAvoid);
@@ -102,12 +102,12 @@ public class AvoidMoveDialog extends JDialog {
 
               private DocumentFilter filter = new DigitOnlyFilter();
             });
-    txtUntilMove.setBounds(90, 115, 47, 20);
+    txtUntilMove.setBounds(110, 109, 47, 20);
     buttonPane.add(txtUntilMove);
     txtUntilMove.setColumns(10);
 
     JLabel lblPrompt1 = new JLabel(resourceBundle.getString("LizzieAvoidMove.lblPrompt1.text"));
-    lblPrompt1.setBounds(10, 11, 349, 14);
+    lblPrompt1.setBounds(10, 11, 383, 14);
     buttonPane.add(lblPrompt1);
 
     JLabel lblType = new JLabel(resourceBundle.getString("LizzieAvoidMove.lblType.text"));
@@ -120,19 +120,19 @@ public class AvoidMoveDialog extends JDialog {
 
     ButtonGroup colorGroup = new ButtonGroup();
     rdoBlack = new JRadioButton(resourceBundle.getString("LizzieAvoidMove.rdoBlack.text"));
-    rdoBlack.setBounds(90, 58, 55, 23);
+    rdoBlack.setBounds(112, 57, 74, 23);
     rdoBlack.setSelected(true);
     buttonPane.add(rdoBlack);
     colorGroup.add(rdoBlack);
 
     rdoWhite = new JRadioButton(resourceBundle.getString("LizzieAvoidMove.rdoWhite.text"));
-    rdoWhite.setBounds(155, 58, 55, 23);
+    rdoWhite.setBounds(187, 57, 74, 23);
     buttonPane.add(rdoWhite);
     colorGroup.add(rdoWhite);
 
     txtCustom = new JTextField();
     txtCustom.setColumns(10);
-    txtCustom.setBounds(90, 177, 269, 20);
+    txtCustom.setBounds(110, 176, 283, 20);
     buttonPane.add(txtCustom);
 
     JLabel lblCustom = new JLabel(resourceBundle.getString("LizzieAvoidMove.lblCustom.text"));
