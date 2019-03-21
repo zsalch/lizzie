@@ -35,6 +35,7 @@ public class Config {
   public boolean showDynamicKomi = true;
   public double replayBranchIntervalSeconds = 1.0;
   public boolean showCoordinates = false;
+  public boolean colorByWinrateInsteadOfVisits = false;
 
   public boolean showStatus = true;
   public boolean showBranch = true;
@@ -186,6 +187,7 @@ public class Config {
     showCoordinates = uiConfig.optBoolean("show-coordinates");
     replayBranchIntervalSeconds = uiConfig.optDouble("replay-branch-interval-seconds", 1.0);
     boardPositionProportion = uiConfig.optInt("board-postion-proportion", 4);
+    colorByWinrateInsteadOfVisits = uiConfig.optBoolean("color-by-winrate-instead-of-visits");
 
     winrateStrokeWidth = theme.winrateStrokeWidth();
     minimumBlunderBarWidth = theme.minimumBlunderBarWidth();
@@ -289,6 +291,10 @@ public class Config {
 
   public void toggleCoordinates() {
     showCoordinates = !showCoordinates;
+  }
+
+  public void toggleEvaluationColoring() {
+    colorByWinrateInsteadOfVisits = !colorByWinrateInsteadOfVisits;
   }
 
   public boolean showLargeSubBoard() {
