@@ -28,13 +28,13 @@ public class AvoidMoveDialog extends JDialog {
   private JRadioButton rdoWhite;
   private JFormattedTextField txtUntilMove;
   private JTextField txtCoordList;
-  private JTextField txtCustom;
+  private JTextField txtParam;
 
   public AvoidMoveDialog() {
     setTitle(resourceBundle.getString("LizzieAvoidMove.title.config"));
     setModalityType(ModalityType.APPLICATION_MODAL);
     setType(Type.POPUP);
-    setBounds(100, 100, 398, 270);
+    setBounds(100, 100, 416, 282);
     getContentPane().setLayout(new BorderLayout());
     JPanel buttonPane = new JPanel();
     getContentPane().add(buttonPane, BorderLayout.CENTER);
@@ -53,7 +53,7 @@ public class AvoidMoveDialog extends JDialog {
     getRootPane().setDefaultButton(okButton);
 
     JButton cancelButton = new JButton(resourceBundle.getString("LizzieAvoidMove.button.cancel"));
-    cancelButton.setBounds(206, 208, 74, 29);
+    cancelButton.setBounds(218, 208, 74, 29);
     cancelButton.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
@@ -130,15 +130,15 @@ public class AvoidMoveDialog extends JDialog {
     buttonPane.add(rdoWhite);
     colorGroup.add(rdoWhite);
 
-    txtCustom = new JTextField();
-    txtCustom.setColumns(10);
-    txtCustom.setBounds(110, 176, 283, 20);
-    buttonPane.add(txtCustom);
+    txtParam = new JTextField();
+    txtParam.setColumns(10);
+    txtParam.setBounds(110, 176, 283, 20);
+    buttonPane.add(txtParam);
 
-    JLabel lblCustom = new JLabel(resourceBundle.getString("LizzieAvoidMove.lblCustom.text"));
-    lblCustom.setHorizontalAlignment(SwingConstants.LEFT);
-    lblCustom.setBounds(10, 180, 74, 14);
-    buttonPane.add(lblCustom);
+    JLabel lblParam = new JLabel(resourceBundle.getString("LizzieAvoidMove.lblParam.text"));
+    lblParam.setHorizontalAlignment(SwingConstants.LEFT);
+    lblParam.setBounds(10, 180, 74, 14);
+    buttonPane.add(lblParam);
 
     JLabel lblPrompt2 = new JLabel(resourceBundle.getString("LizzieAvoidMove.lblPrompt2.text"));
     lblPrompt2.setBounds(10, 157, 349, 14);
@@ -149,8 +149,8 @@ public class AvoidMoveDialog extends JDialog {
 
   private void applyChange() {
     if (checkInput()) {
-      if (txtCustom.getText() != null && !txtCustom.getText().trim().isEmpty()) {
-        Lizzie.leelaz.analyzeAvoid(txtCustom.getText().trim());
+      if (txtParam.getText() != null && !txtParam.getText().trim().isEmpty()) {
+        Lizzie.leelaz.analyzeAvoid(txtParam.getText().trim());
       } else {
         Lizzie.leelaz.analyzeAvoid(
             getVisitType(), getColor(), txtCoordList.getText().trim(), getUntilMove());
@@ -189,7 +189,7 @@ public class AvoidMoveDialog extends JDialog {
 
   private boolean checkInput() {
     if ((txtCoordList.getText() == null || txtCoordList.getText().isEmpty())
-        && (txtCustom.getText() == null || txtCustom.getText().isEmpty())) {
+        && (txtParam.getText() == null || txtParam.getText().isEmpty())) {
       return false;
     }
     return true;
