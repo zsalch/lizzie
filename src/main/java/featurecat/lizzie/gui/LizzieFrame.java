@@ -737,7 +737,7 @@ public class LizzieFrame extends JFrame {
       boardRenderer.setBoardLength(maxSize);
       boardRenderer.draw(g);
 
-      if (Lizzie.leelaz.isLoaded()) {
+      if (Lizzie.leelaz != null && Lizzie.leelaz.isLoaded()) {
         if (Lizzie.config.showStatus) {
           String statusKey = "LizzieFrame.display." + (Lizzie.leelaz.isPondering() ? "on" : "off");
           String statusText = resourceBundle.getString(statusKey);
@@ -864,7 +864,7 @@ public class LizzieFrame extends JFrame {
     FontMetrics fm = g.getFontMetrics(font);
     int stringWidth = fm.stringWidth(text);
     // Truncate too long text when display switching prompt
-    if (Lizzie.leelaz.isLoaded()) {
+    if (Lizzie.leelaz != null && Lizzie.leelaz.isLoaded()) {
       int mainBoardX = boardRenderer.getLocation().x;
       if (getWidth() > getHeight() && (mainBoardX > x) && stringWidth > (mainBoardX - x)) {
         text = truncateStringByWidth(text, fm, mainBoardX - x);
@@ -1263,7 +1263,7 @@ public class LizzieFrame extends JFrame {
   }
 
   private void setPanelFont(Graphics2D g, float size) {
-    Font font = uiFont.deriveFont(Font.PLAIN, size);
+    Font font = new Font(Lizzie.config.fontName, Font.PLAIN, (int) size);
     g.setFont(font);
   }
 
@@ -1369,11 +1369,12 @@ public class LizzieFrame extends JFrame {
   public void createCommentImage(boolean forceRefresh, int w, int h) {
     if (forceRefresh || scrollPane.getWidth() != w || scrollPane.getHeight() != h) {
       if (w > 0 && h > 0) {
-        scrollPane.addNotify();
         scrollPane.setSize(w, h);
         cachedCommentImage =
             new BufferedImage(scrollPane.getWidth(), scrollPane.getHeight(), TYPE_INT_ARGB);
         Graphics2D g2 = cachedCommentImage.createGraphics();
+        scrollPane.doLayout();
+        scrollPane.addNotify();
         scrollPane.validate();
         scrollPane.printAll(g2);
         g2.dispose();

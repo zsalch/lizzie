@@ -369,6 +369,10 @@ public class BoardRenderer {
     if (Lizzie.frame.isPlayingAgainstLeelaz) {
       return;
     }
+
+    // Leela Zero isn't connected yet
+    if (Lizzie.leelaz == null) return;
+
     // calculate best moves and branch
     bestMoves = Lizzie.leelaz.getBestMoves();
     variationOpt = Optional.empty();
