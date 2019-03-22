@@ -557,7 +557,7 @@ public class BoardRenderer {
     float greenHue = Color.RGBtoHSB(0, 255, 0, null)[0];
     float cyanHue = Color.RGBtoHSB(0, 255, 255, null)[0];
 
-    if (!bestMoves.isEmpty()) {
+    if (bestMoves != null && !bestMoves.isEmpty()) {
 
       int maxPlayouts = 0;
       double maxWinrate = 0;

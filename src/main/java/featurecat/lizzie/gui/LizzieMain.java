@@ -22,13 +22,20 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import org.json.JSONArray;
 
 public class LizzieMain extends JFrame {
+  public static final ResourceBundle resourceBundle =
+      ResourceBundle.getBundle("l10n.DisplayStrings");
 
   public static Input input;
+  public static BasicInfoPane basicInfoPane;
   public static BoardPane boardPane;
+  public static SubBoardPane subBoardPane;
+  public static WinratePane winratePane;
+  public static VariationTreePane variationTreePane;
   public static CommentPane commentPane;
   public static boolean designMode;
 
@@ -132,12 +139,19 @@ public class LizzieMain extends JFrame {
       //      setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 
-    // boardPane = new BoardPane(this);
+    basicInfoPane = new BasicInfoPane(this);
     boardPane = new BoardPane(this);
-    // TODO   Lizzie.frame = boardPane;
+    Lizzie.frame = boardPane;
+    subBoardPane = new SubBoardPane(this);
+    winratePane = new WinratePane(this);
+    variationTreePane = new VariationTreePane(this);
     commentPane = new CommentPane(this);
     layout = new LizzieLayout();
+    layout.addLayoutComponent(LizzieLayout.BASIC_INFO, basicInfoPane);
     layout.addLayoutComponent(LizzieLayout.MAIN_BOARD, boardPane);
+    layout.addLayoutComponent(LizzieLayout.SUB_BOARD, subBoardPane);
+    layout.addLayoutComponent(LizzieLayout.WINRATE, winratePane);
+    layout.addLayoutComponent(LizzieLayout.VARIATION, variationTreePane);
     layout.addLayoutComponent(LizzieLayout.COMMENT, commentPane);
     getContentPane().setLayout(layout);
 
@@ -155,7 +169,7 @@ public class LizzieMain extends JFrame {
           //
           @Override
           public void componentMoved(ComponentEvent e) {
-            updateComponentSize();
+            //            updateComponentSize();
           }
         });
 
@@ -584,7 +598,7 @@ public class LizzieMain extends JFrame {
 
   public void toggleDesignMode() {
     this.designMode = !this.designMode;
-    // TODO   Lizzie.frame.setDesignMode(designMode);
+    Lizzie.frame.setDesignMode(designMode);
     commentPane.setDesignMode(designMode);
   }
 }

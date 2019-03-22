@@ -163,6 +163,8 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
       result = mainBoard; // (commentPane != null) ? commentPane : mainBoard;
     } else if (SUB_BOARD.equals(constraints)) {
       result = subBoard; // (consolePane != null) ? consolePane : variationPane;
+    } else if (COMMENT.equals(constraints)) {
+      result = commentPane; // (consolePane != null) ? consolePane : variationPane;
     } else if (VARIATION.equals(constraints)) {
       //            result = ltr ? firstItem : lastItem;
       //            if (result == null) {
@@ -595,52 +597,26 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
         }
       }
 
-      mainBoard.setBounds(x + boardX, y + boardY, maxSize, maxSize);
-      //      subBoard.setBounds(x + subBoardX, y + subBoardY, subBoardLength, subBoardLength);
-      commentPane.setBounds(x + cx, y + cy, cw, ch);
-      //
-      //      Component mainBoard;
-      //      Component subBoard;
-      //      Component winratePane;
-      //      Component variationPane;
-      //      Component basicInfoPane;
-      //      Component commentPane;
-      //      Component consolePane;
-      //        int top = insets.top;
-      //        int bottom = target.height - insets.bottom;
-      //        int left = insets.left;
-      //        int right = target.width - insets.right;
-      //
-      //        boolean ltr = target.getComponentOrientation().isLeftToRight();
-      //        Component c = null;
-      //
-      //        if ((c=getChild(MAIN_BOARD,ltr)) != null) {
-      //            c.setSize(right - left, c.height);
-      //            Dimension d = c.getPreferredSize();
-      //            c.setBounds(left, top, right - left, d.height);
-      //            top += d.height + vgap;
-      //        }
-      //        if ((c=getChild(SUB_BOARD,ltr)) != null) {
-      //            c.setSize(right - left, c.height);
-      //            Dimension d = c.getPreferredSize();
-      //            c.setBounds(left, bottom - d.height, right - left, d.height);
-      //            bottom -= d.height + vgap;
-      //        }
-      //        if ((c=getChild(WINRATE,ltr)) != null) {
-      //            c.setSize(c.width, bottom - top);
-      //            Dimension d = c.getPreferredSize();
-      //            c.setBounds(right - d.width, top, d.width, bottom - top);
-      //            right -= d.width + hgap;
-      //        }
-      //        if ((c=getChild(VARIATION,ltr)) != null) {
-      //            c.setSize(c.width, bottom - top);
-      //            Dimension d = c.getPreferredSize();
-      //            c.setBounds(left, top, d.width, bottom - top);
-      //            left += d.width + hgap;
-      //        }
-      //        if ((c=getChild(BASIC_INFO,ltr)) != null) {
-      //            c.setBounds(left, top, right - left, bottom - top);
-      //        }
+      boolean ltr = target.getComponentOrientation().isLeftToRight();
+      Component c = null;
+      if ((c = getChild(MAIN_BOARD, ltr)) != null) {
+        c.setBounds(x + boardX, y + boardY, maxSize, maxSize);
+      }
+      if ((c = getChild(SUB_BOARD, ltr)) != null) {
+        c.setBounds(x + subBoardX, y + subBoardY, subBoardLength, subBoardLength);
+      }
+      if ((c = getChild(BASIC_INFO, ltr)) != null) {
+        c.setBounds(x + capx, y + capy, capw, caph);
+      }
+      if ((c = getChild(WINRATE, ltr)) != null) {
+        c.setBounds(x + grx, y + gry, grw, grh);
+      }
+      if ((c = getChild(VARIATION, ltr)) != null) {
+        c.setBounds(x + treex, y + treey, treew, treeh);
+      }
+      if ((c = getChild(COMMENT, ltr)) != null) {
+        c.setBounds(x + cx, y + cy, cw, ch);
+      }
     }
   }
 
@@ -648,23 +624,16 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
     Component result = null;
 
     if (key == MAIN_BOARD) {
-      result = (commentPane != null) ? commentPane : mainBoard;
+      result = mainBoard;
     } else if (key == SUB_BOARD) {
-      result = (consolePane != null) ? consolePane : variationPane;
-    }
-    //        else if (key == VARIATION) {
-    //            result = ltr ? firstItem : lastItem;
-    //            if (result == null) {
-    //                result = subBoard;
-    //            }
-    //        }
-    //        else if (key == WINRATE) {
-    //            result = ltr ? lastItem : firstItem;
-    //            if (result == null) {
-    //                result = winratePane;
-    //            }
-    //        }
-    else if (key == BASIC_INFO) {
+      result = subBoard;
+    } else if (key == VARIATION) {
+      result = winratePane;
+    } else if (key == WINRATE) {
+      result = winratePane;
+    } else if (key == COMMENT) {
+      result = commentPane;
+    } else if (key == BASIC_INFO) {
       result = basicInfoPane;
     }
     //        if (result != null && !result.visible) {
