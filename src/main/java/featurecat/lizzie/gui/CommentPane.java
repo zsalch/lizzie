@@ -64,7 +64,7 @@ public class CommentPane extends LizziePane {
 
     commentPane = new JTextPane();
     commentPane.setText("Comment Pane");
-    commentPane.setEditable(false);
+    commentPane.setEditable(true);
     //    commentPane.setMargin(new Insets(5, 5, 5, 5));
     commentPane.setBackground(Lizzie.config.commentBackgroundColor);
     commentPane.setForeground(Lizzie.config.commentFontColor);

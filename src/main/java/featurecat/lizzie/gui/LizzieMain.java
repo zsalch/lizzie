@@ -11,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -136,13 +137,13 @@ public class LizzieMain extends JFrame {
     }
 
     if (Lizzie.config.startMaximized) {
-      //      setExtendedState(Frame.MAXIMIZED_BOTH);
+      setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 
     basicInfoPane = new BasicInfoPane(this);
     boardPane = new BoardPane(this);
     // TODO
-    //    Lizzie.frame = boardPane;
+//    Lizzie.frame = boardPane;
     subBoardPane = new SubBoardPane(this);
     winratePane = new WinratePane(this);
     variationTreePane = new VariationTreePane(this);
@@ -601,5 +602,16 @@ public class LizzieMain extends JFrame {
     this.designMode = !this.designMode;
     boardPane.setDesignMode(designMode);
     commentPane.setDesignMode(designMode);
+  }
+
+  public void repaintSub() {
+    subBoardPane.repaint();
+    winratePane.repaint();
+  }
+
+  public void updateStatus() {
+    basicInfoPane.repaint();
+    variationTreePane.repaint();
+    commentPane.repaint();
   }
 }

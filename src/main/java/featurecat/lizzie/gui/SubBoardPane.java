@@ -85,8 +85,8 @@ public class SubBoardPane extends JDialog {
    */
   public void paint(Graphics g0) {
 
-    int x = getX();
-    int y = getY();
+    int x = 0; // getX();
+    int y = 0; // getY();
     int width = getWidth();
     int height = getHeight();
     // layout parameters

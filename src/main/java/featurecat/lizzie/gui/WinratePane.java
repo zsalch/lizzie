@@ -96,8 +96,8 @@ public class WinratePane extends JDialog {
    */
   public void paint(Graphics g0) {
 
-    int x = getX();
-    int y = getY();
+    int x = 0; // getX();
+    int y = 0; // getY();
     int width = getWidth();
     int height = getHeight();
 
@@ -109,12 +109,12 @@ public class WinratePane extends JDialog {
 
     if (Lizzie.leelaz != null && Lizzie.leelaz.isLoaded()) {
       if (Lizzie.config.showWinrate) {
-        //          if (backgroundG.isPresent()) {
-        //            drawContainer(backgroundG.get(), contx, conty, contw, conth);
-        //          }
-        // TODO
-        drawMoveStatistics(g, x, y, width, height);
-        winrateGraph.draw(g, x, y, width, height);
+        //                  if (backgroundG.isPresent()) {
+        //                    drawContainer(backgroundG.get(), contx, conty, contw, conth);
+        //                  }
+        int hh = height * 3 / 13;
+        drawMoveStatistics(g, x, y, width, hh);
+        winrateGraph.draw(g, x, y + hh, width, height - hh);
       }
     }
 

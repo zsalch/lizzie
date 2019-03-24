@@ -88,6 +88,7 @@ public class BoardPane extends LizziePane {
   public static Font winrateFont;
 
   private final BufferStrategy bs;
+  private boolean started = false;
 
   private static final int[] outOfBoundCoordinate = new int[] {-1, -1};
   public int[] mouseOverCoordinate = outOfBoundCoordinate;
@@ -125,11 +126,12 @@ public class BoardPane extends LizziePane {
     }
   }
 
+  LizzieMain owner;
   /** Creates a window */
   public BoardPane(LizzieMain owner) {
     super(owner);
     // setModal(true);
-
+    this.owner = owner;
     // setModalityType(ModalityType.APPLICATION_MODAL);
 
     boardRenderer = new BoardRenderer(true);
@@ -151,15 +153,17 @@ public class BoardPane extends LizziePane {
       // setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 
+//    this.setBackground(new Color(0, 0, 0, 255));
+
     createBufferStrategy(2);
     bs = getBufferStrategy();
-    //
-    //    Input input = owner.input;
-    //
-    //    addMouseListener(input);
-    //    addKeyListener(input);
-    //    addMouseWheelListener(input);
-    //    addMouseMotionListener(input);
+
+    Input input = owner.input;
+
+    addMouseListener(input);
+    addKeyListener(input);
+    addMouseWheelListener(input);
+    addMouseMotionListener(input);
 
     // necessary for Windows users - otherwise Lizzie shows a blank white screen on
     // startup until
@@ -356,6 +360,14 @@ public class BoardPane extends LizziePane {
       boardRenderer.setBoardLength(maxSize);
       boardRenderer.draw(g);
 
+      owner.repaintSub();
+
+      if (Lizzie.leelaz != null && Lizzie.leelaz.isLoaded() && !started) {
+        started = true;
+        if (Lizzie.config.showVariationGraph || Lizzie.config.showComment) {
+          owner.updateStatus();
+        }
+      }
       // cleanup
       g.dispose();
     }
@@ -868,6 +880,7 @@ public class BoardPane extends LizziePane {
       LizzieMain.variationTreePane.onClicked(x, y);
     }
     repaint();
+    owner.updateStatus();
   }
 
   private final Consumer<String> placeVariation =

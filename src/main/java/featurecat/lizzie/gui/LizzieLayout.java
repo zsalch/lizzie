@@ -30,10 +30,6 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
   public static final String BASIC_INFO = "basicInfoPane";
   public static final String COMMENT = "commentPane";
   public static final String CONSOLE = "consolePane";
-  public static final String PAGE_START = MAIN_BOARD;
-  public static final String PAGE_END = WINRATE;
-  //    public static final String LINE_START = BEFORE_LINE_BEGINS;
-  //    public static final String LINE_END = AFTER_LINE_ENDS;
 
   public LizzieLayout() {
     this(3, 0);
@@ -609,7 +605,7 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
         c.setBounds(x + capx, y + capy, capw, caph);
       }
       if ((c = getChild(WINRATE, ltr)) != null) {
-        c.setBounds(x + grx, y + gry, grw, grh);
+        c.setBounds(x + statx, y + staty, statw, stath + grh);
       }
       if ((c = getChild(VARIATION, ltr)) != null) {
         c.setBounds(x + treex, y + treey, treew, treeh);
@@ -628,7 +624,7 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
     } else if (key == SUB_BOARD) {
       result = subBoard;
     } else if (key == VARIATION) {
-      result = winratePane;
+      result = variationPane;
     } else if (key == WINRATE) {
       result = winratePane;
     } else if (key == COMMENT) {
