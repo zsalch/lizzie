@@ -63,7 +63,7 @@ public class CommentPane extends LizziePane {
     // setSize...
 
     commentPane = new JTextPane();
-    commentPane.setText("Comment Pane");
+    commentPane.setText("");
     commentPane.setEditable(true);
     //    commentPane.setMargin(new Insets(5, 5, 5, 5));
     commentPane.setBackground(Lizzie.config.commentBackgroundColor);
@@ -158,7 +158,7 @@ public class CommentPane extends LizziePane {
    * @param w
    * @param h
    */
-  private void drawComment(Graphics2D g, int x, int y, int w, int h) {
+  public void drawComment() {
     String comment = Lizzie.board.getHistory().getData().comment;
     int fontSize = (int) (min(getWidth(), getHeight()) * 0.0294);
     if (Lizzie.config.commentFontSize > 0) {
@@ -169,17 +169,6 @@ public class CommentPane extends LizziePane {
     Font font = new Font(Lizzie.config.fontName, Font.PLAIN, fontSize);
     commentPane.setFont(font);
     commentPane.setText(comment);
-    commentPane.setSize(w, h);
-    createCommentImage(!comment.equals(this.cachedComment), w, h);
-    commentRect = new Rectangle(x, y, scrollPane.getWidth(), scrollPane.getHeight());
-    g.drawImage(
-        cachedCommentImage,
-        commentRect.x,
-        commentRect.y,
-        commentRect.width,
-        commentRect.height,
-        null);
-    cachedComment = comment;
   }
 
   public void setDesignMode(boolean mode) {

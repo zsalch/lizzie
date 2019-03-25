@@ -9,6 +9,8 @@ import java.awt.*;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -33,7 +35,7 @@ public class VariationTreePane extends JDialog {
   private boolean isReplayVariation = false;
 
   /** Creates a window */
-  public VariationTreePane(JFrame owner) {
+  public VariationTreePane(LizzieMain owner) {
     super(owner);
     //    setModal(true);
 
@@ -48,16 +50,13 @@ public class VariationTreePane extends JDialog {
     createBufferStrategy(2);
     bs = getBufferStrategy();
 
-    Input input = new Input();
-
-    addMouseListener(input);
-    addKeyListener(input);
-    addMouseWheelListener(input);
-    addMouseMotionListener(input);
-
-    // necessary for Windows users - otherwise Lizzie shows a blank white screen on startup until
-    // updates occur.
-    //    repaint();
+    addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mousePressed(MouseEvent e) {
+            onClicked(e.getX(), e.getY());
+          }
+        });
   }
 
   private BufferedImage cachedImage;

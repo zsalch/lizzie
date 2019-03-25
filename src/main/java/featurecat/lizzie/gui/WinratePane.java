@@ -15,6 +15,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -56,17 +58,18 @@ public class WinratePane extends JDialog {
     createBufferStrategy(2);
     bs = getBufferStrategy();
 
-    Input input = new Input();
+    addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mousePressed(MouseEvent e) {
+            onClicked(e.getX(), e.getY());
+          }
 
-    addMouseListener(input);
-    addKeyListener(input);
-    addMouseWheelListener(input);
-    addMouseMotionListener(input);
-
-    // necessary for Windows users - otherwise Lizzie shows a blank white screen on startup until
-    // updates occur.
-    //    repaint();
-
+          @Override
+          public void mouseDragged(MouseEvent e) {
+            onMouseDragged(e.getX(), e.getY());
+          }
+        });
   }
 
   /** Clears related status from empty board. */
@@ -297,7 +300,6 @@ public class WinratePane extends JDialog {
    */
   public void onClicked(int x, int y) {
     int moveNumber = winrateGraph.moveNumber(x, y);
-
     if (Lizzie.config.showWinrate && moveNumber >= 0) {
       isPlayingAgainstLeelaz = false;
       Lizzie.board.goToMoveNumberBeyondBranch(moveNumber);

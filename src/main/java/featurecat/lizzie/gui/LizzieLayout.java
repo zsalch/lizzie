@@ -15,13 +15,13 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
   private int hgap;
   private int vgap;
 
-  Component mainBoard;
-  Component subBoard;
-  Component winratePane;
-  Component variationPane;
-  Component basicInfoPane;
-  Component commentPane;
-  Component consolePane;
+  private Component mainBoard;
+  private Component subBoard;
+  private Component winratePane;
+  private Component variationPane;
+  private Component basicInfoPane;
+  private Component commentPane;
+  private Component consolePane;
 
   public static final String MAIN_BOARD = "mainBoard";
   public static final String SUB_BOARD = "subBoard";
@@ -30,6 +30,11 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
   public static final String BASIC_INFO = "basicInfoPane";
   public static final String COMMENT = "commentPane";
   public static final String CONSOLE = "consolePane";
+
+  public static final int MODE_FUSION = 0;
+  public static final int MODE_SEPARATION = 1;
+
+  private int mode = 0;
 
   public LizzieLayout() {
     this(3, 0);
@@ -301,9 +306,17 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
     return 0.5f;
   }
 
-  public void invalidateLayout(Container target) {}
+  public void invalidateLayout(Container target) {
+    if (mode == MODE_FUSION) {
+      // TODO
+      layoutContainer(target);
+    }
+  }
 
   public void layoutContainer(Container target) {
+    if (mode != MODE_FUSION) {
+      return;
+    }
     synchronized (target.getTreeLock()) {
       Container main = getMain(target);
       Insets insets = main.getInsets();
@@ -648,5 +661,13 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
       p = p.getParent();
     }
     return p;
+  }
+
+  public int getMode() {
+    return mode;
+  }
+
+  public void setMode(int mode) {
+    this.mode = mode;
   }
 }

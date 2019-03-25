@@ -1,7 +1,6 @@
 package featurecat.lizzie.gui;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
-import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
@@ -16,20 +15,11 @@ import featurecat.lizzie.rules.BoardHistoryNode;
 import featurecat.lizzie.rules.GIBParser;
 import featurecat.lizzie.rules.SGFParser;
 import java.awt.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontFormatException;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
@@ -87,7 +77,7 @@ public class BoardPane extends LizziePane {
   public static Font uiFont;
   public static Font winrateFont;
 
-  private final BufferStrategy bs;
+  //  private final BufferStrategy bs;
   private boolean started = false;
 
   private static final int[] outOfBoundCoordinate = new int[] {-1, -1};
@@ -134,6 +124,27 @@ public class BoardPane extends LizziePane {
     this.owner = owner;
     // setModalityType(ModalityType.APPLICATION_MODAL);
 
+    setBackground(new Color(0, 0, 0, 0));
+    //    JPanel panel = new JPanel() {
+    //        @Override
+    //        protected void paintComponent(Graphics g) {
+    //            if (g instanceof Graphics2D) {
+    //                final int R = 240;
+    //                final int G = 240;
+    //                final int B = 240;
+    //
+    //                Paint p =
+    //                    new GradientPaint(0.0f, 0.0f, new Color(R, G, B, 0),
+    //                        0.0f, getHeight(), new Color(R, G, B, 0), true);
+    //                Graphics2D g2d = (Graphics2D)g;
+    //                g2d.setPaint(p);
+    //                g2d.fillRect(0, 0, getWidth(), getHeight());
+    //            }
+    //        }
+    //    };
+    //    setContentPane(panel);
+    //  getContentPane().setBackground(new Color(0, 100, 100, 0));
+
     boardRenderer = new BoardRenderer(true);
 
     // setMinimumSize(new Dimension(640, 400));
@@ -152,16 +163,14 @@ public class BoardPane extends LizziePane {
     if (Lizzie.config.startMaximized) {
       // setExtendedState(Frame.MAXIMIZED_BOTH);
     }
-
-//    this.setBackground(new Color(0, 0, 0, 255));
-
-    createBufferStrategy(2);
-    bs = getBufferStrategy();
+    // TODO BufferStrategy does not support transparent background?
+    //    createBufferStrategy(2);
+    //    bs = getBufferStrategy();
 
     Input input = owner.input;
 
     addMouseListener(input);
-    addKeyListener(input);
+    //    addKeyListener(input);
     addMouseWheelListener(input);
     addMouseMotionListener(input);
 
@@ -368,19 +377,24 @@ public class BoardPane extends LizziePane {
           owner.updateStatus();
         }
       }
+
       // cleanup
       g.dispose();
     }
 
     // draw the image
-    Graphics2D bsGraphics = (Graphics2D) bs.getDrawGraphics();
+    // TODO BufferStrategy does not support transparent background?
+    Graphics2D bsGraphics = (Graphics2D) g0; // bs.getDrawGraphics();
     bsGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+    //    bsGraphics.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
+    //        RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
     //    bsGraphics.drawImage(cachedBackground, 0, 0, null);
     bsGraphics.drawImage(cachedImage, 0, 0, null);
 
     // cleanup
     bsGraphics.dispose();
-    bs.show();
+    // TODO BufferStrategy does not support transparent background?
+    //    bs.show();
   }
 
   /**
@@ -393,7 +407,7 @@ public class BoardPane extends LizziePane {
   }
 
   private Graphics2D createBackground() {
-    cachedBackground = new BufferedImage(getWidth(), getHeight(), TYPE_INT_RGB);
+    cachedBackground = new BufferedImage(getWidth(), getHeight(), TYPE_INT_ARGB);
     cachedBackgroundWidth = cachedBackground.getWidth();
     cachedBackgroundHeight = cachedBackground.getHeight();
     cachedBackgroundShowControls = showControls;
@@ -408,12 +422,20 @@ public class BoardPane extends LizziePane {
 
     Graphics2D g = cachedBackground.createGraphics();
     g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-    BufferedImage wallpaper = boardRenderer.getWallpaper();
-    int drawWidth = max(wallpaper.getWidth(), getWidth());
-    int drawHeight = max(wallpaper.getHeight(), getHeight());
-    // Support seamless texture
-    boardRenderer.drawTextureImage(g, wallpaper, 0, 0, drawWidth, drawHeight);
+    //    g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
+    //        RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+    //
+    //    final int R = 240;
+    //    final int G = 240;
+    //    final int B = 240;
+    //    Paint p =
+    //        new GradientPaint(0.0f, 0.0f, new Color(R, G, B, 0),
+    //            0.0f, getHeight(), new Color(R, G, B, 0), false);
+    //  g.setPaint(p);
+    //    AlphaComposite composite = AlphaComposite.getInstance(AlphaComposite.CLEAR, 0.0f);
+    //    g.setComposite(composite);
+    //    g.setColor(new Color(0, 0, 0, 0));
+    //    g.fillRect(0, 0, getWidth(), getHeight());
 
     return g;
   }
@@ -856,31 +878,14 @@ public class BoardPane extends LizziePane {
   public void onClicked(int x, int y) {
     // Check for board click
     Optional<int[]> boardCoordinates = boardRenderer.convertScreenToCoordinates(x, y);
-    int moveNumber = 0;
-    if (LizzieMain.winratePane != null) {
-      moveNumber = LizzieMain.winratePane.moveNumber(x, y);
-    }
-
     if (boardCoordinates.isPresent()) {
       int[] coords = boardCoordinates.get();
       if (Lizzie.board.inAnalysisMode()) Lizzie.board.toggleAnalysis();
       if (!isPlayingAgainstLeelaz || (playerIsBlack == Lizzie.board.getData().blackToPlay))
         Lizzie.board.place(coords[0], coords[1]);
+      repaint();
+      owner.updateStatus();
     }
-    if (Lizzie.config.showWinrate && moveNumber >= 0) {
-      isPlayingAgainstLeelaz = false;
-      Lizzie.board.goToMoveNumberBeyondBranch(moveNumber);
-    }
-    if (Lizzie.config.showSubBoard
-        && LizzieMain.subBoardPane != null
-        && LizzieMain.subBoardPane.isInside(x, y)) {
-      Lizzie.config.toggleLargeSubBoard();
-    }
-    if (Lizzie.config.showVariationGraph && LizzieMain.variationTreePane != null) {
-      LizzieMain.variationTreePane.onClicked(x, y);
-    }
-    repaint();
-    owner.updateStatus();
   }
 
   private final Consumer<String> placeVariation =
@@ -911,18 +916,6 @@ public class BoardPane extends LizziePane {
 
   public boolean isMouseOver(int x, int y) {
     return mouseOverCoordinate[0] == x && mouseOverCoordinate[1] == y;
-  }
-
-  public void onMouseDragged(int x, int y) {
-    int moveNumber = 0;
-    if (LizzieMain.winratePane != null) {
-      moveNumber = LizzieMain.winratePane.moveNumber(x, y);
-    }
-    if (Lizzie.config.showWinrate && moveNumber >= 0) {
-      if (Lizzie.board.goToMoveNumberWithinBranch(moveNumber)) {
-        repaint();
-      }
-    }
   }
 
   private void autosaveMaybe() {
@@ -1091,5 +1084,9 @@ public class BoardPane extends LizziePane {
         };
     Thread thread = new Thread(runnable);
     thread.start();
+  }
+
+  public void updateStatus() {
+    owner.updateStatus();
   }
 }

@@ -6,10 +6,8 @@ import com.jhlabs.image.GaussianFilter;
 import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.rules.Board;
 import java.awt.*;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferStrategy;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ResourceBundle;
@@ -23,7 +21,7 @@ public class SubBoardPane extends JDialog {
 
   private static BoardRenderer subBoardRenderer;
 
-  private final BufferStrategy bs;
+  //  private final BufferStrategy bs;
 
   private static final int[] outOfBoundCoordinate = new int[] {-1, -1};
   public int[] mouseOverCoordinate = outOfBoundCoordinate;
@@ -37,7 +35,7 @@ public class SubBoardPane extends JDialog {
   private boolean isReplayVariation = false;
 
   /** Creates a window */
-  public SubBoardPane(JFrame owner) {
+  public SubBoardPane(LizzieMain owner) {
     super(owner);
     //    setModal(true);
 
@@ -48,21 +46,23 @@ public class SubBoardPane extends JDialog {
     setUndecorated(true);
     //    getRootPane().setBorder(BorderFactory.createEmptyBorder());
     //    getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
+    setBackground(new Color(0, 0, 0, 0));
     setVisible(true);
 
-    createBufferStrategy(2);
-    bs = getBufferStrategy();
+    // TODO BufferStrategy does not support transparent background?
+    //    createBufferStrategy(2);
+    //    bs = getBufferStrategy();
 
-    Input input = new Input();
-
-    addMouseListener(input);
-    addKeyListener(input);
-    addMouseWheelListener(input);
-    addMouseMotionListener(input);
-
-    // necessary for Windows users - otherwise Lizzie shows a blank white screen on startup until
-    // updates occur.
-    //    repaint();
+    addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mousePressed(MouseEvent e) {
+            if (Lizzie.config.showSubBoard) {
+              Lizzie.config.toggleLargeSubBoard();
+              owner.invalidLayout();
+            }
+          }
+        });
   }
 
   private BufferedImage cachedImage;
@@ -114,14 +114,16 @@ public class SubBoardPane extends JDialog {
     g.dispose();
 
     // draw the image
-    Graphics2D bsGraphics = (Graphics2D) bs.getDrawGraphics();
+    // TODO BufferStrategy does not support transparent background?
+    Graphics2D bsGraphics = (Graphics2D) g0; // bs.getDrawGraphics();
     bsGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-    bsGraphics.drawImage(cachedBackground, 0, 0, null);
+    //    bsGraphics.drawImage(cachedBackground, 0, 0, null);
     bsGraphics.drawImage(cachedImage, 0, 0, null);
 
     // cleanup
     bsGraphics.dispose();
-    bs.show();
+    // TODO BufferStrategy does not support transparent background?
+    //    bs.show();
   }
 
   private GaussianFilter filter20 = new GaussianFilter(20);
