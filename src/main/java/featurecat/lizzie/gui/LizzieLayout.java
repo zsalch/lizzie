@@ -12,8 +12,8 @@ import java.awt.Insets;
 import java.awt.LayoutManager2;
 
 public class LizzieLayout implements LayoutManager2, java.io.Serializable {
-  private int hgap;
-  private int vgap;
+  int hgap;
+  int vgap;
 
   private Component mainBoard;
   private Component subBoard;
@@ -72,6 +72,8 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
     }
   }
 
+  /** @deprecated replaced by <code>addLayoutComponent(Component, Object)</code>. */
+  @Deprecated
   public void addLayoutComponent(String name, Component comp) {
     synchronized (comp.getTreeLock()) {
       if (name == null) {
@@ -92,13 +94,7 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
         commentPane = comp;
       } else if (CONSOLE.equals(name)) {
         consolePane = comp;
-      }
-      //        else if (BEFORE_LINE_BEGINS.equals(name)) {
-      //            firstItem = comp;
-      //        } else if (AFTER_LINE_ENDS.equals(name)) {
-      //            lastItem = comp;
-      //        }
-      else {
+      } else {
         throw new IllegalArgumentException("cannot add to layout: unknown constraint: " + name);
       }
     }
@@ -122,11 +118,6 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
       } else if (comp == consolePane) {
         consolePane = null;
       }
-      //        else if (comp == firstItem) {
-      //            firstItem = null;
-      //        } else if (comp == lastItem) {
-      //            lastItem = null;
-      //        }
     }
   }
 
@@ -145,11 +136,6 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
       return commentPane;
     } else if (CONSOLE.equals(constraints)) {
       return consolePane;
-      //        }
-      //        else if (LINE_START.equals(constraints)) {
-      //            return firstItem;
-      //        } else if (LINE_END.equals(constraints)) {
-      //            return lastItem;
     } else {
       throw new IllegalArgumentException(
           "cannot get component: unknown constraint: " + constraints);
@@ -161,21 +147,15 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
     Component result = null;
 
     if (MAIN_BOARD.equals(constraints)) {
-      result = mainBoard; // (commentPane != null) ? commentPane : mainBoard;
+      result = mainBoard;
     } else if (SUB_BOARD.equals(constraints)) {
-      result = subBoard; // (consolePane != null) ? consolePane : variationPane;
+      result = subBoard;
     } else if (COMMENT.equals(constraints)) {
-      result = commentPane; // (consolePane != null) ? consolePane : variationPane;
+      result = commentPane;
     } else if (VARIATION.equals(constraints)) {
-      //            result = ltr ? firstItem : lastItem;
-      //            if (result == null) {
       result = variationPane;
-      //            }
     } else if (WINRATE.equals(constraints)) {
-      //            result = ltr ? lastItem : firstItem;
-      //            if (result == null) {
       result = winratePane;
-      //            }
     } else if (BASIC_INFO.equals(constraints)) {
       result = basicInfoPane;
     } else {
@@ -204,10 +184,6 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
       return COMMENT;
     } else if (comp == consolePane) {
       return CONSOLE;
-      //        } else if (comp == firstItem) {
-      //            return LINE_START;
-      //        } else if (comp == lastItem) {
-      //            return LINE_END;
     }
     return null;
   }
@@ -306,25 +282,20 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
     return 0.5f;
   }
 
-  public void invalidateLayout(Container target) {
-    if (mode == MODE_FUSION) {
-      // TODO
-      layoutContainer(target);
-    }
-  }
+  public void invalidateLayout(Container target) {}
 
   public void layoutContainer(Container target) {
     if (mode != MODE_FUSION) {
       return;
     }
     synchronized (target.getTreeLock()) {
-      Container main = getMain(target);
-      Insets insets = main.getInsets();
+      //      Container main = getMain(target);
+      Insets insets = target.getInsets();
 
-      int x = main.getX();
-      int y = main.getY();
-      int width = main.getWidth();
-      int height = main.getHeight();
+      int x = target.getX();
+      int y = target.getY();
+      int width = target.getWidth();
+      int height = target.getHeight();
 
       // layout parameters
 
@@ -645,22 +616,11 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
     } else if (key == BASIC_INFO) {
       result = basicInfoPane;
     }
-    //        if (result != null && !result.visible) {
-    //            result = null;
-    //        }
     return result;
   }
 
   public String toString() {
     return getClass().getName() + "[hgap=" + hgap + ",vgap=" + vgap + "]";
-  }
-
-  private Container getMain(Container target) {
-    Container p = (target != null) ? target.getParent() : null;
-    while (p != null && !(p instanceof LizzieMain)) {
-      p = p.getParent();
-    }
-    return p;
   }
 
   public int getMode() {
