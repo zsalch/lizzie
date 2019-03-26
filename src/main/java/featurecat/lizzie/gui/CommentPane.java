@@ -3,18 +3,23 @@ package featurecat.lizzie.gui;
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 import static java.lang.Math.min;
 
-import com.jhlabs.image.GaussianFilter;
-import featurecat.lizzie.Lizzie;
-import featurecat.lizzie.rules.Board;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.IOException;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
-import javax.swing.*;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
+
+import featurecat.lizzie.Lizzie;
 
 /** The window used to display the game. */
 public class CommentPane extends LizziePane {
@@ -23,21 +28,10 @@ public class CommentPane extends LizziePane {
 
   //  private final BufferStrategy bs;
 
-  private static final int[] outOfBoundCoordinate = new int[] {-1, -1};
-  public int[] mouseOverCoordinate = outOfBoundCoordinate;
-  public boolean showControls = false;
-  public boolean isPlayingAgainstLeelaz = false;
-  public boolean playerIsBlack = true;
-  public int winRateGridLines = 3;
-  public int BoardPositionProportion = 4;
-
-  private long lastAutosaveTime = System.currentTimeMillis();
-  private boolean isReplayVariation = false;
-
-  // Save the player title
-  private String playerTitle = "";
-
   // Display Comment
+  private HTMLDocument htmlDoc;
+  private HTMLEditorKit htmlKit;
+  private StyleSheet htmlStyle;
   private JScrollPane scrollPane;
   private JTextPane commentPane;
   private BufferedImage cachedCommentImage = new BufferedImage(1, 1, TYPE_INT_ARGB);
@@ -47,22 +41,16 @@ public class CommentPane extends LizziePane {
   /** Creates a window */
   public CommentPane(LizzieMain owner) {
     super(owner);
-    // setModal(true);
+    setLayout(new BorderLayout(0, 0));
 
-    // setModalityType(ModalityType.APPLICATION_MODAL);
-
-    // setMinimumSize(new Dimension(640, 400));
-    // JSONArray windowSize = Lizzie.config.uiConfig.getJSONArray("window-size");
-    //    setBounds(200, 300, 200, 300);
-    //    commentRect = new Rectangle(0, 0, 100, 150);
-
-    // setBounds(owner.getInsets().left, owner.getInsets().top, windowSize.getInt(0)
-    // - owner.getInsets().left - owner.getInsets().right, windowSize.getInt(1) -
-    // owner.getInsets().top - owner.getInsets().bottom);
-    // setLocationRelativeTo(null); // Start centered, needs to be called *after*
-    // setSize...
-
+    htmlKit = new HTMLEditorKit();
+    htmlDoc = (HTMLDocument) htmlKit.createDefaultDocument();
+    htmlStyle = htmlKit.getStyleSheet();
+    htmlStyle.addRule("body {background:#"+String.format("%02x%02x%02x",Lizzie.config.commentBackgroundColor.getRed(),Lizzie.config.commentBackgroundColor.getGreen(),Lizzie.config.commentBackgroundColor.getBlue())+"; color:#"+String.format("%02x%02x%02x",Lizzie.config.commentFontColor.getRed(),Lizzie.config.commentFontColor.getGreen(),Lizzie.config.commentFontColor.getBlue())+";}");
+    
     commentPane = new JTextPane();
+    commentPane.setEditorKit(htmlKit);
+    commentPane.setDocument(htmlDoc);
     commentPane.setText("");
     commentPane.setEditable(true);
     //    commentPane.setMargin(new Insets(5, 5, 5, 5));
@@ -74,7 +62,7 @@ public class CommentPane extends LizziePane {
         javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
     // TODO
     //    getContentPane().add(scrollPane);
-    add(scrollPane, BorderLayout.CENTER);
+    add(scrollPane);
     scrollPane.setViewportView(commentPane);
     //    setUndecorated(true);
     // getRootPane().setBorder(BorderFactory.createEmptyBorder());
@@ -84,27 +72,6 @@ public class CommentPane extends LizziePane {
     //    createBufferStrategy(2);
     //    bs = getBufferStrategy();
   }
-
-  private BufferedImage cachedImage;
-
-  private BufferedImage cachedBackground;
-  private int cachedBackgroundWidth = 0, cachedBackgroundHeight = 0;
-  private boolean cachedBackgroundShowControls = false;
-  private boolean cachedShowWinrate = true;
-  private boolean cachedShowVariationGraph = true;
-  private boolean cachedShowLargeSubBoard = true;
-  private boolean cachedLargeWinrate = true;
-  private boolean cachedShowComment = true;
-  private boolean redrawBackgroundAnyway = false;
-  private int cachedBoardPositionProportion = BoardPositionProportion;
-
-  private GaussianFilter filter20 = new GaussianFilter(20);
-  private GaussianFilter filter10 = new GaussianFilter(10);
-
-  private boolean userAlreadyKnowsAboutCommandString = false;
-
-  private final Consumer<String> placeVariation =
-      v -> Board.asCoordinates(v).ifPresent(c -> Lizzie.board.place(c[0], c[1]));
 
   /**
    * Process Comment Mouse Wheel Moved
@@ -170,8 +137,17 @@ public class CommentPane extends LizziePane {
     }
     Font font = new Font(Lizzie.config.fontName, Font.PLAIN, fontSize);
     commentPane.setFont(font);
-    commentPane.setText(comment);
-    scrollPane.setBounds(this.getBounds());
+    addText(comment);
+  }
+
+  private void addText(String text) {
+    try {
+      htmlDoc.remove(0, htmlDoc.getLength());
+      htmlKit.insertHTML(htmlDoc, htmlDoc.getLength(), text, 0, 0, null);
+      commentPane.setCaretPosition(htmlDoc.getLength());
+    } catch (BadLocationException | IOException e) {
+      e.printStackTrace();
+    }
   }
 
   public void setDesignMode(boolean mode) {
