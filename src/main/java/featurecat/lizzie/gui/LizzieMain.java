@@ -11,7 +11,6 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Frame;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -21,7 +20,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import org.json.JSONArray;
@@ -148,13 +146,13 @@ public class LizzieMain extends JFrame {
     variationTreePane = new VariationTreePane(this);
     commentPane = new CommentPane(this);
     layout = new LizzieLayout();
-    layout.addLayoutComponent(LizzieLayout.BASIC_INFO, basicInfoPane);
-    layout.addLayoutComponent(LizzieLayout.MAIN_BOARD, boardPane);
-    layout.addLayoutComponent(LizzieLayout.SUB_BOARD, subBoardPane);
-    layout.addLayoutComponent(LizzieLayout.WINRATE, winratePane);
-    layout.addLayoutComponent(LizzieLayout.VARIATION, variationTreePane);
-    layout.addLayoutComponent(LizzieLayout.COMMENT, commentPane);
     getContentPane().setLayout(layout);
+    getContentPane().add(boardPane, LizzieLayout.MAIN_BOARD);
+    getContentPane().add(basicInfoPane, LizzieLayout.BASIC_INFO);
+    getContentPane().add(winratePane, LizzieLayout.WINRATE);
+    getContentPane().add(subBoardPane, LizzieLayout.SUB_BOARD);
+    getContentPane().add(variationTreePane, LizzieLayout.VARIATION);
+    getContentPane().add(commentPane, LizzieLayout.COMMENT);
 
     setVisible(true);
 
@@ -181,41 +179,43 @@ public class LizzieMain extends JFrame {
    *
    * @param g0 not used
    */
-  public void paint(Graphics g0) {
-    int width = getWidth();
-    int height = getHeight();
-
-    originX = getX();
-    originY = getY();
-    originW = width;
-    originH = height;
-
-    Optional<Graphics2D> backgroundG;
-    if (cachedBackgroundWidth != width
-        || cachedBackgroundHeight != height
-        || redrawBackgroundAnyway) {
-      backgroundG = Optional.of(createBackground());
-    } else {
-      backgroundG = Optional.empty();
-    }
-
-    cachedImage = new BufferedImage(width, height, TYPE_INT_ARGB);
-    Graphics2D g = (Graphics2D) cachedImage.getGraphics();
-    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-    // cleanup
-    g.dispose();
-
-    // draw the image
-    Graphics2D bsGraphics = (Graphics2D) bs.getDrawGraphics();
-    bsGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-    bsGraphics.drawImage(cachedBackground, 0, 0, null);
-    bsGraphics.drawImage(cachedImage, 0, 0, null);
-
-    // cleanup
-    bsGraphics.dispose();
-    bs.show();
-  }
+  //  public void paint(Graphics g0) {
+  //    super.paintComponents(g0);
+  //    int width = getWidth();
+  //    int height = getHeight();
+  //
+  //    originX = getX();
+  //    originY = getY();
+  //    originW = width;
+  //    originH = height;
+  //
+  //    Optional<Graphics2D> backgroundG;
+  //    if (cachedBackgroundWidth != width
+  //        || cachedBackgroundHeight != height
+  //        || redrawBackgroundAnyway) {
+  //      backgroundG = Optional.of(createBackground());
+  //    } else {
+  //      backgroundG = Optional.empty();
+  //    }
+  //
+  //    cachedImage = new BufferedImage(width, height, TYPE_INT_ARGB);
+  //    Graphics2D g = (Graphics2D) cachedImage.getGraphics();
+  //    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+  //
+  //    // cleanup
+  //    g.dispose();
+  //
+  //    // draw the image
+  //    Graphics2D bsGraphics = (Graphics2D) bs.getDrawGraphics();
+  //    bsGraphics.setRenderingHint(RenderingHints.KEY_RENDERING,
+  // RenderingHints.VALUE_RENDER_QUALITY);
+  //    bsGraphics.drawImage(cachedBackground, 0, 0, null);
+  //    bsGraphics.drawImage(cachedImage, 0, 0, null);
+  //
+  //    // cleanup
+  //    bsGraphics.dispose();
+  //    bs.show();
+  //  }
 
   /**
    * temporary measure to refresh background. ideally we shouldn't need this (but we want to release
@@ -269,7 +269,7 @@ public class LizzieMain extends JFrame {
 
   public void toggleDesignMode() {
     this.designMode = !this.designMode;
-    boardPane.setDesignMode(designMode);
+    //    boardPane.setDesignMode(designMode);
     commentPane.setDesignMode(designMode);
   }
 

@@ -14,21 +14,32 @@ import featurecat.lizzie.rules.BoardData;
 import featurecat.lizzie.rules.BoardHistoryNode;
 import featurecat.lizzie.rules.GIBParser;
 import featurecat.lizzie.rules.SGFParser;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
-import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.json.JSONObject;
 
@@ -119,12 +130,12 @@ public class BoardPane extends LizziePane {
   LizzieMain owner;
   /** Creates a window */
   public BoardPane(LizzieMain owner) {
-    super(owner);
+    //    super(owner);
     // setModal(true);
     this.owner = owner;
     // setModalityType(ModalityType.APPLICATION_MODAL);
 
-    setBackground(new Color(0, 0, 0, 0));
+    //    setBackground(new Color(0, 0, 0, 0));
     //    JPanel panel = new JPanel() {
     //        @Override
     //        protected void paintComponent(Graphics g) {
@@ -150,7 +161,7 @@ public class BoardPane extends LizziePane {
     // setMinimumSize(new Dimension(640, 400));
     // JSONArray windowSize = Lizzie.config.uiConfig.getJSONArray("window-size");
     // setSize(windowSize.getInt(0), windowSize.getInt(1));
-    setLocationRelativeTo(owner);
+    //    setLocationRelativeTo(owner);
 
     // Allow change font in the config
     if (Lizzie.config.uiFontName != null) {
@@ -329,7 +340,9 @@ public class BoardPane extends LizziePane {
    *
    * @param g0 not used
    */
-  public void paint(Graphics g0) {
+  @Override
+  protected void paintComponent(Graphics g0) {
+    super.paintComponent(g0);
     autosaveMaybe();
 
     int width = getWidth();

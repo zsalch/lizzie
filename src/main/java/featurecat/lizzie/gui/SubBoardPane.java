@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import javax.swing.*;
 
 /** The window used to display the game. */
-public class SubBoardPane extends JDialog {
+public class SubBoardPane extends LizziePane {
   private static final ResourceBundle resourceBundle =
       ResourceBundle.getBundle("l10n.DisplayStrings");
 
@@ -43,7 +43,7 @@ public class SubBoardPane extends JDialog {
 
     subBoardRenderer = new BoardRenderer(false);
 
-    setUndecorated(true);
+    //    setUndecorated(true);
     //    getRootPane().setBorder(BorderFactory.createEmptyBorder());
     //    getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
     setBackground(new Color(0, 0, 0, 0));
@@ -83,7 +83,8 @@ public class SubBoardPane extends JDialog {
    *
    * @param g0 not used
    */
-  public void paint(Graphics g0) {
+  @Override
+  protected void paintComponent(Graphics g0) {
 
     int x = 0; // getX();
     int y = 0; // getY();

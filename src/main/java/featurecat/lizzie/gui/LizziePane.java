@@ -14,10 +14,11 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.JWindow;
 
 /** The window used to display the game. */
-public class LizziePane extends JWindow {
+public class LizziePane extends JPanel {
 
   /** Keys to lookup borders in defaults table. */
   private static final int[] cursorMapping =
@@ -71,10 +72,10 @@ public class LizziePane extends JWindow {
 
   /** Creates a window */
   public LizziePane(LizzieMain owner) {
-    super(owner);
-    initCompotents();
-    input = owner.input;
-    installInputListeners();
+    //    super(owner);
+    //    initCompotents();
+    //    input = owner.input;
+    //    installInputListeners();
   }
 
   private void initCompotents() {
@@ -94,12 +95,14 @@ public class LizziePane extends JWindow {
 
     // setUndecorated(true);
     // setResizable(true);
-    getRootPane().setBorder(BorderFactory.createEmptyBorder());
+    // TODO
+    //    getRootPane().setBorder(BorderFactory.createEmptyBorder());
+    setBorder(BorderFactory.createEmptyBorder());
     // getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
     setVisible(true);
 
-    createBufferStrategy(2);
-    bs = getBufferStrategy();
+    //    createBufferStrategy(2);
+    //    bs = getBufferStrategy();
 
     // necessary for Windows users - otherwise Lizzie shows a blank white screen on
     // startup until
@@ -375,7 +378,7 @@ public class LizziePane extends JWindow {
 
   protected void installDesignListeners() {
     if (dragListener == null) {
-      dragListener = new PaneDragListener(this);
+      //      dragListener = new PaneDragListener(this);
     }
     addMouseListener(dragListener);
     addMouseMotionListener(dragListener);

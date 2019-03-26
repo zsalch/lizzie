@@ -10,28 +10,25 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 
 /** The window used to display the game. */
-public class BasicInfoPane extends JDialog {
+public class BasicInfoPane extends LizziePane {
 
-  private final BufferStrategy bs;
+  //  private final BufferStrategy bs;
   public int winRateGridLines = 3;
 
   /** Creates a window */
-  public BasicInfoPane(JFrame owner) {
-    super(owner);
+  public BasicInfoPane(LizzieMain owner) {
+    //    super(owner);
 
-    setUndecorated(true);
+    //    setUndecorated(true);
     //    getRootPane().setBorder(BorderFactory.createEmptyBorder());
     //    getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
     setVisible(true);
 
-    createBufferStrategy(2);
-    bs = getBufferStrategy();
+    //    createBufferStrategy(2);
+    //    bs = getBufferStrategy();
 
     //    Input input = new Input();
     //
@@ -58,7 +55,8 @@ public class BasicInfoPane extends JDialog {
    *
    * @param g0 not used
    */
-  public void paint(Graphics g0) {
+  @Override
+  protected void paintComponent(Graphics g0) {
 
     int x = 0; // getX();
     int y = 0; // getY();
@@ -83,13 +81,13 @@ public class BasicInfoPane extends JDialog {
     g.dispose();
 
     // draw the image
-    Graphics2D bsGraphics = (Graphics2D) bs.getDrawGraphics();
+    Graphics2D bsGraphics = (Graphics2D) g0; // bs.getDrawGraphics();
     bsGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
     bsGraphics.drawImage(cachedImage, 0, 0, null);
 
     // cleanup
     bsGraphics.dispose();
-    bs.show();
+    //    bs.show();
   }
 
   /**

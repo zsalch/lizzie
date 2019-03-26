@@ -72,7 +72,9 @@ public class CommentPane extends LizziePane {
     scrollPane.setBorder(null);
     scrollPane.setVerticalScrollBarPolicy(
         javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-    getContentPane().add(scrollPane);
+    // TODO
+    //    getContentPane().add(scrollPane);
+    add(scrollPane, BorderLayout.CENTER);
     scrollPane.setViewportView(commentPane);
     //    setUndecorated(true);
     // getRootPane().setBorder(BorderFactory.createEmptyBorder());
@@ -169,6 +171,7 @@ public class CommentPane extends LizziePane {
     Font font = new Font(Lizzie.config.fontName, Font.PLAIN, fontSize);
     commentPane.setFont(font);
     commentPane.setText(comment);
+    scrollPane.setBounds(this.getBounds());
   }
 
   public void setDesignMode(boolean mode) {

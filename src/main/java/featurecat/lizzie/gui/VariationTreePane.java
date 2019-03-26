@@ -11,17 +11,16 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.function.Consumer;
 import javax.swing.*;
 
 /** The window used to display the game. */
-public class VariationTreePane extends JDialog {
+public class VariationTreePane extends LizziePane {
   private static VariationTree variationTree;
 
-  private final BufferStrategy bs;
+  //  private final BufferStrategy bs;
 
   private static final int[] outOfBoundCoordinate = new int[] {-1, -1};
   public int[] mouseOverCoordinate = outOfBoundCoordinate;
@@ -42,13 +41,13 @@ public class VariationTreePane extends JDialog {
     //    setModalityType(ModalityType.APPLICATION_MODAL);
 
     variationTree = new VariationTree();
-    setUndecorated(true);
+    //    setUndecorated(true);
     //    getRootPane().setBorder(BorderFactory.createEmptyBorder());
     //    getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
     setVisible(true);
 
-    createBufferStrategy(2);
-    bs = getBufferStrategy();
+    //    createBufferStrategy(2);
+    //    bs = getBufferStrategy();
 
     addMouseListener(
         new MouseAdapter() {
@@ -77,7 +76,9 @@ public class VariationTreePane extends JDialog {
    *
    * @param g0 not used
    */
-  public void paint(Graphics g0) {
+  @Override
+  protected void paintComponent(Graphics g0) {
+    super.paintComponent(g0);
 
     int x = 0; // getX();
     int y = 0; // getY();
@@ -106,14 +107,14 @@ public class VariationTreePane extends JDialog {
     g.dispose();
 
     // draw the image
-    Graphics2D bsGraphics = (Graphics2D) bs.getDrawGraphics();
+    Graphics2D bsGraphics = (Graphics2D) g0; // bs.getDrawGraphics();
     bsGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
     bsGraphics.drawImage(cachedBackground, 0, 0, null);
     bsGraphics.drawImage(cachedImage, 0, 0, null);
 
     // cleanup
     bsGraphics.dispose();
-    bs.show();
+    //    bs.show();
   }
 
   /**
