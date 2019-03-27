@@ -46,7 +46,7 @@ public class SubBoardPane extends LizziePane {
     //    setUndecorated(true);
     //    getRootPane().setBorder(BorderFactory.createEmptyBorder());
     //    getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
-    setBackground(new Color(0, 0, 0, 0));
+//    setBackground(new Color(0, 0, 0, 0));
     setVisible(true);
 
     // TODO BufferStrategy does not support transparent background?
