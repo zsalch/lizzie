@@ -2,9 +2,12 @@ package featurecat.lizzie.gui;
 
 import featurecat.lizzie.Lizzie;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Insets;
+import java.awt.LayoutManager;
+import java.awt.LayoutManager2;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -12,13 +15,28 @@ import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
+import javax.swing.UIManager;
+import javax.swing.plaf.UIResource;
 
 /** The window used to display the game. */
 public class LizziePane extends JPanel {
+
+  private static final String uiClassID = "LizziePaneUI";
+
+  static {
+    UIManager.put(uiClassID, BasicLizziePaneUI.class.getName());
+  }
+
+  private boolean floatable = true;
 
   /** Keys to lookup borders in defaults table. */
   private static final int[] cursorMapping =
@@ -76,6 +94,61 @@ public class LizziePane extends JPanel {
     //    initCompotents();
     //    input = owner.input;
     //    installInputListeners();
+  }
+
+  @Override
+  public LizziePaneUI getUI() {
+    return (LizziePaneUI) ui;
+  }
+
+  public void setUI(LizziePaneUI ui) {
+    super.setUI(ui);
+  }
+
+  public void updateUI() {
+    setUI((LizziePaneUI) UIManager.getUI(this));
+    if (getLayout() == null) {
+      setLayout(new DefaultLizziePaneLayout());
+    }
+    invalidate();
+  }
+
+  public String getUIClassID() {
+    return uiClassID;
+  }
+
+  public int getComponentIndex(Component c) {
+    int ncomponents = this.getComponentCount();
+    Component[] component = this.getComponents();
+    for (int i = 0; i < ncomponents; i++) {
+      Component comp = component[i];
+      if (comp == c) return i;
+    }
+    return -1;
+  }
+
+  public Component getComponentAtIndex(int i) {
+    int ncomponents = this.getComponentCount();
+    if (i >= 0 && i < ncomponents) {
+      Component[] component = this.getComponents();
+      return component[i];
+    }
+    return null;
+  }
+
+  public boolean isFloatable() {
+    return floatable;
+  }
+
+  public void setFloatable(boolean b) {
+    if (floatable != b) {
+      boolean old = floatable;
+      floatable = b;
+
+      firePropertyChange("floatable", old, b);
+      revalidate();
+      repaint();
+    }
   }
 
   private void initCompotents() {
@@ -410,6 +483,89 @@ public class LizziePane extends JPanel {
     } else {
       uninstallDesignListeners();
       installInputListeners();
+    }
+  }
+
+  private class DefaultLizziePaneLayout
+      implements LayoutManager2, Serializable, PropertyChangeListener, UIResource {
+
+    LizzieLayout lm;
+
+    DefaultLizziePaneLayout() {
+      // TODO
+      lm = new LizzieLayout();
+    }
+
+    public void addLayoutComponent(String name, Component comp) {
+      lm.addLayoutComponent(name, comp);
+    }
+
+    public void addLayoutComponent(Component comp, Object constraints) {
+      lm.addLayoutComponent(comp, constraints);
+    }
+
+    public void removeLayoutComponent(Component comp) {
+      lm.removeLayoutComponent(comp);
+    }
+
+    public Dimension preferredLayoutSize(Container target) {
+      return lm.preferredLayoutSize(target);
+    }
+
+    public Dimension minimumLayoutSize(Container target) {
+      return lm.minimumLayoutSize(target);
+    }
+
+    public Dimension maximumLayoutSize(Container target) {
+      return lm.maximumLayoutSize(target);
+    }
+
+    public void layoutContainer(Container target) {
+      lm.layoutContainer(target);
+    }
+
+    public float getLayoutAlignmentX(Container target) {
+      return lm.getLayoutAlignmentX(target);
+    }
+
+    public float getLayoutAlignmentY(Container target) {
+      return lm.getLayoutAlignmentY(target);
+    }
+
+    public void invalidateLayout(Container target) {
+      lm.invalidateLayout(target);
+    }
+
+    public void propertyChange(PropertyChangeEvent e) {
+      String name = e.getPropertyName();
+      // TODO
+      if (name.equals("orientation")) {
+        int o = ((Integer) e.getNewValue()).intValue();
+        //                if (o == LizziePane.VERTICAL)
+        //                    lm = new LizzieLayout(LizziePane.this, LizzieLayout.PAGE_AXIS);
+        //                else {
+        //                    lm = new LizzieLayout(LizziePane.this, LizzieLayout.LINE_AXIS);
+        //                }
+      }
+    }
+  }
+
+  public void setLayout(LayoutManager mgr) {
+    LayoutManager oldMgr = getLayout();
+    if (oldMgr instanceof PropertyChangeListener) {
+      removePropertyChangeListener((PropertyChangeListener) oldMgr);
+    }
+    super.setLayout(mgr);
+  }
+
+  private void writeObject(ObjectOutputStream s) throws IOException {
+    s.defaultWriteObject();
+    if (getUIClassID().equals(uiClassID)) {
+      //        byte count = JComponent.getWriteObjCounter(this);
+      //        JComponent.setWriteObjCounter(this, --count);
+      //        if (count == 0 && ui != null) {
+      ui.installUI(this);
+      //        }
     }
   }
 }

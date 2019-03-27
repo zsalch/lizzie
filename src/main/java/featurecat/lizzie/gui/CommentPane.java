@@ -3,6 +3,7 @@ package featurecat.lizzie.gui;
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 import static java.lang.Math.min;
 
+import featurecat.lizzie.Lizzie;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -11,15 +12,12 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ResourceBundle;
-
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
-
-import featurecat.lizzie.Lizzie;
 
 /** The window used to display the game. */
 public class CommentPane extends LizziePane {
@@ -46,8 +44,21 @@ public class CommentPane extends LizziePane {
     htmlKit = new HTMLEditorKit();
     htmlDoc = (HTMLDocument) htmlKit.createDefaultDocument();
     htmlStyle = htmlKit.getStyleSheet();
-    htmlStyle.addRule("body {background:#"+String.format("%02x%02x%02x",Lizzie.config.commentBackgroundColor.getRed(),Lizzie.config.commentBackgroundColor.getGreen(),Lizzie.config.commentBackgroundColor.getBlue())+"; color:#"+String.format("%02x%02x%02x",Lizzie.config.commentFontColor.getRed(),Lizzie.config.commentFontColor.getGreen(),Lizzie.config.commentFontColor.getBlue())+";}");
-    
+    htmlStyle.addRule(
+        "body {background:#"
+            + String.format(
+                "%02x%02x%02x",
+                Lizzie.config.commentBackgroundColor.getRed(),
+                Lizzie.config.commentBackgroundColor.getGreen(),
+                Lizzie.config.commentBackgroundColor.getBlue())
+            + "; color:#"
+            + String.format(
+                "%02x%02x%02x",
+                Lizzie.config.commentFontColor.getRed(),
+                Lizzie.config.commentFontColor.getGreen(),
+                Lizzie.config.commentFontColor.getBlue())
+            + ";}");
+
     commentPane = new JTextPane();
     commentPane.setEditorKit(htmlKit);
     commentPane.setDocument(htmlDoc);

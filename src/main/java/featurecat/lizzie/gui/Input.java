@@ -8,15 +8,15 @@ import javax.swing.*;
 
 public class Input implements MouseListener, KeyListener, MouseWheelListener, MouseMotionListener {
   @Override
-  public void mouseClicked(MouseEvent e) {}
-
-  @Override
-  public void mousePressed(MouseEvent e) {
+  public void mouseClicked(MouseEvent e) {
     if (e.getButton() == MouseEvent.BUTTON1) // left click
     Lizzie.frame.onClicked(e.getX(), e.getY());
     else if (e.getButton() == MouseEvent.BUTTON3) // right click
     undo();
   }
+
+  @Override
+  public void mousePressed(MouseEvent e) {}
 
   @Override
   public void mouseReleased(MouseEvent e) {}

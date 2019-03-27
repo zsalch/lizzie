@@ -137,6 +137,8 @@ public class LizzieMain extends JFrame {
       setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 
+    layout = new LizzieLayout();
+    getContentPane().setLayout(layout);
     basicInfoPane = new BasicInfoPane(this);
     boardPane = new BoardPane(this);
     // TODO
@@ -145,8 +147,6 @@ public class LizzieMain extends JFrame {
     winratePane = new WinratePane(this);
     variationTreePane = new VariationTreePane(this);
     commentPane = new CommentPane(this);
-    layout = new LizzieLayout();
-    getContentPane().setLayout(layout);
     getContentPane().add(boardPane, LizzieLayout.MAIN_BOARD);
     getContentPane().add(basicInfoPane, LizzieLayout.BASIC_INFO);
     getContentPane().add(winratePane, LizzieLayout.WINRATE);
