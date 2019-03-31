@@ -246,7 +246,7 @@ public class Leelaz {
         // Clear switching prompt
         switching = false;
         // Display engine command in the title
-        Lizzie.frame.updateTitle();
+        Lizzie.main.updateTitle();
         if (isResponseUpToDate()) {
           // This should not be stale data when the command number match
           parseInfo(line.substring(5));

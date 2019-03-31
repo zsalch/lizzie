@@ -1,6 +1,5 @@
 package featurecat.lizzie.gui;
 
-import featurecat.lizzie.Lizzie;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -152,67 +151,8 @@ public class LizziePane extends JPanel {
   }
 
   private void initCompotents() {
-
-    // setModal(true);
-
-    // setModalityType(ModalityType.APPLICATION_MODAL);
-
-    // setMinimumSize(new Dimension(640, 400));
-    // JSONArray windowSize = Lizzie.config.uiConfig.getJSONArray("window-size");
-    // setSize(windowSize.getInt(0), windowSize.getInt(1));
-    // setLocationRelativeTo(owner);
-
-    if (Lizzie.config.startMaximized) {
-      // setExtendedState(Frame.MAXIMIZED_BOTH);
-    }
-
-    // setUndecorated(true);
-    // setResizable(true);
-    // TODO
-    //    getRootPane().setBorder(BorderFactory.createEmptyBorder());
     setBorder(BorderFactory.createEmptyBorder());
-    // getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
     setVisible(true);
-
-    //    createBufferStrategy(2);
-    //    bs = getBufferStrategy();
-
-    // necessary for Windows users - otherwise Lizzie shows a blank white screen on
-    // startup until
-    // updates occur.
-    // repaint();
-
-    // When the window is closed: save the SGF file, then run shutdown()
-    // this.addWindowListener(new WindowAdapter() {
-    // public void windowClosing(WindowEvent e) {
-    // Lizzie.shutdown();
-    // }
-    // });
-  }
-
-  public void updateComponentSize() {
-    try {
-      int width = this.getWidth();
-      int height = this.getHeight();
-      Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-      int screenWidth = screenSize.width;
-      int screenHeight = screenSize.height;
-      float proportionW = screenWidth / width;
-      float proportionH = screenHeight / height;
-      Component[] components = this.getRootPane().getContentPane().getComponents();
-      for (Component co : components) {
-        float x = co.getX() * proportionW;
-        float y = co.getY() * proportionH;
-        float w = co.getWidth() * proportionW;
-        float h = co.getHeight() * proportionH;
-        co.setBounds((int) x, (int) y, (int) w, (int) h);
-        // int size = (int) (co.getFont().getSize() * proportionH);
-        // Font font = new Font(co.getFont().getFontName(), co.getFont().getStyle(),
-        // size);
-        // co.setFont(font);
-      }
-    } catch (Exception e) {
-    }
   }
 
   private class PaneDragListener extends MouseAdapter {
@@ -463,17 +403,17 @@ public class LizziePane extends JPanel {
   }
 
   protected void installInputListeners() {
-    addMouseListener(input);
-    addKeyListener(input);
-    addMouseWheelListener(input);
-    addMouseMotionListener(input);
+    //    addMouseListener(input);
+    //    addKeyListener(input);
+    //    addMouseWheelListener(input);
+    //    addMouseMotionListener(input);
   }
 
   protected void uninstallInputListeners() {
-    removeMouseListener(input);
-    removeKeyListener(input);
-    removeMouseWheelListener(input);
-    removeMouseMotionListener(input);
+    //    removeMouseListener(input);
+    //    removeKeyListener(input);
+    //    removeMouseWheelListener(input);
+    //    removeMouseMotionListener(input);
   }
 
   public void setDesignMode(boolean mode) {

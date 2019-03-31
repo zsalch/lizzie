@@ -2,7 +2,6 @@ package featurecat.lizzie.gui;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
-import com.jhlabs.image.GaussianFilter;
 import featurecat.lizzie.Lizzie;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -15,40 +14,11 @@ import java.awt.image.BufferedImage;
 /** The window used to display the game. */
 public class BasicInfoPane extends LizziePane {
 
-  //  private final BufferStrategy bs;
-  public int winRateGridLines = 3;
-
-  /** Creates a window */
   public BasicInfoPane(LizzieMain owner) {
-    //    super(owner);
-
-    //    setUndecorated(true);
-    //    getRootPane().setBorder(BorderFactory.createEmptyBorder());
-    //    getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
     setVisible(true);
-
-    //    createBufferStrategy(2);
-    //    bs = getBufferStrategy();
-
-    //    Input input = new Input();
-    //
-    //    addMouseListener(input);
-    //    addKeyListener(input);
-    //    addMouseWheelListener(input);
-    //    addMouseMotionListener(input);
   }
 
   private BufferedImage cachedImage;
-
-  private BufferedImage cachedBackground;
-  private int cachedBackgroundWidth = 0, cachedBackgroundHeight = 0;
-  private boolean cachedBackgroundShowControls = false;
-  private boolean cachedShowWinrate = true;
-  private boolean cachedShowVariationGraph = true;
-  private boolean cachedShowLargeSubBoard = true;
-  private boolean cachedLargeWinrate = true;
-  private boolean cachedShowComment = true;
-  private boolean redrawBackgroundAnyway = false;
 
   /**
    * Draws the game board and interface
@@ -63,11 +33,6 @@ public class BasicInfoPane extends LizziePane {
     int width = getWidth();
     int height = getHeight();
 
-    int topInset = this.getInsets().top;
-    int leftInset = this.getInsets().left;
-    int rightInset = this.getInsets().right;
-    int bottomInset = this.getInsets().bottom;
-    int maxBound = Math.max(width, height);
     // initialize
 
     cachedImage = new BufferedImage(width, height, TYPE_INT_ARGB);
@@ -89,18 +54,6 @@ public class BasicInfoPane extends LizziePane {
     bsGraphics.dispose();
     //    bs.show();
   }
-
-  /**
-   * temporary measure to refresh background. ideally we shouldn't need this (but we want to release
-   * Lizzie 0.5 today, not tomorrow!). Refactor me out please! (you need to get blurring to work
-   * properly on startup).
-   */
-  public void refreshBackground() {
-    redrawBackgroundAnyway = true;
-  }
-
-  private GaussianFilter filter20 = new GaussianFilter(20);
-  private GaussianFilter filter10 = new GaussianFilter(10);
 
   private void drawCaptured(Graphics2D g, int posX, int posY, int width, int height) {
     // Draw border

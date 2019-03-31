@@ -6,6 +6,9 @@ import static java.lang.Math.max;
 
 import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.analysis.GameInfo;
+import featurecat.lizzie.analysis.Leelaz;
+import featurecat.lizzie.rules.GIBParser;
+import featurecat.lizzie.rules.SGFParser;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -15,14 +18,22 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.TexturePaint;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class LizzieMain extends JFrame {
   public static final ResourceBundle resourceBundle =
@@ -30,21 +41,20 @@ public class LizzieMain extends JFrame {
 
   public static Input input;
   public static BasicInfoPane basicInfoPane;
+  private static final String DEFAULT_TITLE = resourceBundle.getString("LizzieFrame.title");
+
   public static BoardPane boardPane;
   public static SubBoardPane subBoardPane;
   public static WinratePane winratePane;
   public static VariationTreePane variationTreePane;
   public static CommentPane commentPane;
   public static boolean designMode;
+  private LizzieLayout layout;
 
   private int originX;
   private int originY;
   private int originW;
   private int originH;
-
-  private LizzieLayout layout;
-
-  private static final String DEFAULT_TITLE = "Lizzie - Leela Zero Interface";
 
   public static Font uiFont;
   public static Font winrateFont;
@@ -65,6 +75,27 @@ public class LizzieMain extends JFrame {
   private boolean cachedLargeWinrate = true;
   private boolean cachedShowComment = true;
   private boolean redrawBackgroundAnyway = false;
+
+  private static final int[] outOfBoundCoordinate = new int[] {-1, -1};
+  public int[] mouseOverCoordinate = outOfBoundCoordinate;
+  public boolean showControls = false;
+  public boolean isPlayingAgainstLeelaz = false;
+  public boolean playerIsBlack = true;
+  public boolean isNewGame = false;
+  public int winRateGridLines = 3;
+  public int BoardPositionProportion = Lizzie.config.boardPositionProportion;
+
+  private long lastAutosaveTime = System.currentTimeMillis();
+  private boolean isReplayVariation = false;
+
+  // Save the player title
+  private String playerTitle = "";
+
+  // Show the playouts in the title
+  private ScheduledExecutorService showPlayouts = Executors.newScheduledThreadPool(1);
+  private long lastPlayouts = 0;
+  private String visitsString = "";
+  public boolean isDrawVisitsInTitle = true;
 
   static {
     // load fonts
@@ -104,26 +135,22 @@ public class LizzieMain extends JFrame {
   /** Create the frame. */
   public LizzieMain() {
     super(DEFAULT_TITLE);
-    //    addWindowStateListener(
-    //        new WindowStateListener() {
-    //          public void windowStateChanged(WindowEvent e) {
-    //            updateComponentSize();
-    //          }
-    //        });
-
-    input = new Input();
-
-    addMouseListener(input);
-    addKeyListener(input);
-    addMouseWheelListener(input);
-    //    addMouseMotionListener(input);
-
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     setMinimumSize(new Dimension(640, 400));
-    JSONArray windowSize = Lizzie.config.uiConfig.getJSONArray("window-size");
-    setSize(windowSize.getInt(0), windowSize.getInt(1));
-    setLocationRelativeTo(null); // Start centered, needs to be called *after* setSize...
+    boolean persisted =
+        Lizzie.config.persistedUi != null
+            && Lizzie.config.persistedUi.optJSONArray("main-window-position") != null
+            && Lizzie.config.persistedUi.optJSONArray("main-window-position").length() == 4;
+    if (persisted) {
+      JSONArray pos = Lizzie.config.persistedUi.getJSONArray("main-window-position");
+      this.setBounds(pos.getInt(0), pos.getInt(1), pos.getInt(2), pos.getInt(3));
+      this.BoardPositionProportion =
+          Lizzie.config.persistedUi.optInt("board-postion-propotion", this.BoardPositionProportion);
+    } else {
+      JSONArray windowSize = Lizzie.config.uiConfig.getJSONArray("window-size");
+      setSize(windowSize.getInt(0), windowSize.getInt(1));
+      setLocationRelativeTo(null); // Start centered, needs to be called *after* setSize...
+    }
 
     // Allow change font in the config
     if (Lizzie.config.uiFontName != null) {
@@ -133,10 +160,36 @@ public class LizzieMain extends JFrame {
       winrateFont = new Font(Lizzie.config.winrateFontName, Font.BOLD, 12);
     }
 
-    if (Lizzie.config.startMaximized) {
+    if (Lizzie.config.startMaximized && !persisted) {
       setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 
+    // TODO Need Better Background
+    //        setBackground(new Color(0, 0, 0, 0));
+    //    JPanel panel =
+    //        new JPanel() {
+    //          @Override
+    //          protected void paintComponent(Graphics g) {
+    //            if (g instanceof Graphics2D) {
+    //              int width = getWidth();
+    //              int height = getHeight();
+    //              Optional<Graphics2D> backgroundG;
+    //              if (cachedBackgroundWidth != width
+    //                  || cachedBackgroundHeight != height
+    //                  || redrawBackgroundAnyway) {
+    //                backgroundG = Optional.of(createBackground());
+    //              } else {
+    //                backgroundG = Optional.empty();
+    //              }
+    //              // draw the image
+    //              Graphics2D bsGraphics = (Graphics2D) g; // bs.getDrawGraphics();
+    //              bsGraphics.setRenderingHint(
+    //                  RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+    //              bsGraphics.drawImage(cachedBackground, 0, 0, null);
+    //            }
+    //          }
+    //        };
+    //    setContentPane(panel);
     layout = new LizzieLayout();
     getContentPane().setLayout(layout);
     basicInfoPane = new BasicInfoPane(this);
@@ -159,63 +212,95 @@ public class LizzieMain extends JFrame {
     createBufferStrategy(2);
     bs = getBufferStrategy();
 
-    addComponentListener(
-        new ComponentAdapter() {
-          //          @Override
-          //          public void componentResized(ComponentEvent e) {
-          //            updateComponentSize();
-          //          }
-          //
-          @Override
-          public void componentMoved(ComponentEvent e) {
-            layout.invalidateLayout(getContentPane());
+    input = new Input();
+    //  addMouseListener(input);
+    addKeyListener(input);
+    addMouseWheelListener(input);
+    //    addMouseMotionListener(input);
+
+    // When the window is closed: save the SGF file, then run shutdown()
+    this.addWindowListener(
+        new WindowAdapter() {
+          public void windowClosing(WindowEvent e) {
+            Lizzie.shutdown();
           }
         });
+    // Show the playouts in the title
+    showPlayouts.scheduleAtFixedRate(
+        new Runnable() {
+          @Override
+          public void run() {
+            if (!isDrawVisitsInTitle) {
+              visitsString = "";
+              return;
+            }
+            if (Lizzie.leelaz == null) return;
+            try {
+              Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
+              if (stats.totalPlayouts <= 0) return;
+              visitsString =
+                  String.format(
+                      " %d visits/second",
+                      (stats.totalPlayouts > lastPlayouts)
+                          ? stats.totalPlayouts - lastPlayouts
+                          : 0);
+              updateTitle();
+              lastPlayouts = stats.totalPlayouts;
+            } catch (Exception e) {
+            }
+          }
+        },
+        1,
+        1,
+        TimeUnit.SECONDS);
 
-    //    repaint();
+    setFocusable(true);
+    setFocusTraversalKeysEnabled(false);
   }
   /**
    * Draws the game board and interface
    *
    * @param g0 not used
    */
-  //  public void paint(Graphics g0) {
-  //    super.paintComponents(g0);
-  //    int width = getWidth();
-  //    int height = getHeight();
+  // TODO Need Better Background
+  //    public void paint(Graphics g0) {
+  ////      super.paintComponents(g0);
   //
-  //    originX = getX();
-  //    originY = getY();
-  //    originW = width;
-  //    originH = height;
+  //      int width = getWidth();
+  //      int height = getHeight();
   //
-  //    Optional<Graphics2D> backgroundG;
-  //    if (cachedBackgroundWidth != width
-  //        || cachedBackgroundHeight != height
-  //        || redrawBackgroundAnyway) {
-  //      backgroundG = Optional.of(createBackground());
-  //    } else {
-  //      backgroundG = Optional.empty();
+  //      originX = getX();
+  //      originY = getY();
+  //      originW = width;
+  //      originH = height;
+  //
+  //      Optional<Graphics2D> backgroundG;
+  //      if (cachedBackgroundWidth != width
+  //          || cachedBackgroundHeight != height
+  //          || redrawBackgroundAnyway) {
+  //        backgroundG = Optional.of(createBackground());
+  //      } else {
+  //        backgroundG = Optional.empty();
+  //      }
+  //
+  ////      cachedImage = new BufferedImage(width, height, TYPE_INT_ARGB);
+  ////      Graphics2D g = (Graphics2D) cachedImage.getGraphics();
+  ////      g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+  //
+  //      // cleanup
+  ////      g.dispose();
+  //
+  //      // draw the image
+  //      Graphics2D bsGraphics = (Graphics2D) bs.getDrawGraphics();
+  //      bsGraphics.setRenderingHint(RenderingHints.KEY_RENDERING,
+  //   RenderingHints.VALUE_RENDER_QUALITY);
+  //      bsGraphics.drawImage(cachedBackground, 0, 0, null);
+  ////      bsGraphics.drawImage(cachedImage, 0, 0, null);
+  //
+  //      // cleanup
+  //      bsGraphics.dispose();
+  //      bs.show();
   //    }
-  //
-  //    cachedImage = new BufferedImage(width, height, TYPE_INT_ARGB);
-  //    Graphics2D g = (Graphics2D) cachedImage.getGraphics();
-  //    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-  //
-  //    // cleanup
-  //    g.dispose();
-  //
-  //    // draw the image
-  //    Graphics2D bsGraphics = (Graphics2D) bs.getDrawGraphics();
-  //    bsGraphics.setRenderingHint(RenderingHints.KEY_RENDERING,
-  // RenderingHints.VALUE_RENDER_QUALITY);
-  //    bsGraphics.drawImage(cachedBackground, 0, 0, null);
-  //    bsGraphics.drawImage(cachedImage, 0, 0, null);
-  //
-  //    // cleanup
-  //    bsGraphics.dispose();
-  //    bs.show();
-  //  }
 
   /**
    * temporary measure to refresh background. ideally we shouldn't need this (but we want to release
@@ -274,7 +359,15 @@ public class LizzieMain extends JFrame {
   }
 
   public void invalidLayout() {
-    layout.invalidateLayout(getContentPane());
+    // TODO
+    layout.layoutContainer(getContentPane());
+  }
+
+  public void refresh(boolean all) {
+    boardPane.repaint();
+    if (all) {
+      updateStatus();
+    }
   }
 
   public void repaintSub() {
@@ -285,7 +378,6 @@ public class LizzieMain extends JFrame {
   public void updateStatus() {
     basicInfoPane.repaint();
     variationTreePane.repaint();
-    //    commentPane.repaint();
     commentPane.drawComment();
   }
 
@@ -359,5 +451,102 @@ public class LizzieMain extends JFrame {
         }
       }
     }
+  }
+
+  public static void editGameInfo() {
+    GameInfo gameInfo = Lizzie.board.getHistory().getGameInfo();
+
+    GameInfoDialog gameInfoDialog = new GameInfoDialog();
+    gameInfoDialog.setGameInfo(gameInfo);
+    gameInfoDialog.setVisible(true);
+
+    gameInfoDialog.dispose();
+  }
+
+  public static void saveFile() {
+    FileNameExtensionFilter filter = new FileNameExtensionFilter("*.sgf", "SGF");
+    JSONObject filesystem = Lizzie.config.persisted.getJSONObject("filesystem");
+    JFileChooser chooser = new JFileChooser(filesystem.getString("last-folder"));
+    chooser.setFileFilter(filter);
+    chooser.setMultiSelectionEnabled(false);
+    int result = chooser.showSaveDialog(null);
+    if (result == JFileChooser.APPROVE_OPTION) {
+      File file = chooser.getSelectedFile();
+      if (file.exists()) {
+        int ret =
+            JOptionPane.showConfirmDialog(
+                null,
+                resourceBundle.getString("LizzieFrame.prompt.sgfExists"),
+                "Warning",
+                JOptionPane.OK_CANCEL_OPTION);
+        if (ret == JOptionPane.CANCEL_OPTION) {
+          return;
+        }
+      }
+      if (!file.getPath().endsWith(".sgf")) {
+        file = new File(file.getPath() + ".sgf");
+      }
+      try {
+        SGFParser.save(Lizzie.board, file.getPath());
+        filesystem.put("last-folder", file.getParent());
+      } catch (IOException err) {
+        JOptionPane.showConfirmDialog(
+            null,
+            resourceBundle.getString("LizzieFrame.prompt.failedTosaveFile"),
+            "Error",
+            JOptionPane.ERROR);
+      }
+    }
+  }
+
+  public static void openFile() {
+    FileNameExtensionFilter filter = new FileNameExtensionFilter("*.sgf or *.gib", "SGF", "GIB");
+    JSONObject filesystem = Lizzie.config.persisted.getJSONObject("filesystem");
+    JFileChooser chooser = new JFileChooser(filesystem.getString("last-folder"));
+
+    chooser.setFileFilter(filter);
+    chooser.setMultiSelectionEnabled(false);
+    int result = chooser.showOpenDialog(null);
+    if (result == JFileChooser.APPROVE_OPTION) loadFile(chooser.getSelectedFile());
+  }
+
+  public static void loadFile(File file) {
+    JSONObject filesystem = Lizzie.config.persisted.getJSONObject("filesystem");
+    if (!(file.getPath().endsWith(".sgf") || file.getPath().endsWith(".gib"))) {
+      file = new File(file.getPath() + ".sgf");
+    }
+    try {
+      System.out.println(file.getPath());
+      if (file.getPath().endsWith(".sgf")) {
+        SGFParser.load(file.getPath());
+      } else {
+        GIBParser.load(file.getPath());
+      }
+      filesystem.put("last-folder", file.getParent());
+    } catch (IOException err) {
+      JOptionPane.showConfirmDialog(
+          null,
+          resourceBundle.getString("LizzieFrame.prompt.failedToOpenFile"),
+          "Error",
+          JOptionPane.ERROR);
+    }
+  }
+
+  public void setPlayers(String whitePlayer, String blackPlayer) {
+    playerTitle = String.format("(%s [W] vs %s [B])", whitePlayer, blackPlayer);
+    updateTitle();
+  }
+
+  public void updateTitle() {
+    StringBuilder sb = new StringBuilder(DEFAULT_TITLE);
+    sb.append(playerTitle);
+    sb.append(" [" + Lizzie.leelaz.engineCommand() + "]");
+    sb.append(visitsString);
+    setTitle(sb.toString());
+  }
+
+  public void resetTitle() {
+    playerTitle = "";
+    updateTitle();
   }
 }

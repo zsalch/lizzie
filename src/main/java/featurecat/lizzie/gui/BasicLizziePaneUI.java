@@ -1,5 +1,6 @@
 package featurecat.lizzie.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -51,6 +52,7 @@ public class BasicLizziePaneUI extends LizziePaneUI implements SwingConstants {
   private Container dockingSource;
   private int dockingSensitivity = 0;
   protected int focusedCompIndex = -1;
+  private Dimension originSize = null;
 
   protected Color dockingColor = null;
   protected Color floatingColor = null;
@@ -307,6 +309,7 @@ public class BasicLizziePaneUI extends LizziePaneUI implements SwingConstants {
         };
     frame.getRootPane().setName("LizziePane.FloatingFrame");
     frame.setResizable(false);
+    frame.setSize(lizziePane.getSize());
     WindowListener wl = createFrameListener();
     frame.addWindowListener(wl);
     return frame;
@@ -361,7 +364,8 @@ public class BasicLizziePaneUI extends LizziePaneUI implements SwingConstants {
 
     dialog.getRootPane().setName("LizziePane.FloatingWindow");
     dialog.setTitle(lizziePane.getName());
-    dialog.setResizable(false);
+    dialog.setResizable(true);
+    dialog.setSize(lizziePane.getSize());
     WindowListener wl = createFrameListener();
     dialog.addWindowListener(wl);
     return dialog;
@@ -410,18 +414,23 @@ public class BasicLizziePaneUI extends LizziePaneUI implements SwingConstants {
         }
         constraintBeforeFloating = calculateConstraint();
         if (propertyListener != null) UIManager.addPropertyChangeListener(propertyListener);
-        // TODO
-        floatingLizziePane.getContentPane().add(lizziePane, LizzieLayout.MAIN_BOARD);
+        floatingLizziePane.getContentPane().add(lizziePane, BorderLayout.CENTER);
         if (floatingLizziePane instanceof Window) {
           ((Window) floatingLizziePane).pack();
           ((Window) floatingLizziePane).setLocation(floatingX, floatingY);
+          Insets insets = ((Window) floatingLizziePane).getInsets();
+          Dimension d =
+              new Dimension(
+                  originSize.width + insets.left + insets.right,
+                  originSize.height + insets.top + insets.bottom);
+          ((Window) floatingLizziePane).setMinimumSize(d);
           if (visible) {
-            ((Window) floatingLizziePane).show();
+            ((Window) floatingLizziePane).setVisible(true);
           } else {
             ancestor.addWindowListener(
                 new WindowAdapter() {
                   public void windowOpened(WindowEvent e) {
-                    ((Window) floatingLizziePane).show();
+                    ((Window) floatingLizziePane).setVisible(true);
                   }
                 });
           }
@@ -515,12 +524,13 @@ public class BasicLizziePaneUI extends LizziePaneUI implements SwingConstants {
   }
 
   protected void dragTo(Point position, Point origin) {
+    originSize = lizziePane.getSize();
     if (lizziePane.isFloatable()) {
       try {
         if (dragWindow == null) dragWindow = createDragWindow(lizziePane);
         Point offset = dragWindow.getOffset();
         if (offset == null) {
-          Dimension size = lizziePane.getPreferredSize();
+          Dimension size = lizziePane.getSize(); // TODO .getPreferredSize();
           offset = new Point(size.width / 2, size.height / 2);
           dragWindow.setOffset(offset);
         }
@@ -542,9 +552,9 @@ public class BasicLizziePaneUI extends LizziePaneUI implements SwingConstants {
 
         dragWindow.setLocation(dragPoint.x, dragPoint.y);
         if (dragWindow.isVisible() == false) {
-          Dimension size = lizziePane.getPreferredSize();
+          Dimension size = lizziePane.getSize(); // TODO.getPreferredSize();
           dragWindow.setSize(size.width, size.height);
-          dragWindow.show();
+          dragWindow.setVisible(true);
         }
       } catch (IllegalComponentStateException e) {
       }

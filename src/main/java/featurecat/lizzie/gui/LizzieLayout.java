@@ -308,7 +308,12 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
       // board
       int maxSize = (int) (min(width - leftInset - rightInset, height - topInset - bottomInset));
       maxSize = max(maxSize, Board.boardSize + 5); // don't let maxWidth become too small
-      int boardX = (width - maxSize) / 2;
+      int boardX =
+          (width - maxSize)
+              / 8
+              * (Lizzie.main == null
+                  ? Lizzie.config.boardPositionProportion
+                  : Lizzie.main.BoardPositionProportion);
       int boardY = topInset + (height - topInset - bottomInset - maxSize) / 2;
 
       int panelMargin = (int) (maxSize * 0.02);
@@ -595,7 +600,9 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
         c.setBounds(x + treex, y + treey, treew, treeh);
       }
       if ((c = getChild(COMMENT, ltr)) != null) {
+        //        ((CommentPane)c).setCommentBounds(x + cx, y + cy, cw, ch);
         c.setBounds(x + cx, y + cy, cw, ch);
+        c.repaint();
       }
     }
   }

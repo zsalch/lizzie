@@ -447,10 +447,10 @@ public class Config {
 
   public void persist() throws IOException {
     JSONArray mainPos = new JSONArray();
-    mainPos.put(Lizzie.frame.getX());
-    mainPos.put(Lizzie.frame.getY());
-    mainPos.put(Lizzie.frame.getWidth());
-    mainPos.put(Lizzie.frame.getHeight());
+    mainPos.put(Lizzie.main.getX());
+    mainPos.put(Lizzie.main.getY());
+    mainPos.put(Lizzie.main.getWidth());
+    mainPos.put(Lizzie.main.getHeight());
     persistedUi.put("main-window-position", mainPos);
     JSONArray gtpPos = new JSONArray();
     gtpPos.put(Lizzie.gtpConsole.getX());
@@ -458,7 +458,7 @@ public class Config {
     gtpPos.put(Lizzie.gtpConsole.getWidth());
     gtpPos.put(Lizzie.gtpConsole.getHeight());
     persistedUi.put("gtp-console-position", gtpPos);
-    persistedUi.put("board-postion-propotion", Lizzie.frame.BoardPositionProportion);
+    persistedUi.put("board-postion-propotion", Lizzie.main.BoardPositionProportion);
     writeConfig(this.persisted, new File(persistFilename));
   }
 
