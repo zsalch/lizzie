@@ -355,6 +355,10 @@ public class LizzieMain extends JFrame {
   public void toggleDesignMode() {
     this.designMode = !this.designMode;
     //    boardPane.setDesignMode(designMode);
+    basicInfoPane.setDesignMode(designMode);
+    winratePane.setDesignMode(designMode);
+    subBoardPane.setDesignMode(designMode);
+    variationTreePane.setDesignMode(designMode);
     commentPane.setDesignMode(designMode);
   }
 
