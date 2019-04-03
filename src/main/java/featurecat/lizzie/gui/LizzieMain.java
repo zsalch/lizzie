@@ -6,10 +6,9 @@ import static java.lang.Math.max;
 
 import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.analysis.GameInfo;
-import featurecat.lizzie.analysis.Leelaz;
+import featurecat.lizzie.analysis.MoveData;
 import featurecat.lizzie.rules.GIBParser;
 import featurecat.lizzie.rules.SGFParser;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Frame;
@@ -100,12 +99,12 @@ public class LizzieMain extends JFrame {
   static {
     // load fonts
     try {
-      uiFont =
-          Font.createFont(
-              Font.TRUETYPE_FONT,
-              Thread.currentThread()
-                  .getContextClassLoader()
-                  .getResourceAsStream("fonts/OpenSans-Regular.ttf"));
+      uiFont = new Font("SansSerif", Font.TRUETYPE_FONT, 12);
+      //          Font.createFont(
+      //              Font.TRUETYPE_FONT,
+      //              Thread.currentThread()
+      //                  .getContextClassLoader()
+      //                  .getResourceAsStream("fonts/OpenSans-Regular.ttf"));
       winrateFont =
           Font.createFont(
               Font.TRUETYPE_FONT,
@@ -117,39 +116,22 @@ public class LizzieMain extends JFrame {
     }
   }
 
-  /** Launch the application. */
-  public static void main(String[] args) {
-    EventQueue.invokeLater(
-        new Runnable() {
-          public void run() {
-            try {
-              LizzieMain frame = new LizzieMain();
-              frame.setVisible(true);
-            } catch (Exception e) {
-              e.printStackTrace();
-            }
-          }
-        });
-  }
-
-  /** Create the frame. */
+  /** Creates a window */
   public LizzieMain() {
     super(DEFAULT_TITLE);
 
     // TODO
     //    setMinimumSize(new Dimension(640, 400));
-    boolean persisted =
-        Lizzie.config.persistedUi != null
-            && Lizzie.config.persistedUi.optJSONArray("main-window-position") != null
-            && Lizzie.config.persistedUi.optJSONArray("main-window-position").length() == 4;
-    if (persisted) {
+    boolean persisted = Lizzie.config.persistedUi != null;
+    if (persisted
+        && Lizzie.config.persistedUi.optJSONArray("main-window-position") != null
+        && Lizzie.config.persistedUi.optJSONArray("main-window-position").length() == 4) {
       JSONArray pos = Lizzie.config.persistedUi.getJSONArray("main-window-position");
       this.setBounds(pos.getInt(0), pos.getInt(1), pos.getInt(2), pos.getInt(3));
       this.BoardPositionProportion =
           Lizzie.config.persistedUi.optInt("board-postion-propotion", this.BoardPositionProportion);
     } else {
-      JSONArray windowSize = Lizzie.config.uiConfig.getJSONArray("window-size");
-      setSize(windowSize.getInt(0), windowSize.getInt(1));
+      setSize(960, 600);
       setLocationRelativeTo(null); // Start centered, needs to be called *after* setSize...
     }
 
@@ -162,6 +144,8 @@ public class LizzieMain extends JFrame {
     }
 
     if (Lizzie.config.startMaximized && !persisted) {
+      setExtendedState(Frame.MAXIMIZED_BOTH);
+    } else if (persisted && Lizzie.config.persistedUi.getBoolean("window-maximized")) {
       setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 
@@ -237,16 +221,14 @@ public class LizzieMain extends JFrame {
             }
             if (Lizzie.leelaz == null) return;
             try {
-              Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
-              if (stats.totalPlayouts <= 0) return;
+              int totalPlayouts = MoveData.getPlayouts(Lizzie.leelaz.getBestMoves());
+              if (totalPlayouts <= 0) return;
               visitsString =
                   String.format(
                       " %d visits/second",
-                      (stats.totalPlayouts > lastPlayouts)
-                          ? stats.totalPlayouts - lastPlayouts
-                          : 0);
+                      (totalPlayouts > lastPlayouts) ? totalPlayouts - lastPlayouts : 0);
               updateTitle();
-              lastPlayouts = stats.totalPlayouts;
+              lastPlayouts = totalPlayouts;
             } catch (Exception e) {
             }
           }
@@ -419,16 +401,16 @@ public class LizzieMain extends JFrame {
     }
   }
 
-  public static void startNewGame() {
+  public static void startGame() {
     GameInfo gameInfo = Lizzie.board.getHistory().getGameInfo();
 
-    NewGameDialog newGameDialog = new NewGameDialog();
-    newGameDialog.setGameInfo(gameInfo);
-    newGameDialog.setVisible(true);
-    boolean playerIsBlack = newGameDialog.playerIsBlack();
-    boolean isNewGame = newGameDialog.isNewGame();
-    //    newGameDialog.dispose();
-    if (newGameDialog.isCancelled()) return;
+    GameDialog gameDialog = new GameDialog();
+    gameDialog.setGameInfo(gameInfo);
+    gameDialog.setVisible(true);
+    boolean playerIsBlack = gameDialog.playerIsBlack();
+    boolean isNewGame = gameDialog.isNewGame();
+    //    gameDialog.dispose();
+    if (gameDialog.isCancelled()) return;
 
     if (isNewGame) {
       Lizzie.board.clear();
@@ -462,6 +444,34 @@ public class LizzieMain extends JFrame {
           Lizzie.leelaz.genmove((Lizzie.board.getData().blackToPlay ? "B" : "W"));
         }
       }
+    }
+  }
+
+  public static void startNewGame() {
+    GameInfo gameInfo = Lizzie.board.getHistory().getGameInfo();
+
+    NewGameDialog newGameDialog = new NewGameDialog();
+    newGameDialog.setGameInfo(gameInfo);
+    newGameDialog.setVisible(true);
+    boolean playerIsBlack = newGameDialog.playerIsBlack();
+    newGameDialog.dispose();
+    if (newGameDialog.isCancelled()) return;
+
+    Lizzie.board.clear();
+    Lizzie.board.getHistory().setGameInfo(gameInfo);
+    Lizzie.leelaz.sendCommand("komi " + gameInfo.getKomi());
+
+    Lizzie.leelaz.time_settings();
+    Lizzie.frame.playerIsBlack = playerIsBlack;
+    Lizzie.frame.isPlayingAgainstLeelaz = true;
+
+    boolean isHandicapGame = gameInfo.getHandicap() != 0;
+    if (isHandicapGame) {
+      Lizzie.board.getHistory().getData().blackToPlay = false;
+      Lizzie.leelaz.sendCommand("fixed_handicap " + gameInfo.getHandicap());
+      if (playerIsBlack) Lizzie.leelaz.genmove("W");
+    } else if (!playerIsBlack) {
+      Lizzie.leelaz.genmove("B");
     }
   }
 

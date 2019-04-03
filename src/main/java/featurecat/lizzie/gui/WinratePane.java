@@ -112,7 +112,7 @@ public class WinratePane extends LizziePane {
     double lastWR = 50; // winrate the previous move
     boolean validLastWinrate = false; // whether it was actually calculated
     Optional<BoardData> previous = Lizzie.board.getHistory().getPrevious();
-    if (previous.isPresent() && previous.get().playouts > 0) {
+    if (previous.isPresent() && previous.get().getPlayouts() > 0) {
       lastWR = previous.get().winrate;
       validLastWinrate = true;
     }

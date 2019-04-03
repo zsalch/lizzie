@@ -1,6 +1,10 @@
 package featurecat.lizzie.gui;
 
-import static java.awt.RenderingHints.*;
+import static java.awt.RenderingHints.KEY_ANTIALIASING;
+import static java.awt.RenderingHints.KEY_INTERPOLATION;
+import static java.awt.RenderingHints.VALUE_ANTIALIAS_OFF;
+import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
+import static java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR;
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 import static java.lang.Math.log;
 import static java.lang.Math.max;
@@ -16,7 +20,18 @@ import featurecat.lizzie.rules.BoardHistoryNode;
 import featurecat.lizzie.rules.SGFParser;
 import featurecat.lizzie.rules.Stone;
 import featurecat.lizzie.rules.Zobrist;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Point;
+import java.awt.RadialGradientPaint;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.TexturePaint;
 import java.awt.font.TextAttribute;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -375,6 +390,10 @@ public class BoardRenderer {
 
     // calculate best moves and branch
     bestMoves = Lizzie.leelaz.getBestMoves();
+    if (MoveData.getPlayouts(bestMoves) < Lizzie.board.getData().getPlayouts()) {
+      bestMoves = Lizzie.board.getData().bestMoves;
+    }
+
     variationOpt = Optional.empty();
 
     if (isMainBoard && (isShowingRawBoard() || !Lizzie.config.showBranchNow())) {
@@ -551,7 +570,7 @@ public class BoardRenderer {
    */
   private void drawLeelazSuggestions(Graphics2D g) {
     int minAlpha = 32;
-    float winrateHueFactor = 2.0f;
+    float winrateHueFactor = 0.9f;
     float alphaFactor = 5.0f;
     float redHue = Color.RGBtoHSB(255, 0, 0, null)[0];
     float greenHue = Color.RGBtoHSB(0, 255, 0, null)[0];
@@ -561,9 +580,11 @@ public class BoardRenderer {
 
       int maxPlayouts = 0;
       double maxWinrate = 0;
+      double minWinrate = 100.0;
       for (MoveData move : bestMoves) {
         if (move.playouts > maxPlayouts) maxPlayouts = move.playouts;
         if (move.winrate > maxWinrate) maxWinrate = move.winrate;
+        if (move.winrate < minWinrate) minWinrate = move.winrate;
       }
 
       for (int i = 0; i < Board.boardSize; i++) {
@@ -597,6 +618,11 @@ public class BoardRenderer {
           }
 
           float percentPlayouts = (float) move.playouts / maxPlayouts;
+          double percentWinrate =
+              Math.min(
+                  1,
+                  Math.max(0.01, move.winrate - minWinrate)
+                      / Math.max(0.01, maxWinrate - minWinrate));
 
           Optional<int[]> coordsOpt = Board.asCoordinates(move.coordinate);
           if (!coordsOpt.isPresent()) {
@@ -613,7 +639,7 @@ public class BoardRenderer {
           } else {
             double fraction;
             if (Lizzie.config.colorByWinrateInsteadOfVisits) {
-              fraction = move.winrate / 100;
+              fraction = percentWinrate;
               if (flipWinrate) {
                 fraction = 1 - fraction;
               }
@@ -636,11 +662,17 @@ public class BoardRenderer {
           float saturation = 1.0f;
           float brightness = 0.85f;
           float alpha =
-              Lizzie.config.colorByWinrateInsteadOfVisits
-                  ? maxAlpha
-                  : minAlpha
-                      + (maxAlpha - minAlpha)
-                          * max(0, (float) log(percentPlayouts) / alphaFactor + 1);
+              minAlpha
+                  + (maxAlpha - minAlpha)
+                      * max(
+                          0,
+                          (float)
+                                      log(
+                                          Lizzie.config.colorByWinrateInsteadOfVisits
+                                              ? percentWinrate
+                                              : percentPlayouts)
+                                  / alphaFactor
+                              + 1);
 
           Color hsbColor = Color.getHSBColor(hue, saturation, brightness);
           Color color =
@@ -653,24 +685,26 @@ public class BoardRenderer {
             fillCircle(g, suggestionX, suggestionY, stoneRadius);
           }
 
-          boolean ringedMove = isBestMove || hasMaxWinrate;
+          boolean ringedMove =
+              !Lizzie.config.colorByWinrateInsteadOfVisits && (isBestMove || hasMaxWinrate);
           if (!branchOpt.isPresent() || (ringedMove && isMouseOver)) {
             int strokeWidth = 1;
             if (ringedMove) {
               strokeWidth = 2;
               if (isBestMove) {
                 if (hasMaxWinrate) {
-                  g.setColor(Color.CYAN);
+                  g.setColor(color.darker());
+                  strokeWidth = 1;
                 } else {
-                  g.setColor(Color.MAGENTA);
+                  g.setColor(Color.RED);
                 }
               } else {
                 g.setColor(Color.BLUE);
               }
-              g.setStroke(new BasicStroke(strokeWidth));
             } else {
               g.setColor(color.darker());
             }
+            g.setStroke(new BasicStroke(strokeWidth));
             drawCircle(g, suggestionX, suggestionY, stoneRadius - strokeWidth / 2);
             g.setStroke(new BasicStroke(1));
           }

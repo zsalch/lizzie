@@ -2,18 +2,28 @@ package featurecat.lizzie;
 
 import featurecat.lizzie.theme.Theme;
 import java.awt.Color;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import org.json.*;
+import javax.swing.JFrame;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 public class Config {
+  public String language = "en";
 
   public boolean showBorder = false;
   public boolean showMoveNumber = false;
@@ -73,7 +83,7 @@ public class Config {
   public Optional<List<Double>> blunderWinrateThresholds;
   public Optional<Map<Double, Color>> blunderNodeColors;
   public int nodeColorMode = 0;
-  public boolean appendWinrateToComment = false;
+  public boolean appendWinrateToComment = true;
   public int boardPositionProportion = 4;
   public String gtpConsoleStyle = "";
   private final String defaultGtpConsoleStyle =
@@ -181,20 +191,23 @@ public class Config {
     showSubBoard = uiConfig.getBoolean("show-subboard");
     largeSubBoard = uiConfig.getBoolean("large-subboard");
     handicapInsteadOfWinrate = uiConfig.getBoolean("handicap-instead-of-winrate");
-    startMaximized = uiConfig.getBoolean("window-maximized");
     showDynamicKomi = uiConfig.getBoolean("show-dynamic-komi");
     appendWinrateToComment = uiConfig.optBoolean("append-winrate-to-comment");
     showCoordinates = uiConfig.optBoolean("show-coordinates");
     replayBranchIntervalSeconds = uiConfig.optDouble("replay-branch-interval-seconds", 1.0);
-    boardPositionProportion = uiConfig.optInt("board-postion-proportion", 4);
     colorByWinrateInsteadOfVisits = uiConfig.optBoolean("color-by-winrate-instead-of-visits");
+    boardPositionProportion = uiConfig.optInt("board-postion-proportion", 4);
 
     winrateStrokeWidth = theme.winrateStrokeWidth();
     minimumBlunderBarWidth = theme.minimumBlunderBarWidth();
     shadowSize = theme.shadowSize();
-    fontName = theme.fontName();
-    uiFontName = theme.uiFontName();
-    winrateFontName = theme.winrateFontName();
+
+    if (theme.fontName() != null) fontName = theme.fontName();
+
+    if (theme.uiFontName() != null) uiFontName = theme.uiFontName();
+
+    if (theme.winrateFontName() != null) winrateFontName = theme.winrateFontName();
+
     commentFontSize = theme.commentFontSize();
     commentFontColor = theme.commentFontColor();
     commentBackgroundColor = theme.commentBackgroundColor();
@@ -209,6 +222,9 @@ public class Config {
     nodeColorMode = theme.nodeColorMode();
 
     gtpConsoleStyle = uiConfig.optString("gtp-console-style", defaultGtpConsoleStyle);
+
+    System.out.println(Locale.getDefault().getLanguage()); // todo add config option for language...
+    setLanguage(Locale.getDefault().getLanguage());
   }
 
   // Modifies config by adding in values from default_config that are missing.
@@ -387,8 +403,6 @@ public class Config {
     ui.put("autosave-interval-seconds", -1);
     ui.put("handicap-instead-of-winrate", false);
     ui.put("board-size", 19);
-    ui.put("window-size", new JSONArray("[1229, 768]"));
-    ui.put("window-maximized", false);
     ui.put("show-dynamic-komi", true);
     ui.put("min-playout-ratio-for-stats", 0.0);
     ui.put("theme", "default");
@@ -423,6 +437,7 @@ public class Config {
     // Main Window Position & Size
     ui.put("main-window-position", new JSONArray("[]"));
     ui.put("gtp-console-position", new JSONArray("[]"));
+    ui.put("window-maximized", false);
 
     config.put("filesystem", filesys);
 
@@ -446,11 +461,15 @@ public class Config {
   }
 
   public void persist() throws IOException {
+    boolean windowIsMaximized = Lizzie.main.getExtendedState() == JFrame.MAXIMIZED_BOTH;
+
     JSONArray mainPos = new JSONArray();
-    mainPos.put(Lizzie.main.getX());
-    mainPos.put(Lizzie.main.getY());
-    mainPos.put(Lizzie.main.getWidth());
-    mainPos.put(Lizzie.main.getHeight());
+    if (!windowIsMaximized) {
+      mainPos.put(Lizzie.main.getX());
+      mainPos.put(Lizzie.main.getY());
+      mainPos.put(Lizzie.main.getWidth());
+      mainPos.put(Lizzie.main.getHeight());
+    }
     persistedUi.put("main-window-position", mainPos);
     JSONArray gtpPos = new JSONArray();
     gtpPos.put(Lizzie.gtpConsole.getX());
@@ -459,10 +478,25 @@ public class Config {
     gtpPos.put(Lizzie.gtpConsole.getHeight());
     persistedUi.put("gtp-console-position", gtpPos);
     persistedUi.put("board-postion-propotion", Lizzie.main.BoardPositionProportion);
+    persistedUi.put("window-maximized", windowIsMaximized);
     writeConfig(this.persisted, new File(persistFilename));
   }
 
   public void save() throws IOException {
     writeConfig(this.config, new File(configFilename));
+  }
+
+  public void setLanguage(String code) {
+    // currently will not set the resource bundle. TODO.
+    if (code.equals("ko")) {
+      // korean
+      if (fontName == null) {
+        fontName = "Malgun Gothic";
+      }
+      if (uiFontName == null) {
+        uiFontName = "Malgun Gothic";
+      }
+      winrateFontName = null;
+    }
   }
 }

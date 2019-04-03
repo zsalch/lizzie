@@ -1,10 +1,61 @@
 package featurecat.lizzie.gui;
 
-import static java.awt.event.KeyEvent.*;
+import static java.awt.event.KeyEvent.VK_0;
+import static java.awt.event.KeyEvent.VK_1;
+import static java.awt.event.KeyEvent.VK_2;
+import static java.awt.event.KeyEvent.VK_3;
+import static java.awt.event.KeyEvent.VK_4;
+import static java.awt.event.KeyEvent.VK_5;
+import static java.awt.event.KeyEvent.VK_6;
+import static java.awt.event.KeyEvent.VK_7;
+import static java.awt.event.KeyEvent.VK_8;
+import static java.awt.event.KeyEvent.VK_9;
+import static java.awt.event.KeyEvent.VK_A;
+import static java.awt.event.KeyEvent.VK_BACK_SPACE;
+import static java.awt.event.KeyEvent.VK_C;
+import static java.awt.event.KeyEvent.VK_CLOSE_BRACKET;
+import static java.awt.event.KeyEvent.VK_COMMA;
+import static java.awt.event.KeyEvent.VK_D;
+import static java.awt.event.KeyEvent.VK_DELETE;
+import static java.awt.event.KeyEvent.VK_DOWN;
+import static java.awt.event.KeyEvent.VK_E;
+import static java.awt.event.KeyEvent.VK_END;
+import static java.awt.event.KeyEvent.VK_ENTER;
+import static java.awt.event.KeyEvent.VK_F;
+import static java.awt.event.KeyEvent.VK_G;
+import static java.awt.event.KeyEvent.VK_H;
+import static java.awt.event.KeyEvent.VK_HOME;
+import static java.awt.event.KeyEvent.VK_I;
+import static java.awt.event.KeyEvent.VK_K;
+import static java.awt.event.KeyEvent.VK_LEFT;
+import static java.awt.event.KeyEvent.VK_M;
+import static java.awt.event.KeyEvent.VK_N;
+import static java.awt.event.KeyEvent.VK_O;
+import static java.awt.event.KeyEvent.VK_OPEN_BRACKET;
+import static java.awt.event.KeyEvent.VK_P;
+import static java.awt.event.KeyEvent.VK_PAGE_DOWN;
+import static java.awt.event.KeyEvent.VK_PAGE_UP;
+import static java.awt.event.KeyEvent.VK_PERIOD;
+import static java.awt.event.KeyEvent.VK_R;
+import static java.awt.event.KeyEvent.VK_RIGHT;
+import static java.awt.event.KeyEvent.VK_S;
+import static java.awt.event.KeyEvent.VK_SPACE;
+import static java.awt.event.KeyEvent.VK_T;
+import static java.awt.event.KeyEvent.VK_UP;
+import static java.awt.event.KeyEvent.VK_V;
+import static java.awt.event.KeyEvent.VK_W;
+import static java.awt.event.KeyEvent.VK_X;
+import static java.awt.event.KeyEvent.VK_Y;
+import static java.awt.event.KeyEvent.VK_Z;
 
 import featurecat.lizzie.Lizzie;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 public class Input implements MouseListener, KeyListener, MouseWheelListener, MouseMotionListener {
   @Override
@@ -429,7 +480,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         }
         break;
 
-      case VK_Q:
+      case VK_K:
         Lizzie.config.toggleEvaluationColoring();
         break;
 
@@ -454,7 +505,6 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 
     if (shouldDisableAnalysis && Lizzie.board.inAnalysisMode()) Lizzie.board.toggleAnalysis();
 
-    // TODO need check
     Lizzie.frame.repaint();
   }
 

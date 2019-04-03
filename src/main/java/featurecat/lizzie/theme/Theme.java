@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
-import javax.swing.JLabel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -82,7 +81,7 @@ public class Theme {
   /** Use custom font for general text */
   public String fontName() {
     String key = "font-name";
-    return config.optString(key, uiConfig.optString(key, new JLabel().getFont().getFontName()));
+    return config.optString(key, uiConfig.optString(key, null));
   }
 
   /** Use custom font for the UI */

@@ -648,7 +648,7 @@ public class BoardPane extends LizziePane {
 
     // Last winrate
     Optional<BoardData> lastNode = node.previous().flatMap(n -> Optional.of(n.getData()));
-    boolean validLastWinrate = lastNode.map(d -> d.playouts > 0).orElse(false);
+    boolean validLastWinrate = lastNode.map(d -> d.getPlayouts() > 0).orElse(false);
     double lastWR = validLastWinrate ? lastNode.get().winrate : 50;
 
     // Current winrate
@@ -664,7 +664,7 @@ public class BoardPane extends LizziePane {
         validWinrate = false;
       }
     } else {
-      validWinrate = (data.playouts > 0);
+      validWinrate = (data.getPlayouts() > 0);
       curWR = validWinrate ? data.winrate : 100 - lastWR;
     }
 

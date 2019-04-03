@@ -1,6 +1,10 @@
 package featurecat.lizzie.rules;
 
+import featurecat.lizzie.Lizzie;
+import featurecat.lizzie.analysis.MoveData;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,7 +22,8 @@ public class BoardData {
   public boolean verify;
 
   public double winrate;
-  public int playouts;
+  private int playouts;
+  public List<MoveData> bestMoves;
   public int blackCaptures;
   public int whiteCaptures;
 
@@ -55,6 +60,7 @@ public class BoardData {
     this.playouts = playouts;
     this.blackCaptures = blackCaptures;
     this.whiteCaptures = whiteCaptures;
+    this.bestMoves = new ArrayList<>();
   }
 
   public static BoardData empty(int size) {
@@ -138,5 +144,52 @@ public class BoardData {
    */
   public String propertiesString() {
     return SGFParser.propertiesString(properties);
+  }
+
+  public double getWinrate() {
+    if (!blackToPlay || !Lizzie.config.uiConfig.getBoolean("win-rate-always-black")) {
+      return winrate;
+    } else {
+      return 100 - winrate;
+    }
+  }
+
+  public void tryToSetBestMoves(List<MoveData> moves) {
+    if (MoveData.getPlayouts(moves) > playouts) {
+      bestMoves = moves;
+      setPlayouts(MoveData.getPlayouts(moves));
+      winrate = getWinrateFromBestMoves(moves);
+    }
+  }
+
+  public static double getWinrateFromBestMoves(List<MoveData> bestMoves) {
+    // return the weighted average winrate of bestMoves
+    return bestMoves
+        .stream()
+        .mapToDouble(move -> move.winrate * move.playouts / MoveData.getPlayouts(bestMoves))
+        .sum();
+  }
+
+  public String bestMovesToString() {
+    StringBuilder sb = new StringBuilder();
+    for (MoveData move : bestMoves) {
+      // eg: info move R5 visits 38 winrate 5404 pv R5 Q5 R6 S4 Q10 C3 D3 C4 C6 C5 D5
+      sb.append("move ").append(move.coordinate);
+      sb.append(" visits ").append(move.playouts);
+      sb.append(" winrate ").append((int) (move.winrate * 100));
+      sb.append(" pv ").append(move.variation.stream().reduce((a, b) -> a + " " + b).get());
+      sb.append(" info "); // this order is just because of how the MoveData info parser works
+    }
+    return sb.toString();
+  }
+
+  public void setPlayouts(int playouts) {
+    if (playouts > this.playouts) {
+      this.playouts = playouts;
+    }
+  }
+
+  public int getPlayouts() {
+    return playouts;
   }
 }

@@ -1,6 +1,7 @@
 package featurecat.lizzie.analysis;
 
 import featurecat.lizzie.Lizzie;
+import featurecat.lizzie.rules.BoardData;
 import featurecat.lizzie.rules.Stone;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -209,12 +210,16 @@ public class Leelaz {
     outputStream = new BufferedOutputStream(process.getOutputStream());
   }
 
-  private void parseInfo(String line) {
-    bestMoves = new ArrayList<>();
+  public static List<MoveData> parseInfo(String line) {
+    List<MoveData> bestMoves = new ArrayList<>();
     String[] variations = line.split(" info ");
     for (String var : variations) {
-      bestMoves.add(MoveData.fromInfo(var));
+      if (!var.trim().isEmpty()) {
+        bestMoves.add(MoveData.fromInfo(var));
+      }
     }
+    Lizzie.board.getData().tryToSetBestMoves(bestMoves);
+    return bestMoves;
   }
 
   /**
@@ -249,7 +254,7 @@ public class Leelaz {
         Lizzie.main.updateTitle();
         if (isResponseUpToDate()) {
           // This should not be stale data when the command number match
-          parseInfo(line.substring(5));
+          this.bestMoves = parseInfo(line.substring(5));
           notifyBestMoveListeners();
           Lizzie.frame.repaint();
           // don't follow the maxAnalyzeTime rule if we are in analysis mode
@@ -587,15 +592,14 @@ public class Leelaz {
       // we should match the Leelaz UCTNode get_eval, which is a weighted average
       // copy the list to avoid concurrent modification exception... TODO there must be a better way
       // (note the concurrent modification exception is very very rare)
-      final List<MoveData> moves = new ArrayList<MoveData>(bestMoves);
+      // We should use Lizzie Board's best moves as they will generally be the most accurate
+      final List<MoveData> moves = new ArrayList<MoveData>(Lizzie.board.getData().bestMoves);
 
       // get the total number of playouts in moves
       int totalPlayouts = moves.stream().mapToInt(move -> move.playouts).sum();
       stats.totalPlayouts = totalPlayouts;
 
-      // set maxWinrate to the weighted average winrate of moves
-      stats.maxWinrate =
-          moves.stream().mapToDouble(move -> move.winrate * move.playouts / totalPlayouts).sum();
+      stats.maxWinrate = BoardData.getWinrateFromBestMoves(moves);
     }
 
     return stats;
