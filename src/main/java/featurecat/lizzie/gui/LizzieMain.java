@@ -9,11 +9,14 @@ import featurecat.lizzie.analysis.GameInfo;
 import featurecat.lizzie.analysis.MoveData;
 import featurecat.lizzie.rules.GIBParser;
 import featurecat.lizzie.rules.SGFParser;
+
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.TexturePaint;
@@ -191,7 +194,7 @@ public class LizzieMain extends JFrame {
     getContentPane().add(subBoardPane, LizzieLayout.SUB_BOARD);
     getContentPane().add(variationTreePane, LizzieLayout.VARIATION);
     getContentPane().add(commentPane, LizzieLayout.COMMENT);
-
+    variationTreePane.toWindow(new Point(1000, 100), new Point(0, 0), new Dimension(200, 300));
     setVisible(true);
 
     createBufferStrategy(2);
