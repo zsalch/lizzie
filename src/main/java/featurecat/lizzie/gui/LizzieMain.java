@@ -350,6 +350,7 @@ public class LizzieMain extends JFrame {
     // TODO
     layout.layoutContainer(getContentPane());
     layout.invalidateLayout(getContentPane());
+    repaint();
   }
 
   public void refresh(boolean all) {
