@@ -115,10 +115,10 @@ public class LizziePane extends JPanel {
   public String getUIClassID() {
     return uiClassID;
   }
-  
-  public void toWindow(Point position, Point origin, Dimension size) {
+
+  public void toWindow(Point position, Dimension size) {
     if (getUI() != null) {
-      getUI().toWindow(position, origin, size);
+      getUI().toWindow(position, size);
     }
   }
 
