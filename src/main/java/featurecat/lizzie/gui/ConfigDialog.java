@@ -61,6 +61,7 @@ public class ConfigDialog extends JDialog {
   private JRadioButton rdoBoardSize7;
   private JRadioButton rdoBoardSize5;
   private JRadioButton rdoBoardSize4;
+  private JFormattedTextField txtMinPlayoutRatioForStats;
 
   public String enginePath = "";
   public String weightPath = "";
@@ -502,6 +503,23 @@ public class ConfigDialog extends JDialog {
     uiTab.add(txtBoardSize);
     txtBoardSize.setColumns(10);
 
+    txtMinPlayoutRatioForStats =
+        new JFormattedTextField(
+            new InternationalFormatter() {
+              protected DocumentFilter getDocumentFilter() {
+                return filter;
+              }
+
+              private DocumentFilter filter = new NumericFilter();
+            });
+    txtMinPlayoutRatioForStats.setColumns(10);
+    txtMinPlayoutRatioForStats.setBounds(171, 35, 57, 26);
+    uiTab.add(txtMinPlayoutRatioForStats);
+
+    JLabel lblMinPlayoutRatioForStats = new JLabel("Min Playout Ratio for Stats");
+    lblMinPlayoutRatioForStats.setBounds(6, 40, 157, 16);
+    uiTab.add(lblMinPlayoutRatioForStats);
+
     JTabbedPane tabTheme = new JTabbedPane(JTabbedPane.TOP);
     tabbedPane.addTab(resourceBundle.getString("LizzieConfig.title.theme"), null, tabTheme, null);
     txts =
@@ -537,6 +555,7 @@ public class ConfigDialog extends JDialog {
     curPath = (new File("")).getAbsoluteFile().toPath();
     osName = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
     setBoardSize();
+    txtMinPlayoutRatioForStats.setText(String.valueOf(Lizzie.config.minPlayoutRatioForStats));
     setLocationRelativeTo(getOwner());
   }
 
@@ -548,7 +567,7 @@ public class ConfigDialog extends JDialog {
     if (isWindows()) {
       FileNameExtensionFilter filter =
           new FileNameExtensionFilter(
-              resourceBundle.getString("LizzieConfig.title.engine"), "exe", "bat");
+              resourceBundle.getString("LizzieConfig.title.engine"), "exe", "bat", "sh");
       chooser.setFileFilter(filter);
     } else {
       setVisible(false);
@@ -626,16 +645,21 @@ public class ConfigDialog extends JDialog {
 
   private void saveConfig() {
     try {
-      leelazConfig.putOpt("max-analyze-time-minutes", txtFieldValue(txtMaxAnalyzeTime));
+      leelazConfig.putOpt("max-analyze-time-minutes", txtFieldIntValue(txtMaxAnalyzeTime));
       leelazConfig.putOpt(
-          "analyze-update-interval-centisec", txtFieldValue(txtAnalyzeUpdateInterval));
-      leelazConfig.putOpt("max-game-thinking-time-seconds", txtFieldValue(txtMaxGameThinkingTime));
+          "analyze-update-interval-centisec", txtFieldIntValue(txtAnalyzeUpdateInterval));
+      leelazConfig.putOpt(
+          "max-game-thinking-time-seconds", txtFieldIntValue(txtMaxGameThinkingTime));
       leelazConfig.putOpt("print-comms", chkPrintEngineLog.isSelected());
       leelazConfig.put("engine-command", txtEngine.getText().trim());
       JSONArray engines = new JSONArray();
       Arrays.asList(txts).forEach(t -> engines.put(t.getText().trim()));
       leelazConfig.put("engine-command-list", engines);
       Lizzie.config.uiConfig.put("board-size", getBoardSize());
+      Lizzie.config.minPlayoutRatioForStats = txtFieldDoubleValue(txtMinPlayoutRatioForStats);
+      Lizzie.config.uiConfig.put(
+          "min-playout-ratio-for-stats", Lizzie.config.minPlayoutRatioForStats);
+
       Lizzie.config.save();
     } catch (IOException e) {
       e.printStackTrace();
@@ -646,11 +670,19 @@ public class ConfigDialog extends JDialog {
     Lizzie.board.reopen(getBoardSize());
   }
 
-  private Integer txtFieldValue(JTextField txt) {
+  private Integer txtFieldIntValue(JTextField txt) {
     if (txt.getText().trim().isEmpty()) {
       return 0;
     } else {
       return Integer.parseInt(txt.getText().trim());
+    }
+  }
+
+  private Double txtFieldDoubleValue(JTextField txt) {
+    if (txt.getText().trim().isEmpty()) {
+      return 0.0;
+    } else {
+      return new Double(txt.getText().trim());
     }
   }
 
@@ -668,6 +700,26 @@ public class ConfigDialog extends JDialog {
     public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
         throws BadLocationException {
       String newStr = text != null ? text.replaceAll("\\D++", "") : "";
+      if (!newStr.isEmpty()) {
+        fb.replace(offset, length, newStr, attrs);
+      }
+    }
+  }
+
+  private class NumericFilter extends DocumentFilter {
+    @Override
+    public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+        throws BadLocationException {
+      String newStr = string != null ? string.replaceAll("[^0-9\\.]++", "") : "";
+      if (!newStr.isEmpty()) {
+        fb.insertString(offset, newStr, attr);
+      }
+    }
+
+    @Override
+    public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+        throws BadLocationException {
+      String newStr = text != null ? text.replaceAll("[^0-9\\.]++", "") : "";
       if (!newStr.isEmpty()) {
         fb.replace(offset, length, newStr, attrs);
       }

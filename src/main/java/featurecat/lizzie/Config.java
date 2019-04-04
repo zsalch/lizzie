@@ -46,6 +46,7 @@ public class Config {
   public double replayBranchIntervalSeconds = 1.0;
   public boolean showCoordinates = false;
   public boolean colorByWinrateInsteadOfVisits = false;
+  public double minPlayoutRatioForStats = 0.0;
 
   public boolean showStatus = true;
   public boolean showBranch = true;
@@ -197,6 +198,7 @@ public class Config {
     replayBranchIntervalSeconds = uiConfig.optDouble("replay-branch-interval-seconds", 1.0);
     colorByWinrateInsteadOfVisits = uiConfig.optBoolean("color-by-winrate-instead-of-visits");
     boardPositionProportion = uiConfig.optInt("board-postion-proportion", 4);
+    minPlayoutRatioForStats = uiConfig.optDouble("min-playout-ratio-for-stats", 0.0);
 
     winrateStrokeWidth = theme.winrateStrokeWidth();
     minimumBlunderBarWidth = theme.minimumBlunderBarWidth();
