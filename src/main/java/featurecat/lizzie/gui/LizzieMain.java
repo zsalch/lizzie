@@ -253,42 +253,42 @@ public class LizzieMain extends JFrame {
   // TODO Need Better Background
   public void paint(Graphics g0) {
     super.paintComponents(g0);
+    //
+    //            int width = getWidth();
+    //            int height = getHeight();
+    //
+    //            originX = getX();
+    //            originY = getY();
+    //            originW = width;
+    //            originH = height;
+    //
+    //            Optional<Graphics2D> backgroundG;
+    //            if (cachedBackgroundWidth != width
+    //                || cachedBackgroundHeight != height
+    //                || redrawBackgroundAnyway) {
+    //              backgroundG = Optional.of(createBackground());
+    //            } else {
+    //              backgroundG = Optional.empty();
+    //            }
 
-    //        int width = getWidth();
-    //        int height = getHeight();
-    //
-    //        originX = getX();
-    //        originY = getY();
-    //        originW = width;
-    //        originH = height;
-    //
-    //        Optional<Graphics2D> backgroundG;
-    //        if (cachedBackgroundWidth != width
-    //            || cachedBackgroundHeight != height
-    //            || redrawBackgroundAnyway) {
-    //          backgroundG = Optional.of(createBackground());
-    //        } else {
-    //          backgroundG = Optional.empty();
-    //        }
-    //
-    //  //      cachedImage = new BufferedImage(width, height, TYPE_INT_ARGB);
-    //  //      Graphics2D g = (Graphics2D) cachedImage.getGraphics();
-    //  //      g.setRenderingHint(RenderingHints.KEY_RENDERING,
-    // RenderingHints.VALUE_RENDER_QUALITY);
-    //
-    //        // cleanup
-    //  //      g.dispose();
-    //
-    //        // draw the image
-    //        Graphics2D bsGraphics = (Graphics2D) bs.getDrawGraphics();
-    //        bsGraphics.setRenderingHint(RenderingHints.KEY_RENDERING,
+    //      cachedImage = new BufferedImage(width, height, TYPE_INT_ARGB);
+    //      Graphics2D g = (Graphics2D) cachedImage.getGraphics();
+    //      g.setRenderingHint(RenderingHints.KEY_RENDERING,
     //     RenderingHints.VALUE_RENDER_QUALITY);
-    //        bsGraphics.drawImage(cachedBackground, 0, 0, null);
-    //  //      bsGraphics.drawImage(cachedImage, 0, 0, null);
-    //
-    //        // cleanup
-    //        bsGraphics.dispose();
-    //        bs.show();
+
+    // cleanup
+    //      g.dispose();
+
+    // draw the image
+    //            Graphics2D bsGraphics = (Graphics2D) bs.getDrawGraphics();
+    //            bsGraphics.setRenderingHint(RenderingHints.KEY_RENDERING,
+    //         RenderingHints.VALUE_RENDER_QUALITY);
+    //            bsGraphics.drawImage(cachedBackground, 0, 0, null);
+    //      bsGraphics.drawImage(cachedImage, 0, 0, null);
+
+    // cleanup
+    //            bsGraphics.dispose();
+    //            bs.show();
   }
 
   /**

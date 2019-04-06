@@ -289,7 +289,7 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
       return;
     }
     synchronized (target.getTreeLock()) {
-      //      Container main = getMain(target);
+      Container main = getMain(target);
       Insets insets = target.getInsets();
 
       int x = target.getX();
@@ -320,9 +320,9 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
       int boardX =
           (width - maxSize)
               / 8
-              * (Lizzie.main == null
+              * ((main == null || !(main instanceof LizzieMain))
                   ? Lizzie.config.boardPositionProportion
-                  : Lizzie.main.BoardPositionProportion);
+                  : ((LizzieMain) main).BoardPositionProportion);
       if (noBasic && noWinrate && noSubBoard) {
         boardX = leftInset;
       } else if (noVariation && noComment) {
@@ -640,6 +640,14 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
 
   public String toString() {
     return getClass().getName() + "[hgap=" + hgap + ",vgap=" + vgap + "]";
+  }
+
+  private Container getMain(Container target) {
+    Container p = (target != null) ? target.getParent() : null;
+    while (p != null && !(p instanceof LizzieMain)) {
+      p = p.getParent();
+    }
+    return p;
   }
 
   public int getMode() {
