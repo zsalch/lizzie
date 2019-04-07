@@ -546,6 +546,9 @@ public class Leelaz {
     } else {
       sendCommand("name"); // ends pondering
     }
+    if (Lizzie.main.basicInfoPane != null) {
+      Lizzie.main.basicInfoPane.repaint();
+    }
   }
 
   /** End the process */
