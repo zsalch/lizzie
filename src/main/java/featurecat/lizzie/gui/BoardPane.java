@@ -718,7 +718,7 @@ public class BoardPane extends LizziePane {
             }
             boardRenderer.setDisplayedBranchLength(oriBranchLength);
             isReplayVariation = false;
-            if (Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
+            if (!Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
           }
         };
     Thread thread = new Thread(runnable);
