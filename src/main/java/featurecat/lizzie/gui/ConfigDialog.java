@@ -43,7 +43,17 @@ import org.json.JSONObject;
 
 public class ConfigDialog extends JDialog {
   public final ResourceBundle resourceBundle = ResourceBundle.getBundle("l10n.DisplayStrings");
+
+  public String enginePath = "";
+  public String weightPath = "";
+  public String commandHelp = "";
+
   private String osName;
+  private Path curPath;
+  private BufferedInputStream inputStream;
+  private JSONObject leelazConfig;
+
+  // Engine Tab
   private JTextField txtEngine;
   private JTextField txtEngine1;
   private JTextField txtEngine2;
@@ -55,6 +65,14 @@ public class ConfigDialog extends JDialog {
   private JTextField txtEngine8;
   private JTextField txtEngine9;
   private JTextField[] txts;
+  private JFormattedTextField txtMaxAnalyzeTime;
+  private JFormattedTextField txtMaxGameThinkingTime;
+  private JFormattedTextField txtAnalyzeUpdateInterval;
+  private JCheckBox chkPrintEngineLog;
+
+  // UI Tab
+  private JTextField txtBoardSize;
+  private JRadioButton rdoBoardSizeOther;
   private JRadioButton rdoBoardSize19;
   private JRadioButton rdoBoardSize13;
   private JRadioButton rdoBoardSize9;
@@ -62,20 +80,11 @@ public class ConfigDialog extends JDialog {
   private JRadioButton rdoBoardSize5;
   private JRadioButton rdoBoardSize4;
   private JFormattedTextField txtMinPlayoutRatioForStats;
-
-  public String enginePath = "";
-  public String weightPath = "";
-  public String commandHelp = "";
-
-  private Path curPath;
-  private BufferedInputStream inputStream;
-  private JFormattedTextField txtMaxAnalyzeTime;
-  private JFormattedTextField txtMaxGameThinkingTime;
-  private JFormattedTextField txtAnalyzeUpdateInterval;
-  private JCheckBox chkPrintEngineLog;
-  private JSONObject leelazConfig;
-  private JTextField txtBoardSize;
-  private JRadioButton rdoBoardSizeOther;
+  private JCheckBox chkShowCoordinates;
+  private JRadioButton rdoShowMoveNumberNo;
+  private JRadioButton rdoShowMoveNumberAll;
+  private JRadioButton rdoShowMoveNumberLast;
+  private JTextField txtShowMoveNumber;
 
   public ConfigDialog() {
     setTitle(resourceBundle.getString("LizzieConfig.title.config"));
@@ -434,6 +443,7 @@ public class ConfigDialog extends JDialog {
     chkPrintEngineLog = new JCheckBox("");
     chkPrintEngineLog.setBounds(167, 425, 201, 23);
     engineTab.add(chkPrintEngineLog);
+
     JPanel uiTab = new JPanel();
     tabbedPane.addTab(resourceBundle.getString("LizzieConfig.title.ui"), null, uiTab, null);
     uiTab.setLayout(null);
@@ -503,6 +513,9 @@ public class ConfigDialog extends JDialog {
     uiTab.add(txtBoardSize);
     txtBoardSize.setColumns(10);
 
+    JLabel lblMinPlayoutRatioForStats = new JLabel("Min Playout Ratio for Stats");
+    lblMinPlayoutRatioForStats.setBounds(6, 40, 157, 16);
+    uiTab.add(lblMinPlayoutRatioForStats);
     txtMinPlayoutRatioForStats =
         new JFormattedTextField(
             new InternationalFormatter() {
@@ -516,9 +529,70 @@ public class ConfigDialog extends JDialog {
     txtMinPlayoutRatioForStats.setBounds(171, 35, 57, 26);
     uiTab.add(txtMinPlayoutRatioForStats);
 
-    JLabel lblMinPlayoutRatioForStats = new JLabel("Min Playout Ratio for Stats");
-    lblMinPlayoutRatioForStats.setBounds(6, 40, 157, 16);
-    uiTab.add(lblMinPlayoutRatioForStats);
+    JLabel lblShowCoordinates =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.showCoordinates"));
+    lblShowCoordinates.setBounds(6, 67, 157, 16);
+    uiTab.add(lblShowCoordinates);
+    chkShowCoordinates = new JCheckBox("");
+    chkShowCoordinates.addChangeListener(
+        new ChangeListener() {
+          public void stateChanged(ChangeEvent e) {
+            if (chkShowCoordinates.isSelected() != Lizzie.config.showCoordinates) {
+              Lizzie.config.toggleCoordinates();
+              Lizzie.main.invalidLayout();
+            }
+          }
+        });
+    chkShowCoordinates.setBounds(170, 63, 57, 23);
+    uiTab.add(chkShowCoordinates);
+
+    JLabel lblShowMoveNumber =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.showMoveNumber"));
+    lblShowMoveNumber.setBounds(6, 94, 157, 16);
+    uiTab.add(lblShowMoveNumber);
+
+    rdoShowMoveNumberNo =
+        new JRadioButton(resourceBundle.getString("LizzieConfig.title.showMoveNumberNo"));
+    rdoShowMoveNumberNo.setBounds(170, 89, 84, 23);
+    uiTab.add(rdoShowMoveNumberNo);
+
+    rdoShowMoveNumberAll =
+        new JRadioButton(resourceBundle.getString("LizzieConfig.title.showMoveNumberAll"));
+    rdoShowMoveNumberAll.setBounds(261, 91, 65, 23);
+    uiTab.add(rdoShowMoveNumberAll);
+
+    rdoShowMoveNumberLast =
+        new JRadioButton(resourceBundle.getString("LizzieConfig.title.showMoveNumberLast"));
+    rdoShowMoveNumberLast.addChangeListener(
+        new ChangeListener() {
+          public void stateChanged(ChangeEvent e) {
+            if (rdoShowMoveNumberLast.isSelected()) {
+              txtShowMoveNumber.setEnabled(true);
+            } else {
+              txtShowMoveNumber.setEnabled(false);
+            }
+          }
+        });
+    rdoShowMoveNumberLast.setBounds(325, 91, 67, 23);
+    uiTab.add(rdoShowMoveNumberLast);
+
+    ButtonGroup showMoveGroup = new ButtonGroup();
+    showMoveGroup.add(rdoShowMoveNumberNo);
+    showMoveGroup.add(rdoShowMoveNumberAll);
+    showMoveGroup.add(rdoShowMoveNumberLast);
+
+    txtShowMoveNumber =
+        new JFormattedTextField(
+            new InternationalFormatter(nf) {
+              protected DocumentFilter getDocumentFilter() {
+                return filter;
+              }
+
+              private DocumentFilter filter = new DigitOnlyFilter();
+            });
+    txtShowMoveNumber.setBounds(395, 89, 52, 26);
+    uiTab.add(txtShowMoveNumber);
+    txtShowMoveNumber.setColumns(10);
 
     JTabbedPane tabTheme = new JTabbedPane(JTabbedPane.TOP);
     tabbedPane.addTab(resourceBundle.getString("LizzieConfig.title.theme"), null, tabTheme, null);
@@ -556,6 +630,8 @@ public class ConfigDialog extends JDialog {
     osName = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
     setBoardSize();
     txtMinPlayoutRatioForStats.setText(String.valueOf(Lizzie.config.minPlayoutRatioForStats));
+    chkShowCoordinates.setSelected(Lizzie.config.showCoordinates);
+    setShowMoveNumber();
     setLocationRelativeTo(getOwner());
   }
 
@@ -659,7 +735,17 @@ public class ConfigDialog extends JDialog {
       Lizzie.config.minPlayoutRatioForStats = txtFieldDoubleValue(txtMinPlayoutRatioForStats);
       Lizzie.config.uiConfig.put(
           "min-playout-ratio-for-stats", Lizzie.config.minPlayoutRatioForStats);
-
+      Lizzie.config.uiConfig.putOpt("show-coordinates", chkShowCoordinates.isSelected());
+      Lizzie.config.uiConfig.put("board-size", getBoardSize());
+      Lizzie.config.showMoveNumber = !rdoShowMoveNumberNo.isSelected();
+      Lizzie.config.onlyLastMoveNumber =
+          rdoShowMoveNumberLast.isSelected() ? txtFieldIntValue(txtShowMoveNumber) : 0;
+      Lizzie.config.allowMoveNumber =
+          Lizzie.config.showMoveNumber
+              ? (Lizzie.config.onlyLastMoveNumber > 0 ? Lizzie.config.onlyLastMoveNumber : -1)
+              : 0;
+      Lizzie.config.uiConfig.put("show-move-number", Lizzie.config.showMoveNumber);
+      Lizzie.config.uiConfig.put("only-last-move-number", Lizzie.config.onlyLastMoveNumber);
       Lizzie.config.save();
     } catch (IOException e) {
       e.printStackTrace();
@@ -779,6 +865,21 @@ public class ConfigDialog extends JDialog {
         size = 19;
       }
       return size;
+    }
+  }
+
+  private void setShowMoveNumber() {
+    txtShowMoveNumber.setEnabled(false);
+    if (Lizzie.config.showMoveNumber) {
+      if (Lizzie.config.onlyLastMoveNumber > 0) {
+        rdoShowMoveNumberLast.setSelected(true);
+        txtShowMoveNumber.setText(String.valueOf(Lizzie.config.onlyLastMoveNumber));
+        txtShowMoveNumber.setEnabled(true);
+      } else {
+        rdoShowMoveNumberAll.setSelected(true);
+      }
+    } else {
+      rdoShowMoveNumberNo.setSelected(true);
     }
   }
 }
