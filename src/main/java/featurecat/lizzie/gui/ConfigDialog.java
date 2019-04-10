@@ -513,7 +513,8 @@ public class ConfigDialog extends JDialog {
     uiTab.add(txtBoardSize);
     txtBoardSize.setColumns(10);
 
-    JLabel lblMinPlayoutRatioForStats = new JLabel(resourceBundle.getString("LizzieConfig.title.minPlayoutRatioForStats"));
+    JLabel lblMinPlayoutRatioForStats =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.minPlayoutRatioForStats"));
     lblMinPlayoutRatioForStats.setBounds(6, 40, 157, 16);
     uiTab.add(lblMinPlayoutRatioForStats);
     txtMinPlayoutRatioForStats =
