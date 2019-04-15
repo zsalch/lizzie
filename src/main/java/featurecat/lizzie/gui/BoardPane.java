@@ -12,6 +12,7 @@ import featurecat.lizzie.rules.Board;
 import featurecat.lizzie.rules.BoardData;
 import featurecat.lizzie.rules.BoardHistoryNode;
 import featurecat.lizzie.rules.SGFParser;
+import featurecat.lizzie.rules.Stone;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -111,7 +112,15 @@ public class BoardPane extends LizziePane {
         new MouseAdapter() {
           @Override
           public void mouseClicked(MouseEvent e) {
-            onClicked(e.getX(), e.getY());
+            if (e.getButton() == MouseEvent.BUTTON1) { // left click
+              if (e.getClickCount() == 2) {
+                onDoubleClicked(e.getX(), e.getY());
+              } else {
+                onClicked(e.getX(), e.getY());
+              }
+            } else if (e.getButton() == MouseEvent.BUTTON3) { // right click
+              Input.undo();
+            }
           }
         });
     addMouseMotionListener(
@@ -375,6 +384,24 @@ public class BoardPane extends LizziePane {
         Lizzie.board.place(coords[0], coords[1]);
       //      repaint();
       //      owner.updateStatus();
+    }
+  }
+
+  public void onDoubleClicked(int x, int y) {
+    // Check for board double click
+    Optional<int[]> boardCoordinates = boardRenderer.convertScreenToCoordinates(x, y);
+    if (boardCoordinates.isPresent()) {
+      int[] coords = boardCoordinates.get();
+      if (!isPlayingAgainstLeelaz) {
+        int index = Lizzie.board.getIndex(coords[0], coords[1]);
+        if (Lizzie.board.isValid(coords[0], coords[1])
+            && (Lizzie.board.getHistory().getStones()[index] != Stone.EMPTY)) {
+          int moveNumber = Lizzie.board.getHistory().getMoveNumberList()[index];
+          if (moveNumber > 0) {
+            Lizzie.board.goToMoveNumberBeyondBranch(moveNumber);
+          }
+        }
+      }
     }
   }
 
