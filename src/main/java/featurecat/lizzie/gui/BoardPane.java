@@ -113,7 +113,7 @@ public class BoardPane extends LizziePane {
           @Override
           public void mouseClicked(MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1) { // left click
-              if (e.getClickCount() == 2) {
+              if (e.getClickCount() == 2) { // TODO: Maybe need to delay check
                 onDoubleClicked(e.getX(), e.getY());
               } else {
                 onClicked(e.getX(), e.getY());
