@@ -207,6 +207,7 @@ public class LizzieMain extends JFrame {
             Lizzie.shutdown();
           }
         });
+
     // Show the playouts in the title
     showPlayouts.scheduleAtFixedRate(
         new Runnable() {
