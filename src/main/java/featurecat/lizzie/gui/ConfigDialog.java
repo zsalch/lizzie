@@ -774,7 +774,7 @@ public class ConfigDialog extends JDialog {
     lblThemes.setBounds(12, 11, 90, 20);
     themeTab.add(lblThemes);
     cmbThemes = new JComboBox(themeList.toArray());
-    cmbThemes.setBounds(112, 11, 96, 20);
+    cmbThemes.setBounds(112, 11, 173, 20);
     themeTab.add(cmbThemes);
 
     // Engines
