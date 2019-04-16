@@ -30,6 +30,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -196,6 +197,13 @@ public class LizzieMain extends JFrame {
     WindowPosition.restorePane(Lizzie.config.persistedUi, subBoardPane);
     WindowPosition.restorePane(Lizzie.config.persistedUi, variationTreePane);
     WindowPosition.restorePane(Lizzie.config.persistedUi, commentPane);
+
+    try {
+      this.setIconImage(ImageIO.read(getClass().getResourceAsStream("/assets/logo.png")));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
     setVisible(true);
 
     createBufferStrategy(2);
