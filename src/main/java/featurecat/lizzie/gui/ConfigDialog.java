@@ -700,7 +700,7 @@ public class ConfigDialog extends JDialog {
     themeList.add(0, resourceBundle.getString("LizzieConfig.title.defaultTheme"));
 
     JLabel lblThemes = new JLabel(resourceBundle.getString("LizzieConfig.title.theme"));
-    lblThemes.setBounds(10, 11, 155, 20);
+    lblThemes.setBounds(10, 11, 163, 20);
     themeTab.add(lblThemes);
     cmbThemes = new JComboBox(themeList.toArray());
     cmbThemes.addItemListener(
@@ -718,7 +718,7 @@ public class ConfigDialog extends JDialog {
     themeTab.add(lblWinrateStrokeWidth);
     spnWinrateStrokeWidth = new JSpinner();
     spnWinrateStrokeWidth.setModel(new SpinnerNumberModel(2, 1, 10, 1));
-    spnWinrateStrokeWidth.setBounds(175, 42, 41, 20);
+    spnWinrateStrokeWidth.setBounds(175, 42, 69, 20);
     themeTab.add(spnWinrateStrokeWidth);
 
     JLabel lblMinimumBlunderBarWidth =
@@ -727,7 +727,7 @@ public class ConfigDialog extends JDialog {
     themeTab.add(lblMinimumBlunderBarWidth);
     spnMinimumBlunderBarWidth = new JSpinner();
     spnMinimumBlunderBarWidth.setModel(new SpinnerNumberModel(1, 1, 10, 1));
-    spnMinimumBlunderBarWidth.setBounds(175, 72, 41, 20);
+    spnMinimumBlunderBarWidth.setBounds(175, 72, 69, 20);
     themeTab.add(spnMinimumBlunderBarWidth);
 
     JLabel lblShadowSize = new JLabel(resourceBundle.getString("LizzieConfig.title.shadowSize"));
@@ -735,7 +735,7 @@ public class ConfigDialog extends JDialog {
     themeTab.add(lblShadowSize);
     spnShadowSize = new JSpinner();
     spnShadowSize.setModel(new SpinnerNumberModel(50, 1, 100, 1));
-    spnShadowSize.setBounds(175, 102, 41, 20);
+    spnShadowSize.setBounds(175, 102, 69, 20);
     themeTab.add(spnShadowSize);
 
     fontList =
@@ -798,7 +798,7 @@ public class ConfigDialog extends JDialog {
     JLabel lblBackgroundPath =
         new JLabel(resourceBundle.getString("LizzieConfig.title.backgroundPath"));
     lblBackgroundPath.setHorizontalAlignment(SwingConstants.LEFT);
-    lblBackgroundPath.setBounds(10, 225, 92, 16);
+    lblBackgroundPath.setBounds(10, 225, 163, 16);
     themeTab.add(lblBackgroundPath);
     txtBackgroundPath = new JTextField();
     txtBackgroundPath.setText((String) null);
@@ -808,7 +808,7 @@ public class ConfigDialog extends JDialog {
 
     JLabel lblBoardPath = new JLabel(resourceBundle.getString("LizzieConfig.title.boardPath"));
     lblBoardPath.setHorizontalAlignment(SwingConstants.LEFT);
-    lblBoardPath.setBounds(10, 255, 92, 16);
+    lblBoardPath.setBounds(10, 255, 163, 16);
     themeTab.add(lblBoardPath);
     txtBoardPath = new JTextField();
     txtBoardPath.setText((String) null);
@@ -819,7 +819,7 @@ public class ConfigDialog extends JDialog {
     JLabel lblBlackStonePath =
         new JLabel(resourceBundle.getString("LizzieConfig.title.blackStonePath"));
     lblBlackStonePath.setHorizontalAlignment(SwingConstants.LEFT);
-    lblBlackStonePath.setBounds(10, 285, 92, 16);
+    lblBlackStonePath.setBounds(10, 285, 163, 16);
     themeTab.add(lblBlackStonePath);
     txtBlackStonePath = new JTextField();
     txtBlackStonePath.setText((String) null);
@@ -830,7 +830,7 @@ public class ConfigDialog extends JDialog {
     JLabel lblWhiteStonePath =
         new JLabel(resourceBundle.getString("LizzieConfig.title.whiteStonePath"));
     lblWhiteStonePath.setHorizontalAlignment(SwingConstants.LEFT);
-    lblWhiteStonePath.setBounds(10, 315, 92, 16);
+    lblWhiteStonePath.setBounds(10, 315, 163, 16);
     themeTab.add(lblWhiteStonePath);
     txtWhiteStonePath = new JTextField();
     txtWhiteStonePath.setText((String) null);
