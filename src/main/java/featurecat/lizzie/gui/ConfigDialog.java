@@ -676,84 +676,6 @@ public class ConfigDialog extends JDialog {
     sldBoardPositionProportion.setBounds(170, 225, 200, 28);
     uiTab.add(sldBoardPositionProportion);
 
-    JLabel lblWinrateStrokeWidth =
-        new JLabel(resourceBundle.getString("LizzieConfig.title.winrateStrokeWidth"));
-    lblWinrateStrokeWidth.setBounds(6, 274, 163, 16);
-    uiTab.add(lblWinrateStrokeWidth);
-    spnWinrateStrokeWidth = new JSpinner();
-    spnWinrateStrokeWidth.setModel(new SpinnerNumberModel(2, 1, 10, 1));
-    spnWinrateStrokeWidth.setBounds(171, 272, 41, 20);
-    uiTab.add(spnWinrateStrokeWidth);
-
-    JLabel lblMinimumBlunderBarWidth =
-        new JLabel(resourceBundle.getString("LizzieConfig.title.minimumBlunderBarWidth"));
-    lblMinimumBlunderBarWidth.setBounds(6, 304, 163, 16);
-    uiTab.add(lblMinimumBlunderBarWidth);
-    spnMinimumBlunderBarWidth = new JSpinner();
-    spnMinimumBlunderBarWidth.setModel(new SpinnerNumberModel(1, 1, 10, 1));
-    spnMinimumBlunderBarWidth.setBounds(171, 302, 41, 20);
-    uiTab.add(spnMinimumBlunderBarWidth);
-
-    JLabel lblShadowSize = new JLabel(resourceBundle.getString("LizzieConfig.title.shadowSize"));
-    lblShadowSize.setBounds(6, 334, 163, 16);
-    uiTab.add(lblShadowSize);
-    spnShadowSize = new JSpinner();
-    spnShadowSize.setModel(new SpinnerNumberModel(50, 1, 100, 1));
-    spnShadowSize.setBounds(171, 332, 41, 20);
-    uiTab.add(spnShadowSize);
-
-    String fonts[] =
-        GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-
-    JLabel lblFontName = new JLabel(resourceBundle.getString("LizzieConfig.title.fontName"));
-    lblFontName.setBounds(6, 364, 163, 16);
-    uiTab.add(lblFontName);
-    cmbFontName = new JComboBox(fonts);
-    cmbFontName.setMaximumRowCount(16);
-    cmbFontName.setBounds(170, 363, 200, 20);
-    cmbFontName.setRenderer(new FontComboBoxRenderer<String>());
-    cmbFontName.addItemListener(
-        new ItemListener() {
-          public void itemStateChanged(ItemEvent e) {
-            cmbFontName.setFont(
-                new Font((String) e.getItem(), Font.PLAIN, cmbFontName.getFont().getSize()));
-          }
-        });
-    uiTab.add(cmbFontName);
-
-    JLabel lblUiFontName = new JLabel(resourceBundle.getString("LizzieConfig.title.uiFontName"));
-    lblUiFontName.setBounds(6, 394, 163, 16);
-    uiTab.add(lblUiFontName);
-    cmbUiFontName = new JComboBox(fonts);
-    cmbUiFontName.setMaximumRowCount(16);
-    cmbUiFontName.setBounds(170, 393, 200, 20);
-    cmbUiFontName.setRenderer(new FontComboBoxRenderer<String>());
-    cmbUiFontName.addItemListener(
-        new ItemListener() {
-          public void itemStateChanged(ItemEvent e) {
-            cmbUiFontName.setFont(
-                new Font((String) e.getItem(), Font.PLAIN, cmbUiFontName.getFont().getSize()));
-          }
-        });
-    uiTab.add(cmbUiFontName);
-
-    JLabel lblWinrateFontName =
-        new JLabel(resourceBundle.getString("LizzieConfig.title.winrateFontName"));
-    lblWinrateFontName.setBounds(6, 424, 163, 16);
-    uiTab.add(lblWinrateFontName);
-    cmbWinrateFontName = new JComboBox(fonts);
-    cmbWinrateFontName.setMaximumRowCount(16);
-    cmbWinrateFontName.setBounds(170, 423, 200, 20);
-    cmbWinrateFontName.setRenderer(new FontComboBoxRenderer<String>());
-    cmbWinrateFontName.addItemListener(
-        new ItemListener() {
-          public void itemStateChanged(ItemEvent e) {
-            cmbWinrateFontName.setFont(
-                new Font((String) e.getItem(), Font.PLAIN, cmbWinrateFontName.getFont().getSize()));
-          }
-        });
-    uiTab.add(cmbWinrateFontName);
-
     // Theme Tab
     JPanel themeTab = new JPanel();
     tabbedPane.addTab(resourceBundle.getString("LizzieConfig.title.theme"), null, themeTab, null);
@@ -767,16 +689,95 @@ public class ConfigDialog extends JDialog {
                 return f.isDirectory() && !".".equals(f.getName());
               }
             });
-    List themeList =
+    List<String> themeList =
         Arrays.asList(themes).stream().map(t -> t.getName()).collect(Collectors.toList());
+    themeList.add(0, resourceBundle.getString("LizzieConfig.title.defaultTheme"));
 
     JLabel lblThemes = new JLabel(resourceBundle.getString("LizzieConfig.title.theme"));
     lblThemes.setBounds(12, 11, 90, 20);
     themeTab.add(lblThemes);
     cmbThemes = new JComboBox(themeList.toArray());
-    cmbThemes.setBounds(112, 11, 173, 20);
+    cmbThemes.setBounds(175, 11, 173, 20);
     themeTab.add(cmbThemes);
 
+    JLabel lblWinrateStrokeWidth =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.winrateStrokeWidth"));
+    lblWinrateStrokeWidth.setBounds(10, 44, 163, 16);
+    themeTab.add(lblWinrateStrokeWidth);
+    spnWinrateStrokeWidth = new JSpinner();
+    spnWinrateStrokeWidth.setModel(new SpinnerNumberModel(2, 1, 10, 1));
+    spnWinrateStrokeWidth.setBounds(175, 42, 41, 20);
+    themeTab.add(spnWinrateStrokeWidth);
+
+    JLabel lblMinimumBlunderBarWidth =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.minimumBlunderBarWidth"));
+    lblMinimumBlunderBarWidth.setBounds(10, 74, 163, 16);
+    themeTab.add(lblMinimumBlunderBarWidth);
+    spnMinimumBlunderBarWidth = new JSpinner();
+    spnMinimumBlunderBarWidth.setModel(new SpinnerNumberModel(1, 1, 10, 1));
+    spnMinimumBlunderBarWidth.setBounds(175, 72, 41, 20);
+    themeTab.add(spnMinimumBlunderBarWidth);
+
+    JLabel lblShadowSize = new JLabel(resourceBundle.getString("LizzieConfig.title.shadowSize"));
+    lblShadowSize.setBounds(10, 104, 163, 16);
+    themeTab.add(lblShadowSize);
+    spnShadowSize = new JSpinner();
+    spnShadowSize.setModel(new SpinnerNumberModel(50, 1, 100, 1));
+    spnShadowSize.setBounds(175, 102, 41, 20);
+    themeTab.add(spnShadowSize);
+
+    String fonts[] =
+        GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+
+    JLabel lblFontName = new JLabel(resourceBundle.getString("LizzieConfig.title.fontName"));
+    lblFontName.setBounds(10, 134, 163, 16);
+    themeTab.add(lblFontName);
+    cmbFontName = new JComboBox(fonts);
+    cmbFontName.setMaximumRowCount(16);
+    cmbFontName.setBounds(174, 133, 200, 20);
+    cmbFontName.setRenderer(new FontComboBoxRenderer<String>());
+    cmbFontName.addItemListener(
+        new ItemListener() {
+          public void itemStateChanged(ItemEvent e) {
+            cmbFontName.setFont(
+                new Font((String) e.getItem(), Font.PLAIN, cmbFontName.getFont().getSize()));
+          }
+        });
+    themeTab.add(cmbFontName);
+
+    JLabel lblUiFontName = new JLabel(resourceBundle.getString("LizzieConfig.title.uiFontName"));
+    lblUiFontName.setBounds(10, 164, 163, 16);
+    themeTab.add(lblUiFontName);
+    cmbUiFontName = new JComboBox(fonts);
+    cmbUiFontName.setMaximumRowCount(16);
+    cmbUiFontName.setBounds(174, 163, 200, 20);
+    cmbUiFontName.setRenderer(new FontComboBoxRenderer<String>());
+    cmbUiFontName.addItemListener(
+        new ItemListener() {
+          public void itemStateChanged(ItemEvent e) {
+            cmbUiFontName.setFont(
+                new Font((String) e.getItem(), Font.PLAIN, cmbUiFontName.getFont().getSize()));
+          }
+        });
+    themeTab.add(cmbUiFontName);
+
+    JLabel lblWinrateFontName =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.winrateFontName"));
+    lblWinrateFontName.setBounds(10, 194, 163, 16);
+    themeTab.add(lblWinrateFontName);
+    cmbWinrateFontName = new JComboBox(fonts);
+    cmbWinrateFontName.setMaximumRowCount(16);
+    cmbWinrateFontName.setBounds(174, 193, 200, 20);
+    cmbWinrateFontName.setRenderer(new FontComboBoxRenderer<String>());
+    cmbWinrateFontName.addItemListener(
+        new ItemListener() {
+          public void itemStateChanged(ItemEvent e) {
+            cmbWinrateFontName.setFont(
+                new Font((String) e.getItem(), Font.PLAIN, cmbWinrateFontName.getFont().getSize()));
+          }
+        });
+    themeTab.add(cmbWinrateFontName);
+    
     // Engines
     txts =
         new JTextField[] {
