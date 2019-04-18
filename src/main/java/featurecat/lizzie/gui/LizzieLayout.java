@@ -312,7 +312,8 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
       boolean noBasic = (getChild(BASIC_INFO, ltr) == null || !Lizzie.config.showCaptured);
       boolean noSubBoard = (getChild(SUB_BOARD, ltr) == null || !Lizzie.config.showSubBoard);
       boolean noComment = (getChild(COMMENT, ltr) == null || !Lizzie.config.showComment);
-      boolean onlyMainBoard = noWinrate && noVariation && noBasic && noSubBoard && noComment;
+      //      boolean onlyMainBoard = noWinrate && noVariation && noBasic && noSubBoard &&
+      // noComment;
 
       // board
       int maxSize = (int) (min(width - leftInset - rightInset, height - topInset - bottomInset));
@@ -362,21 +363,8 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
 
       // pondering message
       double ponderingSize = .02;
-      int ponderingX = leftInset;
       int ponderingY =
           height - bottomInset - (int) (maxSize * 0.033) - (int) (maxBound * ponderingSize);
-
-      // dynamic komi
-      double dynamicKomiSize = .02;
-      int dynamicKomiX = leftInset;
-      int dynamicKomiY = ponderingY - (int) (maxBound * dynamicKomiSize);
-      int dynamicKomiLabelX = leftInset;
-      int dynamicKomiLabelY = dynamicKomiY - (int) (maxBound * dynamicKomiSize);
-
-      // loading message;
-      double loadingSize = 0.03;
-      int loadingX = ponderingX;
-      int loadingY = ponderingY - (int) (maxBound * (loadingSize - ponderingSize));
 
       // subboard
       int subBoardY = gry + grh + 1;
@@ -555,24 +543,6 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
           vy = boardY + maxSize;
           vw = panelW;
           vh = height - vy - bottomInset;
-        }
-      }
-
-      // graph container
-      int contx = statx;
-      int conty = staty;
-      int contw = statw;
-      int conth = stath + grh;
-      if (width < height) {
-        contw = grw;
-        if (Lizzie.config.showLargeWinrate()) {
-          contx = grx;
-          conty = gry;
-          conth = grh;
-        } else {
-          contx = capx;
-          conty = capy;
-          conth = stath + grh;
         }
       }
 
