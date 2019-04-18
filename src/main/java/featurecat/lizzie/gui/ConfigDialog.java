@@ -3,6 +3,7 @@ package featurecat.lizzie.gui;
 import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.theme.Theme;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -11,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -30,6 +33,7 @@ import java.util.stream.IntStream;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -119,12 +123,18 @@ public class ConfigDialog extends JDialog {
   private JTextField txtBoardPath;
   private JTextField txtBlackStonePath;
   private JTextField txtWhiteStonePath;
+  private JLabel lblWinrateLineColor;
+  private JLabel lblWinrateMissLineColor;
+  private JLabel lblBlunderBarColor;
+  private JCheckBox chkSolidStoneIndicator;
+  private JCheckBox chkShowCommentNodeColor;
+  private JLabel lblCommentNodeColor;
 
   public ConfigDialog() {
     setTitle(resourceBundle.getString("LizzieConfig.title.config"));
     setModalityType(ModalityType.APPLICATION_MODAL);
     setType(Type.POPUP);
-    setBounds(100, 100, 661, 567);
+    setBounds(100, 100, 661, 716);
     getContentPane().setLayout(new BorderLayout());
     JPanel buttonPane = new JPanel();
     buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -838,6 +848,118 @@ public class ConfigDialog extends JDialog {
     txtWhiteStonePath.setBounds(175, 314, 421, 20);
     themeTab.add(txtWhiteStonePath);
 
+    JLabel lblWinrateLineColorTitle =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.winrateLineColor"));
+    lblWinrateLineColorTitle.setHorizontalAlignment(SwingConstants.LEFT);
+    lblWinrateLineColorTitle.setBounds(10, 345, 163, 16);
+    themeTab.add(lblWinrateLineColorTitle);
+    lblWinrateLineColor = new JLabel();
+    lblWinrateLineColor.setOpaque(true);
+    lblWinrateLineColor.setBounds(175, 350, 199, 9);
+    lblWinrateLineColor.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            Color color =
+                JColorChooser.showDialog(
+                    (Component) e.getSource(),
+                    "Choose a color",
+                    lblWinrateLineColor.getBackground());
+            if (color != null) {
+              lblWinrateLineColor.setBackground(color);
+            }
+          }
+        });
+    themeTab.add(lblWinrateLineColor);
+
+    JLabel lblWinrateMissLineColorTitle =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.winrateMissLineColor"));
+    lblWinrateMissLineColorTitle.setHorizontalAlignment(SwingConstants.LEFT);
+    lblWinrateMissLineColorTitle.setBounds(10, 375, 163, 16);
+    themeTab.add(lblWinrateMissLineColorTitle);
+    lblWinrateMissLineColor = new JLabel();
+    lblWinrateMissLineColor.setOpaque(true);
+    lblWinrateMissLineColor.setBounds(175, 380, 199, 9);
+    lblWinrateMissLineColor.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            Color color =
+                JColorChooser.showDialog(
+                    (Component) e.getSource(),
+                    "Choose a color",
+                    lblWinrateMissLineColor.getBackground());
+            if (color != null) {
+              lblWinrateMissLineColor.setBackground(color);
+            }
+          }
+        });
+    themeTab.add(lblWinrateMissLineColor);
+
+    JLabel lblBlunderBarColorTitle =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.blunderBarColor"));
+    lblBlunderBarColorTitle.setHorizontalAlignment(SwingConstants.LEFT);
+    lblBlunderBarColorTitle.setBounds(10, 405, 163, 16);
+    themeTab.add(lblBlunderBarColorTitle);
+    lblBlunderBarColor = new JLabel();
+    lblBlunderBarColor.setOpaque(true);
+    lblBlunderBarColor.setBounds(175, 410, 199, 9);
+    lblBlunderBarColor.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            Color color =
+                JColorChooser.showDialog(
+                    (Component) e.getSource(),
+                    "Choose a color",
+                    lblBlunderBarColor.getBackground());
+            if (color != null) {
+              lblBlunderBarColor.setBackground(color);
+            }
+          }
+        });
+    themeTab.add(lblBlunderBarColor);
+
+    JLabel lblSolidStoneIndicator =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.solidStoneIndicator"));
+    lblSolidStoneIndicator.setBounds(6, 440, 163, 16);
+    themeTab.add(lblSolidStoneIndicator);
+    chkSolidStoneIndicator = new JCheckBox("");
+    chkSolidStoneIndicator.setBounds(170, 437, 57, 23);
+    themeTab.add(chkSolidStoneIndicator);
+
+    JLabel lblShowCommentNodeColor =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.showCommentNodeColor"));
+    lblShowCommentNodeColor.setBounds(6, 470, 163, 16);
+    themeTab.add(lblShowCommentNodeColor);
+    chkShowCommentNodeColor = new JCheckBox("");
+    chkShowCommentNodeColor.setBounds(170, 467, 33, 23);
+    themeTab.add(chkShowCommentNodeColor);
+
+    JLabel lblCommentNodeColorTitle =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.commentNodeColor"));
+    lblCommentNodeColorTitle.setHorizontalAlignment(SwingConstants.LEFT);
+    lblCommentNodeColorTitle.setBounds(283, 470, 138, 16);
+    themeTab.add(lblCommentNodeColorTitle);
+    lblCommentNodeColor = new JLabel();
+    lblCommentNodeColor.setOpaque(true);
+    lblCommentNodeColor.setBounds(431, 468, 22, 22);
+    lblCommentNodeColor.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            Color color =
+                JColorChooser.showDialog(
+                    (Component) e.getSource(),
+                    "Choose a color",
+                    lblCommentNodeColor.getBackground());
+            if (color != null) {
+              lblCommentNodeColor.setBackground(color);
+            }
+          }
+        });
+    themeTab.add(lblCommentNodeColor);
+
     // Engines
     txts =
         new JTextField[] {
@@ -1143,6 +1265,12 @@ public class ConfigDialog extends JDialog {
         txtBlackStonePath.setText(theme.blackStonePath());
         txtWhiteStonePath.setEnabled(true);
         txtWhiteStonePath.setText(theme.whiteStonePath());
+        lblWinrateLineColor.setBackground(theme.winrateLineColor());
+        lblWinrateMissLineColor.setBackground(theme.winrateMissLineColor());
+        lblBlunderBarColor.setBackground(theme.blunderBarColor());
+        chkSolidStoneIndicator.setSelected(theme.solidStoneIndicator());
+        chkShowCommentNodeColor.setSelected(theme.showCommentNodeColor());
+        lblCommentNodeColor.setBackground(theme.commentNodeColor());
       }
     }
   }
@@ -1170,6 +1298,16 @@ public class ConfigDialog extends JDialog {
         theme.config.put("board-image", txtBoardPath.getText().trim());
         theme.config.put("black-stone-image", txtBlackStonePath.getText().trim());
         theme.config.put("white-stone-image", txtWhiteStonePath.getText().trim());
+        theme.config.put(
+            "winrate-line-color", Theme.color2Array(lblWinrateLineColor.getBackground()));
+        theme.config.put(
+            "winrate-miss-line-color", Theme.color2Array(lblWinrateMissLineColor.getBackground()));
+        theme.config.put(
+            "blunder-bar-color", Theme.color2Array(lblBlunderBarColor.getBackground()));
+        theme.config.put("solid-stone-indicator", chkSolidStoneIndicator.isSelected());
+        theme.config.put("show-comment-node-color", chkShowCommentNodeColor.isSelected());
+        theme.config.put(
+            "comment-node-color", Theme.color2Array(lblCommentNodeColor.getBackground()));
         theme.save();
       }
     }
@@ -1191,6 +1329,20 @@ public class ConfigDialog extends JDialog {
     txtBlackStonePath.setText("/asset/black0.png");
     txtWhiteStonePath.setEnabled(false);
     txtWhiteStonePath.setText("/asset/white0.png");
+    lblWinrateLineColor.setBackground(
+        Theme.array2Color(Lizzie.config.uiConfig.optJSONArray("winrate-line-color"), Color.green));
+    lblWinrateMissLineColor.setBackground(
+        Theme.array2Color(
+            Lizzie.config.uiConfig.optJSONArray("winrate-miss-line-color"), Color.blue.darker()));
+    lblBlunderBarColor.setBackground(
+        Theme.array2Color(
+            Lizzie.config.uiConfig.optJSONArray("blunder-bar-color"), new Color(255, 0, 0, 150)));
+    chkSolidStoneIndicator.setSelected(Lizzie.config.uiConfig.optBoolean("solid-stone-indicator"));
+    chkShowCommentNodeColor.setSelected(
+        Lizzie.config.uiConfig.optBoolean("show-comment-node-color"));
+    lblCommentNodeColor.setBackground(
+        Theme.array2Color(
+            Lizzie.config.uiConfig.optJSONArray("comment-node-color"), Color.BLUE.brighter()));
   }
 
   private void writeDefaultTheme() {
@@ -1200,6 +1352,16 @@ public class ConfigDialog extends JDialog {
     Lizzie.config.uiConfig.put("font-name", cmbFontName.getSelectedItem());
     Lizzie.config.uiConfig.put("ui-font-name", cmbUiFontName.getSelectedItem());
     Lizzie.config.uiConfig.put("winrate-font-name", cmbWinrateFontName.getSelectedItem());
+    Lizzie.config.uiConfig.put(
+        "winrate-line-color", Theme.color2Array(lblWinrateLineColor.getBackground()));
+    Lizzie.config.uiConfig.put(
+        "winrate-miss-line-color", Theme.color2Array(lblWinrateMissLineColor.getBackground()));
+    Lizzie.config.uiConfig.put(
+        "blunder-bar-color", Theme.color2Array(lblBlunderBarColor.getBackground()));
+    Lizzie.config.uiConfig.put("solid-stone-indicator", chkSolidStoneIndicator.isSelected());
+    Lizzie.config.uiConfig.put("show-comment-node-color", chkShowCommentNodeColor.isSelected());
+    Lizzie.config.uiConfig.put(
+        "comment-node-color", Theme.color2Array(lblCommentNodeColor.getBackground()));
   }
 
   private void saveConfig() {
