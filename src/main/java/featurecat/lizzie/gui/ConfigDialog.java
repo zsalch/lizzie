@@ -929,6 +929,27 @@ public class ConfigDialog extends JDialog {
     pnlScrollBlunderNodes.setBounds(175, 497, 199, 108);
     themeTab.add(pnlScrollBlunderNodes);
 
+    JButton btnAdd = new JButton(resourceBundle.getString("LizzieConfig.button.add"));
+    btnAdd.setBounds(382, 506, 89, 23);
+    btnAdd.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            ((BlunderNodeTableModel) tblBlunderNodes.getModel()).addRow("", Color.WHITE);
+          }
+        });
+    themeTab.add(btnAdd);
+
+    JButton btnRemove = new JButton(resourceBundle.getString("LizzieConfig.button.remove"));
+    btnRemove.setBounds(384, 540, 89, 23);
+    btnRemove.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            ((BlunderNodeTableModel) tblBlunderNodes.getModel())
+                .removeRow(tblBlunderNodes.getSelectedRow());
+          }
+        });
+    themeTab.add(btnRemove);
+
     // Engines
     txts =
         new JTextField[] {
@@ -1136,6 +1157,8 @@ public class ConfigDialog extends JDialog {
 
   private class ColorLabel extends JLabel {
 
+    private Color curColor;
+
     public ColorLabel() {
       super();
       setOpaque(true);
@@ -1156,11 +1179,12 @@ public class ConfigDialog extends JDialog {
     }
 
     public void setColor(Color c) {
+      curColor = c;
       setBackground(c);
     }
 
     public Color getColor() {
-      return getBackground();
+      return curColor;
     }
   }
 
@@ -1238,15 +1262,31 @@ public class ConfigDialog extends JDialog {
       }
     }
 
+    public JSONArray getThresholdArray() {
+      JSONArray thresholds = new JSONArray("[]");
+      data.forEach(d -> thresholds.put(new Double((String) d.get(0))));
+      return thresholds;
+    }
+
+    public JSONArray getColorArray() {
+      JSONArray colors = new JSONArray("[]");
+      data.forEach(d -> colors.put(Theme.color2Array((Color) d.get(1))));
+      return colors;
+    }
+
     public void addRow(String threshold, Color color) {
       Vector<Object> row = new Vector<Object>();
       row.add(threshold);
       row.add(color);
       data.add(row);
+      fireTableRowsInserted(0, data.size() - 1);
     }
 
     public void removeRow(int index) {
-      data.remove(index);
+      if (index >= 0 && index < data.size()) {
+        data.remove(index);
+        fireTableRowsDeleted(0, data.size() - 1);
+      }
     }
 
     public int getColumnCount() {
@@ -1267,6 +1307,11 @@ public class ConfigDialog extends JDialog {
 
     public Class<?> getColumnClass(int c) {
       return getValueAt(0, c).getClass();
+    }
+
+    public void setValueAt(Object value, int row, int col) {
+      data.get(row).set(col, value);
+      fireTableCellUpdated(row, col);
     }
 
     public boolean isCellEditable(int row, int col) {
@@ -1423,6 +1468,12 @@ public class ConfigDialog extends JDialog {
         theme.config.put("solid-stone-indicator", chkSolidStoneIndicator.isSelected());
         theme.config.put("show-comment-node-color", chkShowCommentNodeColor.isSelected());
         theme.config.put("comment-node-color", Theme.color2Array(lblCommentNodeColor.getColor()));
+        theme.config.put(
+            "blunder-winrate-thresholds",
+            ((BlunderNodeTableModel) tblBlunderNodes.getModel()).getThresholdArray());
+        theme.config.put(
+            "blunder-node-colors",
+            ((BlunderNodeTableModel) tblBlunderNodes.getModel()).getColorArray());
         theme.save();
       }
     }
@@ -1486,6 +1537,12 @@ public class ConfigDialog extends JDialog {
     Lizzie.config.uiConfig.put("show-comment-node-color", chkShowCommentNodeColor.isSelected());
     Lizzie.config.uiConfig.put(
         "comment-node-color", Theme.color2Array(lblCommentNodeColor.getColor()));
+    Lizzie.config.uiConfig.put(
+        "blunder-winrate-thresholds",
+        ((BlunderNodeTableModel) tblBlunderNodes.getModel()).getThresholdArray());
+    Lizzie.config.uiConfig.put(
+        "blunder-node-colors",
+        ((BlunderNodeTableModel) tblBlunderNodes.getModel()).getColorArray());
   }
 
   private void saveConfig() {
