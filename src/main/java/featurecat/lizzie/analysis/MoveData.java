@@ -58,21 +58,35 @@ public class MoveData {
    * @param summary line of summary output
    */
   public static MoveData fromSummary(String summary) {
-    Matcher match = summaryPattern.matcher(summary.trim());
+    Matcher match = summaryPattern17.matcher(summary.trim());
     if (!match.matches()) {
-      throw new IllegalArgumentException("Unexpected summary format: " + summary);
+      match = summaryPattern.matcher(summary.trim());
+      if (!match.matches()) {
+        throw new IllegalArgumentException("Unexpected summary format: " + summary);
+      } else {
+        MoveData result = new MoveData();
+        result.coordinate = match.group(1);
+        result.playouts = Integer.parseInt(match.group(2));
+        result.winrate = Double.parseDouble(match.group(3));
+        result.variation = Arrays.asList(match.group(4).split(" "));
+        return result;
+      }
     } else {
       MoveData result = new MoveData();
       result.coordinate = match.group(1);
       result.playouts = Integer.parseInt(match.group(2));
       result.winrate = Double.parseDouble(match.group(3));
-      result.variation = Arrays.asList(match.group(4).split(" "));
+      result.variation = Arrays.asList(match.group(5).split(" "));
       return result;
     }
   }
 
   private static Pattern summaryPattern =
       Pattern.compile("^ *(\\w\\d*) -> *(\\d+) \\(V: ([^%)]+)%\\) \\([^\\)]+\\) PV: (.+).*$");
+
+  private static Pattern summaryPattern17 =
+      Pattern.compile(
+          "^ *(\\w\\d*) -> *(\\d+) \\(V: ([^%)]+)%\\) \\(LCB: ([^%)]+)%\\) \\([^\\)]+\\) PV: (.+).*$");
 
   public static int getPlayouts(List<MoveData> moves) {
     int playouts = 0;
