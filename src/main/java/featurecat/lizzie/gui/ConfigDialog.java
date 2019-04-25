@@ -740,7 +740,9 @@ public class ConfigDialog extends JDialog {
               }
             });
     List<String> themeList =
-        Arrays.asList(themes).stream().map(t -> t.getName()).collect(Collectors.toList());
+        themes == null
+            ? new ArrayList<String>()
+            : Arrays.asList(themes).stream().map(t -> t.getName()).collect(Collectors.toList());
     themeList.add(0, resourceBundle.getString("LizzieConfig.title.defaultTheme"));
 
     JLabel lblThemes = new JLabel(resourceBundle.getString("LizzieConfig.title.theme"));
@@ -796,7 +798,7 @@ public class ConfigDialog extends JDialog {
     cmbFontName = new JComboBox<String>(fonts);
     cmbFontName.setMaximumRowCount(16);
     cmbFontName.setBounds(175, 133, 200, 20);
-    cmbFontName.setRenderer(new FontComboBoxRenderer<String>());
+    cmbFontName.setRenderer(new FontComboBoxRenderer());
     cmbFontName.addItemListener(
         new ItemListener() {
           public void itemStateChanged(ItemEvent e) {
@@ -812,7 +814,7 @@ public class ConfigDialog extends JDialog {
     cmbUiFontName = new JComboBox<String>(fonts);
     cmbUiFontName.setMaximumRowCount(16);
     cmbUiFontName.setBounds(175, 163, 200, 20);
-    cmbUiFontName.setRenderer(new FontComboBoxRenderer<String>());
+    cmbUiFontName.setRenderer(new FontComboBoxRenderer());
     cmbUiFontName.addItemListener(
         new ItemListener() {
           public void itemStateChanged(ItemEvent e) {
@@ -829,7 +831,7 @@ public class ConfigDialog extends JDialog {
     cmbWinrateFontName = new JComboBox<String>(fonts);
     cmbWinrateFontName.setMaximumRowCount(16);
     cmbWinrateFontName.setBounds(175, 193, 200, 20);
-    cmbWinrateFontName.setRenderer(new FontComboBoxRenderer<String>());
+    cmbWinrateFontName.setRenderer(new FontComboBoxRenderer());
     cmbWinrateFontName.addItemListener(
         new ItemListener() {
           public void itemStateChanged(ItemEvent e) {
@@ -1870,7 +1872,7 @@ public class ConfigDialog extends JDialog {
           "color-by-winrate-instead-of-visits", Lizzie.config.colorByWinrateInsteadOfVisits);
       Lizzie.config.boardPositionProportion = sldBoardPositionProportion.getValue();
       Lizzie.config.uiConfig.putOpt(
-          "board-postion-proportion", Lizzie.config.boardPositionProportion);
+          "board-position-proportion", Lizzie.config.boardPositionProportion);
       Lizzie.config.uiConfig.put("theme", cmbThemes.getSelectedItem());
       writeThemeValues();
 

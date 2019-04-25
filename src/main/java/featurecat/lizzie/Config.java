@@ -199,7 +199,7 @@ public class Config {
     showCoordinates = uiConfig.optBoolean("show-coordinates");
     replayBranchIntervalSeconds = uiConfig.optDouble("replay-branch-interval-seconds", 1.0);
     colorByWinrateInsteadOfVisits = uiConfig.optBoolean("color-by-winrate-instead-of-visits");
-    boardPositionProportion = uiConfig.optInt("board-postion-proportion", 4);
+    boardPositionProportion = uiConfig.optInt("board-position-proportion", 4);
     minPlayoutRatioForStats = uiConfig.optDouble("min-playout-ratio-for-stats", 0.0);
 
     winrateStrokeWidth = theme.winrateStrokeWidth();

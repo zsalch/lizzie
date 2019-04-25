@@ -114,12 +114,6 @@ public class LizzieFrame extends MainFrame {
 
   private static final int[] outOfBoundCoordinate = new int[] {-1, -1};
   public int[] mouseOverCoordinate = outOfBoundCoordinate;
-  public boolean showControls = false;
-  public boolean isPlayingAgainstLeelaz = false;
-  public boolean playerIsBlack = true;
-  public boolean isNewGame = false;
-  public int winRateGridLines = 3;
-  public int boardPositionProportion = Lizzie.config.boardPositionProportion;
 
   private long lastAutosaveTime = System.currentTimeMillis();
   private boolean isReplayVariation = false;
@@ -177,7 +171,8 @@ public class LizzieFrame extends MainFrame {
       JSONArray pos = Lizzie.config.persistedUi.getJSONArray("main-window-position");
       this.setBounds(pos.getInt(0), pos.getInt(1), pos.getInt(2), pos.getInt(3));
       this.boardPositionProportion =
-          Lizzie.config.persistedUi.optInt("board-postion-propotion", this.boardPositionProportion);
+          Lizzie.config.persistedUi.optInt(
+              "board-position-proportion", this.boardPositionProportion);
     } else {
       setSize(960, 600);
       setLocationRelativeTo(null); // Start centered, needs to be called *after* setSize...
@@ -479,6 +474,7 @@ public class LizzieFrame extends MainFrame {
     Optional<Graphics2D> backgroundG;
     if (cachedBackgroundWidth != width
         || cachedBackgroundHeight != height
+        || cachedBoardPositionProportion != boardPositionProportion
         || redrawBackgroundAnyway) {
       backgroundG = Optional.of(createBackground());
     } else {
