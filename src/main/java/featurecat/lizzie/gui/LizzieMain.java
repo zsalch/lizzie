@@ -166,8 +166,6 @@ public class LizzieMain extends MainFrame {
     getContentPane().setLayout(layout);
     basicInfoPane = new BasicInfoPane(this);
     boardPane = new BoardPane(this);
-    // TODO
-    //    Lizzie.frame = boardPane;
     subBoardPane = new SubBoardPane(this);
     winratePane = new WinratePane(this);
     variationTreePane = new VariationTreePane(this);
@@ -363,7 +361,7 @@ public class LizzieMain extends MainFrame {
   public boolean isDesignMode() {
     return designMode;
   }
-  
+
   public void toggleDesignMode() {
     this.designMode = !this.designMode;
     //    boardPane.setDesignMode(designMode);

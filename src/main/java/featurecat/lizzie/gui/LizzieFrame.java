@@ -1526,9 +1526,4 @@ public class LizzieFrame extends MainFrame {
     Thread thread = new Thread(runnable);
     thread.start();
   }
-
-  @Override
-  public void refresh() {
-    repaint();
-  }
 }

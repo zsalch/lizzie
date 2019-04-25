@@ -20,12 +20,14 @@ public abstract class MainFrame extends JFrame {
   public boolean isDesignMode() {
     return false;
   }
-  
+
   public void toggleDesignMode() {}
 
   public void updateBasicInfo() {}
 
-  public abstract void refresh();
+  public void refresh() {
+    repaint();
+  };
 
   public abstract void drawControls();
 
