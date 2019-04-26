@@ -284,6 +284,10 @@ public class Config {
     this.largeWinrate = !this.largeWinrate;
   }
 
+  public void toggleShowLcbWinrate() {
+    this.showLcbWinrate = !this.showLcbWinrate;
+  }
+
   public void toggleShowVariationGraph() {
     this.showVariationGraph = !this.showVariationGraph;
   }

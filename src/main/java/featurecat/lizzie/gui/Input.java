@@ -27,6 +27,7 @@ import static java.awt.event.KeyEvent.VK_H;
 import static java.awt.event.KeyEvent.VK_HOME;
 import static java.awt.event.KeyEvent.VK_I;
 import static java.awt.event.KeyEvent.VK_K;
+import static java.awt.event.KeyEvent.VK_L;
 import static java.awt.event.KeyEvent.VK_LEFT;
 import static java.awt.event.KeyEvent.VK_M;
 import static java.awt.event.KeyEvent.VK_N;
@@ -383,6 +384,10 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
           Lizzie.config.toggleShowWinrate();
           Lizzie.frame.refresh(2);
         }
+        break;
+
+      case VK_L:
+        Lizzie.config.toggleShowLcbWinrate();
         break;
 
       case VK_G:
