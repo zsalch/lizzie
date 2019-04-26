@@ -627,7 +627,7 @@ public class ConfigDialog extends JDialog {
           public void stateChanged(ChangeEvent e) {
             if (chkShowCoordinates.isSelected() != Lizzie.config.showCoordinates) {
               Lizzie.config.toggleCoordinates();
-              Lizzie.frame.refresh();
+              Lizzie.frame.refresh(2);
             }
           }
         });
@@ -726,7 +726,7 @@ public class ConfigDialog extends JDialog {
           public void stateChanged(ChangeEvent e) {
             if (Lizzie.frame.boardPositionProportion != sldBoardPositionProportion.getValue()) {
               Lizzie.frame.boardPositionProportion = sldBoardPositionProportion.getValue();
-              Lizzie.frame.refresh();
+              Lizzie.frame.refresh(2);
             }
           }
         });
