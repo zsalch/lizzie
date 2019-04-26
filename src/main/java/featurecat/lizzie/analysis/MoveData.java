@@ -1,5 +1,6 @@
 package featurecat.lizzie.analysis;
 
+import featurecat.lizzie.Lizzie;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +27,7 @@ public class MoveData {
     MoveData result = new MoveData();
     String[] data = line.trim().split(" ");
 
+    boolean islcb = Lizzie.config.showLcbWinrate;
     // Todo: Proper tag parsing in case gtp protocol is extended(?)/changed
     for (int i = 0; i < data.length; i++) {
       String key = data[i];
@@ -42,7 +44,13 @@ public class MoveData {
         if (key.equals("visits")) {
           result.playouts = Integer.parseInt(value);
         }
+        if (islcb && key.equals("lcb")) {
+          // LCB support
+          result.winrate = Integer.parseInt(value) / 100.0;
+        }
+
         if (key.equals("winrate")) {
+          // support 0.16 0.15
           result.winrate = Integer.parseInt(value) / 100.0;
         }
       }
@@ -53,7 +61,13 @@ public class MoveData {
   /**
    * Parses a leelaz summary output line. For example:
    *
+   * <p>0.15 0.16
+   *
    * <p>P16 -> 4 (V: 50.94%) (N: 5.79%) PV: P16 N18 R5 Q5
+   *
+   * <p>0.17
+   *
+   * <p>Q4 -> 4348 (V: 43.88%) (LCB: 43.81%) (N: 18.67%) PV: Q4 D16 D4 Q16 R14 R6 C1
    *
    * @param summary line of summary output
    */
@@ -75,7 +89,7 @@ public class MoveData {
       MoveData result = new MoveData();
       result.coordinate = match.group(1);
       result.playouts = Integer.parseInt(match.group(2));
-      result.winrate = Double.parseDouble(match.group(3));
+      result.winrate = Double.parseDouble(match.group(Lizzie.config.showLcbWinrate ? 4 : 3));
       result.variation = Arrays.asList(match.group(5).split(" "));
       return result;
     }

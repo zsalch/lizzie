@@ -116,6 +116,8 @@ public class ConfigDialog extends JDialog {
   private JFormattedTextField txtMaxGameThinkingTime;
   private JFormattedTextField txtAnalyzeUpdateInterval;
   private JCheckBox chkPrintEngineLog;
+  private JRadioButton rdoWinrate;
+  private JRadioButton rdoLcb;
 
   // UI Tab
   private JTextField txtBoardSize;
@@ -513,6 +515,23 @@ public class ConfigDialog extends JDialog {
     txtAnalyzeUpdateInterval.setColumns(10);
     txtAnalyzeUpdateInterval.setBounds(496, 363, 40, 26);
     engineTab.add(txtAnalyzeUpdateInterval);
+
+    JLabel lblShowLcbWinrate =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.showLcbWinrate"));
+    lblShowLcbWinrate.setBounds(6, 457, 157, 16);
+    engineTab.add(lblShowLcbWinrate);
+
+    rdoLcb = new JRadioButton("Lcb");
+    rdoLcb.setBounds(167, 454, 69, 23);
+    engineTab.add(rdoLcb);
+
+    rdoWinrate = new JRadioButton("Winrate");
+    rdoWinrate.setBounds(250, 454, 92, 23);
+    engineTab.add(rdoWinrate);
+
+    ButtonGroup wrgroup = new ButtonGroup();
+    wrgroup.add(rdoLcb);
+    wrgroup.add(rdoWinrate);
 
     JLabel lblPrintEngineLog =
         new JLabel(resourceBundle.getString("LizzieConfig.title.printEngineLog"));
@@ -1263,6 +1282,7 @@ public class ConfigDialog extends JDialog {
     pnlBoardPreview.setBounds(422, 11, 200, 200);
     themeTab.add(pnlBoardPreview);
 
+    setShowLcbWinrate();
     setShowMoveNumber();
     setLocationRelativeTo(getOwner());
   }
@@ -1611,6 +1631,28 @@ public class ConfigDialog extends JDialog {
     return osName != null && !osName.contains("darwin") && osName.contains("win");
   }
 
+  private void setShowLcbWinrate() {
+
+    if (Lizzie.config.showLcbWinrate) {
+      rdoLcb.setSelected(true);
+    } else {
+      rdoWinrate.setSelected(true);
+    }
+  }
+
+  private boolean getShowLcbWinrate() {
+
+    if (rdoLcb.isSelected()) {
+      Lizzie.config.showLcbWinrate = true;
+      return true;
+    }
+    if (rdoWinrate.isSelected()) {
+      Lizzie.config.showLcbWinrate = false;
+      return false;
+    }
+    return true;
+  }
+
   private void setBoardSize() {
     int size = Lizzie.config.uiConfig.optInt("board-size", 19);
     txtBoardSize.setEnabled(false);
@@ -1849,6 +1891,7 @@ public class ConfigDialog extends JDialog {
       leelazConfig.putOpt(
           "max-game-thinking-time-seconds", txtFieldIntValue(txtMaxGameThinkingTime));
       leelazConfig.putOpt("print-comms", chkPrintEngineLog.isSelected());
+      leelazConfig.putOpt("show-lcb-winrate", getShowLcbWinrate());
       leelazConfig.put("engine-command", txtEngine.getText().trim());
       JSONArray engines = new JSONArray();
       Arrays.asList(txts).forEach(t -> engines.put(t.getText().trim()));
