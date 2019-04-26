@@ -337,6 +337,26 @@ public class BoardPane extends LizziePane {
         if (Lizzie.board.isValid(coords[0], coords[1])
             && (Lizzie.board.getHistory().getStones()[index] != Stone.EMPTY)) {
           int moveNumber = Lizzie.board.getHistory().getMoveNumberList()[index];
+          boolean isBranch = !Lizzie.board.getHistory().getCurrentHistoryNode().isMainTrunk();
+          if (isBranch) {
+            if (moveNumber > 0) {
+              moveNumber =
+                  moveNumber
+                      + Lizzie.board
+                          .getHistory()
+                          .getCurrentHistoryNode()
+                          .findTop()
+                          .moveNumberOfNode();
+            } else {
+              moveNumber =
+                  Lizzie.board
+                      .getHistory()
+                      .getCurrentHistoryNode()
+                      .findTop()
+                      .getData()
+                      .moveNumberList[index];
+            }
+          }
           if (moveNumber > 0) {
             Lizzie.board.goToMoveNumberBeyondBranch(moveNumber);
           }

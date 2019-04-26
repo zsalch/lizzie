@@ -14,6 +14,7 @@ import featurecat.lizzie.rules.Board;
 import featurecat.lizzie.rules.BoardData;
 import featurecat.lizzie.rules.GIBParser;
 import featurecat.lizzie.rules.SGFParser;
+import featurecat.lizzie.rules.Stone;
 import featurecat.lizzie.util.Utils;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -1285,6 +1286,44 @@ public class LizzieFrame extends MainFrame {
       variationTree.onClicked(x, y);
     }
     repaint();
+  }
+
+  public void onDoubleClicked(int x, int y) {
+    // Check for board double click
+    Optional<int[]> boardCoordinates = boardRenderer.convertScreenToCoordinates(x, y);
+    if (boardCoordinates.isPresent()) {
+      int[] coords = boardCoordinates.get();
+      if (!isPlayingAgainstLeelaz) {
+        int index = Lizzie.board.getIndex(coords[0], coords[1]);
+        if (Lizzie.board.isValid(coords[0], coords[1])
+            && (Lizzie.board.getHistory().getStones()[index] != Stone.EMPTY)) {
+          int moveNumber = Lizzie.board.getHistory().getMoveNumberList()[index];
+          boolean isBranch = !Lizzie.board.getHistory().getCurrentHistoryNode().isMainTrunk();
+          if (isBranch) {
+            if (moveNumber > 0) {
+              moveNumber =
+                  moveNumber
+                      + Lizzie.board
+                          .getHistory()
+                          .getCurrentHistoryNode()
+                          .findTop()
+                          .moveNumberOfNode();
+            } else {
+              moveNumber =
+                  Lizzie.board
+                      .getHistory()
+                      .getCurrentHistoryNode()
+                      .findTop()
+                      .getData()
+                      .moveNumberList[index];
+            }
+          }
+          if (moveNumber > 0) {
+            Lizzie.board.goToMoveNumberBeyondBranch(moveNumber);
+          }
+        }
+      }
+    }
   }
 
   private final Consumer<String> placeVariation =
