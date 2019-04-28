@@ -646,7 +646,8 @@ public class BoardRenderer {
           int suggestionY = y + scaledMargin + squareLength * coords[1];
 
           float hue;
-          if (isBestMove && !Lizzie.config.colorByWinrateInsteadOfVisits) {
+          if (isBestMove && !Lizzie.config.colorByWinrateInsteadOfVisits
+              || hasMaxWinrate && Lizzie.config.colorByWinrateInsteadOfVisits) {
             hue = cyanHue;
           } else {
             double fraction;
