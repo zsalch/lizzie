@@ -107,9 +107,6 @@ public class LizzieFrame extends MainFrame {
   private static VariationTree variationTree;
   private static WinrateGraph winrateGraph;
 
-  public static Font uiFont;
-  public static Font winrateFont;
-
   private final BufferStrategy bs;
 
   private static final int[] outOfBoundCoordinate = new int[] {-1, -1};

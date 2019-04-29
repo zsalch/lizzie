@@ -232,7 +232,7 @@ public class BoardRenderer {
               g,
               x + scaledMargin + squareLength * i,
               y + scaledMargin / 3,
-              LizzieFrame.uiFont,
+              MainFrame.uiFont,
               Board.asName(i),
               stoneRadius * 4 / 5,
               stoneRadius);
@@ -240,7 +240,7 @@ public class BoardRenderer {
               g,
               x + scaledMargin + squareLength * i,
               y - scaledMargin / 3 + boardLength,
-              LizzieFrame.uiFont,
+              MainFrame.uiFont,
               Board.asName(i),
               stoneRadius * 4 / 5,
               stoneRadius);
@@ -250,7 +250,7 @@ public class BoardRenderer {
               g,
               x + scaledMargin / 3,
               y + scaledMargin + squareLength * i,
-              LizzieFrame.uiFont,
+              MainFrame.uiFont,
               "" + (Board.boardSize - i),
               stoneRadius * 4 / 5,
               stoneRadius);
@@ -258,7 +258,7 @@ public class BoardRenderer {
               g,
               x - scaledMargin / 3 + boardLength,
               y + scaledMargin + squareLength * i,
-              LizzieFrame.uiFont,
+              MainFrame.uiFont,
               "" + (Board.boardSize - i),
               stoneRadius * 4 / 5,
               stoneRadius);
@@ -515,7 +515,7 @@ public class BoardRenderer {
             g,
             x + boardLength / 2,
             y + boardLength / 2,
-            LizzieFrame.uiFont,
+            MainFrame.uiFont,
             "pass",
             stoneRadius * 4,
             stoneRadius * 6);
@@ -568,7 +568,7 @@ public class BoardRenderer {
               g,
               stoneX,
               stoneY,
-              LizzieFrame.uiFont,
+              MainFrame.uiFont,
               moveNumberString,
               (float) (stoneRadius * 1.4),
               (int) (stoneRadius * 1.4));
@@ -744,7 +744,7 @@ public class BoardRenderer {
                 g,
                 suggestionX,
                 suggestionY,
-                LizzieFrame.winrateFont,
+                MainFrame.winrateFont,
                 Font.PLAIN,
                 text,
                 stoneRadius,
@@ -755,7 +755,7 @@ public class BoardRenderer {
                 g,
                 suggestionX,
                 suggestionY + stoneRadius * 2 / 5,
-                LizzieFrame.uiFont,
+                MainFrame.uiFont,
                 Utils.getPlayoutsString(move.playouts),
                 (float) (stoneRadius * 0.8),
                 stoneRadius * 1.4);
@@ -1070,7 +1070,7 @@ public class BoardRenderer {
                             g,
                             moveX,
                             moveY,
-                            LizzieFrame.uiFont,
+                            MainFrame.uiFont,
                             moves[1],
                             (float) labelRadius,
                             labelRadius);
