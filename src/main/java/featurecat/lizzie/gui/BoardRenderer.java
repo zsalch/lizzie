@@ -231,7 +231,7 @@ public class BoardRenderer {
           drawString(
               g,
               x + scaledMargin + squareLength * i,
-              y + scaledMargin / 2,
+              y + scaledMargin / 3,
               LizzieFrame.uiFont,
               Board.asName(i),
               stoneRadius * 4 / 5,
@@ -239,7 +239,7 @@ public class BoardRenderer {
           drawString(
               g,
               x + scaledMargin + squareLength * i,
-              y - scaledMargin / 2 + boardLength,
+              y - scaledMargin / 3 + boardLength,
               LizzieFrame.uiFont,
               Board.asName(i),
               stoneRadius * 4 / 5,
@@ -248,7 +248,7 @@ public class BoardRenderer {
         for (int i = 0; i < Board.boardSize; i++) {
           drawString(
               g,
-              x + scaledMargin / 2,
+              x + scaledMargin / 3,
               y + scaledMargin + squareLength * i,
               LizzieFrame.uiFont,
               "" + (Board.boardSize - i),
@@ -256,7 +256,7 @@ public class BoardRenderer {
               stoneRadius);
           drawString(
               g,
-              x - scaledMargin / 2 + +boardLength,
+              x - scaledMargin / 3 + boardLength,
               y + scaledMargin + squareLength * i,
               LizzieFrame.uiFont,
               "" + (Board.boardSize - i),
@@ -840,7 +840,7 @@ public class BoardRenderer {
     int availableLength;
 
     // decrease boardLength until the availableLength will result in square board intersections
-    double margin = (showCoordinates ? 1.5 / (Board.boardSize + 2) : 1.0d / (Board.boardSize + 1));
+    double margin = (showCoordinates ? 0.045 : 0.03) / Board.boardSize * 19.0;
     boardLength++;
     do {
       boardLength--;
