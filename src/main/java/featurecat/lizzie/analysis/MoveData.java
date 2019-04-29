@@ -34,7 +34,13 @@ public class MoveData {
       if (key.equals("pv")) {
         // Read variation to the end of line
         result.variation = new ArrayList<>(Arrays.asList(data));
-        result.variation = result.variation.subList(i + 1, data.length);
+        result.variation =
+            result.variation.subList(
+                i + 1,
+                (Lizzie.config.limitBranchLength > 0
+                        && data.length - i - 1 > Lizzie.config.limitBranchLength)
+                    ? i + 1 + Lizzie.config.limitBranchLength
+                    : data.length);
         break;
       } else {
         String value = data[++i];
@@ -82,7 +88,8 @@ public class MoveData {
         result.coordinate = match.group(1);
         result.playouts = Integer.parseInt(match.group(2));
         result.winrate = Double.parseDouble(match.group(3));
-        result.variation = Arrays.asList(match.group(4).split(" "));
+        result.variation =
+            Arrays.asList(match.group(4).split(" ", Lizzie.config.limitBranchLength));
         return result;
       }
     } else {
@@ -90,7 +97,7 @@ public class MoveData {
       result.coordinate = match.group(1);
       result.playouts = Integer.parseInt(match.group(2));
       result.winrate = Double.parseDouble(match.group(Lizzie.config.showLcbWinrate ? 4 : 3));
-      result.variation = Arrays.asList(match.group(5).split(" "));
+      result.variation = Arrays.asList(match.group(5).split(" ", Lizzie.config.limitBranchLength));
       return result;
     }
   }
