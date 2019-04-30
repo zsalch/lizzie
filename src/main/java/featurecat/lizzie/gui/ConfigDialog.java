@@ -146,6 +146,8 @@ public class ConfigDialog extends JDialog {
   public JCheckBox chkAppendWinrateToComment;
   public JCheckBox chkColorByWinrateInsteadOfVisits;
   public JSlider sldBoardPositionProportion;
+  public JTextField txtLimitBestMoveNum;
+  public JTextField txtLimitBranchLength;
 
   // Theme Tab
   public JComboBox<String> cmbThemes;
@@ -811,6 +813,40 @@ public class ConfigDialog extends JDialog {
       sldBoardPositionProportion.setBounds(170, 250, 200, 28);
       uiTab.add(sldBoardPositionProportion);
 
+      JLabel lblLimitBestMoveNum =
+          new JLabel(resourceBundle.getString("LizzieConfig.title.limitBestMoveNum"));
+      lblLimitBestMoveNum.setBounds(6, 281, 157, 16);
+      uiTab.add(lblLimitBestMoveNum);
+      txtLimitBestMoveNum =
+          new JFormattedTextField(
+              new InternationalFormatter(nf) {
+                protected DocumentFilter getDocumentFilter() {
+                  return filter;
+                }
+
+                private DocumentFilter filter = new DigitOnlyFilter();
+              });
+      txtLimitBestMoveNum.setBounds(171, 279, 52, 24);
+      uiTab.add(txtLimitBestMoveNum);
+      txtLimitBestMoveNum.setColumns(10);
+
+      JLabel lblLimitBranchLength =
+          new JLabel(resourceBundle.getString("LizzieConfig.title.limitBranchLength"));
+      lblLimitBranchLength.setBounds(6, 308, 157, 16);
+      uiTab.add(lblLimitBranchLength);
+      txtLimitBranchLength =
+          new JFormattedTextField(
+              new InternationalFormatter(nf) {
+                protected DocumentFilter getDocumentFilter() {
+                  return filter;
+                }
+
+                private DocumentFilter filter = new DigitOnlyFilter();
+              });
+      txtLimitBranchLength.setBounds(171, 306, 52, 24);
+      uiTab.add(txtLimitBranchLength);
+      txtLimitBranchLength.setColumns(10);
+
       File themeFolder = new File(Theme.pathPrefix);
       File[] themes =
           themeFolder.listFiles(
@@ -1119,6 +1155,8 @@ public class ConfigDialog extends JDialog {
       chkAppendWinrateToComment.setSelected(Lizzie.config.appendWinrateToComment);
       chkColorByWinrateInsteadOfVisits.setSelected(Lizzie.config.colorByWinrateInsteadOfVisits);
       sldBoardPositionProportion.setValue(Lizzie.config.boardPositionProportion);
+      txtLimitBestMoveNum.setText(String.valueOf(Lizzie.config.limitBestMoveNum));
+      txtLimitBranchLength.setText(String.valueOf(Lizzie.config.limitBranchLength));
       cmbThemes.setSelectedItem(
           Lizzie.config.uiConfig.optString(
               "theme", resourceBundle.getString("LizzieConfig.title.defaultTheme")));
@@ -1970,6 +2008,10 @@ public class ConfigDialog extends JDialog {
       Lizzie.config.boardPositionProportion = sldBoardPositionProportion.getValue();
       Lizzie.config.uiConfig.putOpt(
           "board-position-proportion", Lizzie.config.boardPositionProportion);
+      Lizzie.config.limitBestMoveNum = txtFieldIntValue(txtLimitBestMoveNum);
+      Lizzie.config.uiConfig.put("limit-best-move-num", Lizzie.config.limitBestMoveNum);
+      Lizzie.config.limitBranchLength = txtFieldIntValue(txtLimitBranchLength);
+      Lizzie.config.uiConfig.put("limit-branch-length", Lizzie.config.limitBranchLength);
       Lizzie.config.uiConfig.put("theme", cmbThemes.getSelectedItem());
       writeThemeValues();
 

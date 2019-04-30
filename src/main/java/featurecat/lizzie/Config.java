@@ -204,7 +204,7 @@ public class Config {
     replayBranchIntervalSeconds = uiConfig.optDouble("replay-branch-interval-seconds", 1.0);
     colorByWinrateInsteadOfVisits = uiConfig.optBoolean("color-by-winrate-instead-of-visits");
     boardPositionProportion = uiConfig.optInt("board-position-proportion", 4);
-    limitBestMoveNum = uiConfig.optInt("limit-bestMove-num", 0);
+    limitBestMoveNum = uiConfig.optInt("limit-best-move-num", 0);
     limitBranchLength = uiConfig.optInt("limit-branch-length", 0);
     minPlayoutRatioForStats = uiConfig.optDouble("min-playout-ratio-for-stats", 0.0);
 
