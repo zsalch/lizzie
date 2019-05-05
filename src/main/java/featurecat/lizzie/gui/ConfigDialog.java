@@ -69,6 +69,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -148,6 +149,7 @@ public class ConfigDialog extends JDialog {
   public JSlider sldBoardPositionProportion;
   public JTextField txtLimitBestMoveNum;
   public JTextField txtLimitBranchLength;
+  public JTextPane tpGtpConsoleStyle;
 
   // Theme Tab
   public JComboBox<String> cmbThemes;
@@ -847,6 +849,14 @@ public class ConfigDialog extends JDialog {
       uiTab.add(txtLimitBranchLength);
       txtLimitBranchLength.setColumns(10);
 
+      JLabel lblGtpConsoleStyle =
+          new JLabel(resourceBundle.getString("LizzieConfig.title.gtpConsoleStyle"));
+      lblGtpConsoleStyle.setBounds(6, 335, 157, 16);
+      uiTab.add(lblGtpConsoleStyle);
+      tpGtpConsoleStyle = new JTextPane();
+      tpGtpConsoleStyle.setBounds(171, 333, 460, 80);
+      uiTab.add(tpGtpConsoleStyle);
+
       File themeFolder = new File(Theme.pathPrefix);
       File[] themes =
           themeFolder.listFiles(
@@ -1030,27 +1040,27 @@ public class ConfigDialog extends JDialog {
 
       JLabel lblSolidStoneIndicator =
           new JLabel(resourceBundle.getString("LizzieConfig.title.solidStoneIndicator"));
-      lblSolidStoneIndicator.setBounds(10, 444, 163, 16);
+      lblSolidStoneIndicator.setBounds(10, 435, 163, 16);
       themeTab.add(lblSolidStoneIndicator);
       chkSolidStoneIndicator = new JCheckBox("");
-      chkSolidStoneIndicator.setBounds(170, 437, 57, 23);
+      chkSolidStoneIndicator.setBounds(170, 432, 57, 23);
       themeTab.add(chkSolidStoneIndicator);
 
       JLabel lblShowCommentNodeColor =
           new JLabel(resourceBundle.getString("LizzieConfig.title.showCommentNodeColor"));
-      lblShowCommentNodeColor.setBounds(10, 474, 163, 16);
+      lblShowCommentNodeColor.setBounds(10, 465, 163, 16);
       themeTab.add(lblShowCommentNodeColor);
       chkShowCommentNodeColor = new JCheckBox("");
-      chkShowCommentNodeColor.setBounds(170, 467, 33, 23);
+      chkShowCommentNodeColor.setBounds(170, 462, 33, 23);
       themeTab.add(chkShowCommentNodeColor);
 
       JLabel lblCommentNodeColorTitle =
           new JLabel(resourceBundle.getString("LizzieConfig.title.commentNodeColor"));
       lblCommentNodeColorTitle.setHorizontalAlignment(SwingConstants.LEFT);
-      lblCommentNodeColorTitle.setBounds(274, 474, 138, 16);
+      lblCommentNodeColorTitle.setBounds(210, 465, 138, 16);
       themeTab.add(lblCommentNodeColorTitle);
       lblCommentNodeColor = new ColorLabel();
-      lblCommentNodeColor.setBounds(431, 468, 22, 22);
+      lblCommentNodeColor.setBounds(351, 462, 22, 22);
       themeTab.add(lblCommentNodeColor);
 
       JLabel lblBlunderNodes =
@@ -1070,7 +1080,7 @@ public class ConfigDialog extends JDialog {
       themeTab.add(pnlScrollBlunderNodes);
 
       JButton btnAdd = new JButton(resourceBundle.getString("LizzieConfig.button.add"));
-      btnAdd.setBounds(382, 506, 89, 23);
+      btnAdd.setBounds(80, 527, 89, 23);
       btnAdd.addActionListener(
           new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -1080,7 +1090,7 @@ public class ConfigDialog extends JDialog {
       themeTab.add(btnAdd);
 
       JButton btnRemove = new JButton(resourceBundle.getString("LizzieConfig.button.remove"));
-      btnRemove.setBounds(384, 540, 89, 23);
+      btnRemove.setBounds(80, 557, 89, 23);
       btnRemove.addActionListener(
           new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -1157,6 +1167,7 @@ public class ConfigDialog extends JDialog {
       sldBoardPositionProportion.setValue(Lizzie.config.boardPositionProportion);
       txtLimitBestMoveNum.setText(String.valueOf(Lizzie.config.limitBestMoveNum));
       txtLimitBranchLength.setText(String.valueOf(Lizzie.config.limitBranchLength));
+      tpGtpConsoleStyle.setText(Lizzie.config.gtpConsoleStyle);
       cmbThemes.setSelectedItem(
           Lizzie.config.uiConfig.optString(
               "theme", resourceBundle.getString("LizzieConfig.title.defaultTheme")));
@@ -2012,6 +2023,7 @@ public class ConfigDialog extends JDialog {
       Lizzie.config.uiConfig.put("limit-best-move-num", Lizzie.config.limitBestMoveNum);
       Lizzie.config.limitBranchLength = txtFieldIntValue(txtLimitBranchLength);
       Lizzie.config.uiConfig.put("limit-branch-length", Lizzie.config.limitBranchLength);
+      Lizzie.config.uiConfig.put("gtp-console-style", tpGtpConsoleStyle.getText());
       Lizzie.config.uiConfig.put("theme", cmbThemes.getSelectedItem());
       writeThemeValues();
 

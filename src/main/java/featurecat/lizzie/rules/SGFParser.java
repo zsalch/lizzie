@@ -346,6 +346,7 @@ public class SGFParser {
     // Set AW/AB Comment
     if (!headComment.isEmpty()) {
       Lizzie.board.comment(headComment);
+      Lizzie.frame.refresh();
     }
     if (gameProperties.size() > 0) {
       Lizzie.board.addNodeProperties(gameProperties);
