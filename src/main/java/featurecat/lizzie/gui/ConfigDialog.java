@@ -52,6 +52,8 @@ import javax.imageio.ImageIO;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
@@ -70,6 +72,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -105,6 +108,7 @@ public class ConfigDialog extends JDialog {
 
   public JPanel uiTab;
   public JPanel themeTab;
+  public JPanel aboutTab;
   public JButton okButton;
 
   // Engine Tab
@@ -564,6 +568,79 @@ public class ConfigDialog extends JDialog {
     themeTab = new JPanel();
     tabbedPane.addTab(resourceBundle.getString("LizzieConfig.title.theme"), null, themeTab, null);
     themeTab.setLayout(null);
+
+    // About Tab
+    aboutTab = new JPanel();
+    tabbedPane.addTab(resourceBundle.getString("LizzieConfig.title.about"), null, aboutTab, null);
+
+    JLabel lblLizzieName = new JLabel("Lizzie 0.6+");
+    lblLizzieName.setFont(new Font("Tahoma", Font.BOLD, 24));
+    lblLizzieName.setHorizontalAlignment(SwingConstants.CENTER);
+
+    JLabel lblLizzieInfo = new JLabel(resourceBundle.getString("LizzieConfig.lizzie.info"));
+    lblLizzieInfo.setFont(new Font("Tahoma", Font.PLAIN, 14));
+
+    JLabel lblContributorsTitle =
+        new JLabel(resourceBundle.getString("LizzieConfig.lizzie.contributorsTitle"));
+    lblContributorsTitle.setFont(new Font("Tahoma", Font.BOLD, 12));
+
+    JLabel lblContributors =
+        new JLabel(resourceBundle.getString("LizzieConfig.lizzie.contributors"));
+    lblContributors.setVerticalAlignment(SwingConstants.TOP);
+    lblContributors.setFont(new Font("Tahoma", Font.PLAIN, 14));
+    GroupLayout gl = new GroupLayout(aboutTab);
+    gl.setHorizontalGroup(
+        gl.createParallelGroup(Alignment.LEADING)
+            .addGroup(
+                gl.createSequentialGroup()
+                    .addGroup(
+                        gl.createParallelGroup(Alignment.TRAILING)
+                            .addGroup(
+                                Alignment.LEADING,
+                                gl.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(
+                                        lblLizzieInfo,
+                                        GroupLayout.DEFAULT_SIZE,
+                                        620,
+                                        Short.MAX_VALUE))
+                            .addGroup(
+                                Alignment.LEADING,
+                                gl.createSequentialGroup().addGap(254).addComponent(lblLizzieName))
+                            .addGroup(
+                                Alignment.LEADING,
+                                gl.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(lblContributorsTitle))
+                            .addGroup(
+                                Alignment.LEADING,
+                                gl.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(
+                                        lblContributors,
+                                        GroupLayout.PREFERRED_SIZE,
+                                        620,
+                                        GroupLayout.PREFERRED_SIZE)))
+                    .addContainerGap()));
+    gl.setVerticalGroup(
+        gl.createParallelGroup(Alignment.LEADING)
+            .addGroup(
+                gl.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(lblLizzieName)
+                    .addGap(18)
+                    .addComponent(
+                        lblLizzieInfo, GroupLayout.PREFERRED_SIZE, 183, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(lblContributorsTitle)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(
+                        lblContributors,
+                        GroupLayout.PREFERRED_SIZE,
+                        282,
+                        GroupLayout.PREFERRED_SIZE)
+                    .addGap(126)));
+    aboutTab.setLayout(gl);
 
     // Engines
     txts =
@@ -1044,7 +1121,7 @@ public class ConfigDialog extends JDialog {
       JLabel lblCommentBackgroundColorTitle =
           new JLabel(resourceBundle.getString("LizzieConfig.title.commentBackgroundColor"));
       lblCommentBackgroundColorTitle.setHorizontalAlignment(SwingConstants.LEFT);
-      lblCommentBackgroundColorTitle.setBounds(347, 345, 148, 16);
+      lblCommentBackgroundColorTitle.setBounds(370, 345, 148, 16);
       themeTab.add(lblCommentBackgroundColorTitle);
       lblCommentBackgroundColor = new ColorLabel();
       lblCommentBackgroundColor.setBounds(529, 342, 22, 22);
@@ -1053,7 +1130,7 @@ public class ConfigDialog extends JDialog {
       JLabel lblCommentFontColorTitle =
           new JLabel(resourceBundle.getString("LizzieConfig.title.commentFontColor"));
       lblCommentFontColorTitle.setHorizontalAlignment(SwingConstants.LEFT);
-      lblCommentFontColorTitle.setBounds(347, 375, 148, 16);
+      lblCommentFontColorTitle.setBounds(370, 375, 148, 16);
       themeTab.add(lblCommentFontColorTitle);
       lblCommentFontColor = new ColorLabel();
       lblCommentFontColor.setBounds(529, 372, 22, 22);
@@ -1062,7 +1139,7 @@ public class ConfigDialog extends JDialog {
       JLabel lblCommentFontSize =
           new JLabel(resourceBundle.getString("LizzieConfig.title.commentFontSize"));
       lblCommentFontSize.setHorizontalAlignment(SwingConstants.LEFT);
-      lblCommentFontSize.setBounds(347, 405, 148, 16);
+      lblCommentFontSize.setBounds(370, 405, 148, 16);
       themeTab.add(lblCommentFontSize);
       txtCommentFontSize =
           new JFormattedTextField(
