@@ -166,6 +166,9 @@ public class ConfigDialog extends JDialog {
   public ColorLabel lblWinrateLineColor;
   public ColorLabel lblWinrateMissLineColor;
   public ColorLabel lblBlunderBarColor;
+  public ColorLabel lblCommentBackgroundColor;
+  public ColorLabel lblCommentFontColor;
+  public JTextField txtCommentFontSize;
   public JCheckBox chkSolidStoneIndicator;
   public JCheckBox chkShowCommentNodeColor;
   public ColorLabel lblCommentNodeColor;
@@ -1017,7 +1020,7 @@ public class ConfigDialog extends JDialog {
       lblWinrateLineColorTitle.setBounds(10, 345, 163, 16);
       themeTab.add(lblWinrateLineColorTitle);
       lblWinrateLineColor = new ColorLabel();
-      lblWinrateLineColor.setBounds(175, 350, 199, 9);
+      lblWinrateLineColor.setBounds(175, 350, 167, 9);
       themeTab.add(lblWinrateLineColor);
 
       JLabel lblWinrateMissLineColorTitle =
@@ -1026,7 +1029,7 @@ public class ConfigDialog extends JDialog {
       lblWinrateMissLineColorTitle.setBounds(10, 375, 163, 16);
       themeTab.add(lblWinrateMissLineColorTitle);
       lblWinrateMissLineColor = new ColorLabel();
-      lblWinrateMissLineColor.setBounds(175, 380, 199, 9);
+      lblWinrateMissLineColor.setBounds(175, 380, 167, 9);
       themeTab.add(lblWinrateMissLineColor);
 
       JLabel lblBlunderBarColorTitle =
@@ -1035,8 +1038,44 @@ public class ConfigDialog extends JDialog {
       lblBlunderBarColorTitle.setBounds(10, 405, 163, 16);
       themeTab.add(lblBlunderBarColorTitle);
       lblBlunderBarColor = new ColorLabel();
-      lblBlunderBarColor.setBounds(175, 410, 199, 9);
+      lblBlunderBarColor.setBounds(175, 410, 167, 9);
       themeTab.add(lblBlunderBarColor);
+
+      JLabel lblCommentBackgroundColorTitle =
+          new JLabel(resourceBundle.getString("LizzieConfig.title.commentBackgroundColor"));
+      lblCommentBackgroundColorTitle.setHorizontalAlignment(SwingConstants.LEFT);
+      lblCommentBackgroundColorTitle.setBounds(347, 345, 148, 16);
+      themeTab.add(lblCommentBackgroundColorTitle);
+      lblCommentBackgroundColor = new ColorLabel();
+      lblCommentBackgroundColor.setBounds(529, 342, 22, 22);
+      themeTab.add(lblCommentBackgroundColor);
+
+      JLabel lblCommentFontColorTitle =
+          new JLabel(resourceBundle.getString("LizzieConfig.title.commentFontColor"));
+      lblCommentFontColorTitle.setHorizontalAlignment(SwingConstants.LEFT);
+      lblCommentFontColorTitle.setBounds(347, 375, 148, 16);
+      themeTab.add(lblCommentFontColorTitle);
+      lblCommentFontColor = new ColorLabel();
+      lblCommentFontColor.setBounds(529, 372, 22, 22);
+      themeTab.add(lblCommentFontColor);
+
+      JLabel lblCommentFontSize =
+          new JLabel(resourceBundle.getString("LizzieConfig.title.commentFontSize"));
+      lblCommentFontSize.setHorizontalAlignment(SwingConstants.LEFT);
+      lblCommentFontSize.setBounds(347, 405, 148, 16);
+      themeTab.add(lblCommentFontSize);
+      txtCommentFontSize =
+          new JFormattedTextField(
+              new InternationalFormatter(nf) {
+                protected DocumentFilter getDocumentFilter() {
+                  return filter;
+                }
+
+                private DocumentFilter filter = new DigitOnlyFilter();
+              });
+      txtCommentFontSize.setBounds(529, 403, 52, 24);
+      themeTab.add(txtCommentFontSize);
+      txtLimitBranchLength.setColumns(10);
 
       JLabel lblSolidStoneIndicator =
           new JLabel(resourceBundle.getString("LizzieConfig.title.solidStoneIndicator"));
@@ -1849,6 +1888,9 @@ public class ConfigDialog extends JDialog {
         chkSolidStoneIndicator.setSelected(theme.solidStoneIndicator());
         chkShowCommentNodeColor.setSelected(theme.showCommentNodeColor());
         lblCommentNodeColor.setColor(theme.commentNodeColor());
+        lblCommentBackgroundColor.setColor(theme.commentBackgroundColor());
+        lblCommentFontColor.setColor(theme.commentFontColor());
+        txtCommentFontSize.setText(String.valueOf(theme.commentFontSize()));
         tblBlunderNodes.setModel(
             new BlunderNodeTableModel(
                 theme.blunderWinrateThresholds().orElse(null),
@@ -1895,6 +1937,10 @@ public class ConfigDialog extends JDialog {
         theme.config.put("show-comment-node-color", chkShowCommentNodeColor.isSelected());
         theme.config.put("comment-node-color", Theme.color2Array(lblCommentNodeColor.getColor()));
         theme.config.put(
+            "comment-background-color", Theme.color2Array(lblCommentBackgroundColor.getColor()));
+        theme.config.put("comment-font-color", Theme.color2Array(lblCommentFontColor.getColor()));
+        theme.config.put("comment-font-size", txtFieldIntValue(txtCommentFontSize));
+        theme.config.put(
             "blunder-winrate-thresholds",
             ((BlunderNodeTableModel) tblBlunderNodes.getModel()).getThresholdArray());
         theme.config.put(
@@ -1939,6 +1985,14 @@ public class ConfigDialog extends JDialog {
     lblCommentNodeColor.setColor(
         Theme.array2Color(
             Lizzie.config.uiConfig.optJSONArray("comment-node-color"), Color.BLUE.brighter()));
+    lblCommentBackgroundColor.setColor(
+        Theme.array2Color(
+            Lizzie.config.uiConfig.optJSONArray("comment-background-color"),
+            new Color(0, 0, 0, 200)));
+    lblCommentFontColor.setColor(
+        Theme.array2Color(Lizzie.config.uiConfig.optJSONArray("comment-font-color"), Color.WHITE));
+    txtCommentFontSize.setText(
+        String.valueOf(Lizzie.config.uiConfig.optInt("comment-font-size", 3)));
     Theme defTheme = new Theme("");
     tblBlunderNodes.setModel(
         new BlunderNodeTableModel(
@@ -1967,6 +2021,11 @@ public class ConfigDialog extends JDialog {
     Lizzie.config.uiConfig.put("show-comment-node-color", chkShowCommentNodeColor.isSelected());
     Lizzie.config.uiConfig.put(
         "comment-node-color", Theme.color2Array(lblCommentNodeColor.getColor()));
+    Lizzie.config.uiConfig.put(
+        "comment-background-color", Theme.color2Array(lblCommentBackgroundColor.getColor()));
+    Lizzie.config.uiConfig.put(
+        "comment-font-color", Theme.color2Array(lblCommentFontColor.getColor()));
+    Lizzie.config.uiConfig.put("comment-font-size", txtFieldIntValue(txtCommentFontSize));
     Lizzie.config.uiConfig.put(
         "blunder-winrate-thresholds",
         ((BlunderNodeTableModel) tblBlunderNodes.getModel()).getThresholdArray());
