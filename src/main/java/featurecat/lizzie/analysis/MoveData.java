@@ -19,14 +19,19 @@ public class MoveData {
   /**
    * Parses a leelaz ponder output line. For example:
    *
+   * <p>0.16 0.15
+   *
    * <p>info move R5 visits 38 winrate 5404 order 0 pv R5 Q5 R6 S4 Q10 C3 D3 C4 C6 C5 D5
+   *
+   * <p>0.17
+   *
+   * <p>info move Q16 visits 80 winrate 4405 prior 1828 lcb 4379 order 0 pv Q16 D4
    *
    * @param line line of ponder output
    */
   public static MoveData fromInfo(String line) throws ArrayIndexOutOfBoundsException {
     MoveData result = new MoveData();
     String[] data = line.trim().split(" ");
-
     boolean islcb = Lizzie.config.showLcbWinrate;
     // Todo: Proper tag parsing in case gtp protocol is extended(?)/changed
     for (int i = 0; i < data.length; i++) {
@@ -78,18 +83,19 @@ public class MoveData {
    * @param summary line of summary output
    */
   public static MoveData fromSummary(String summary) {
-    Matcher match = summaryPattern17.matcher(summary.trim());
+    Matcher match = summaryPatternLcb.matcher(summary.trim());
     if (!match.matches()) {
-      match = summaryPattern.matcher(summary.trim());
-      if (!match.matches()) {
+      // support 0.16 0.15
+      Matcher matchold = summaryPatternWinrate.matcher(summary.trim());
+      if (!matchold.matches()) {
         throw new IllegalArgumentException("Unexpected summary format: " + summary);
       } else {
         MoveData result = new MoveData();
-        result.coordinate = match.group(1);
-        result.playouts = Integer.parseInt(match.group(2));
-        result.winrate = Double.parseDouble(match.group(3));
+        result.coordinate = matchold.group(1);
+        result.playouts = Integer.parseInt(matchold.group(2));
+        result.winrate = Double.parseDouble(matchold.group(3));
         result.variation =
-            Arrays.asList(match.group(4).split(" ", Lizzie.config.limitBranchLength));
+            Arrays.asList(matchold.group(4).split(" ", Lizzie.config.limitBranchLength));
         return result;
       }
     } else {
@@ -102,12 +108,12 @@ public class MoveData {
     }
   }
 
-  private static Pattern summaryPattern =
-      Pattern.compile("^ *(\\w\\d*) -> *(\\d+) \\(V: ([^%)]+)%\\) \\([^\\)]+\\) PV: (.+).*$");
-
-  private static Pattern summaryPattern17 =
+  private static Pattern summaryPatternLcb =
       Pattern.compile(
           "^ *(\\w\\d*) -> *(\\d+) \\(V: ([^%)]+)%\\) \\(LCB: ([^%)]+)%\\) \\([^\\)]+\\) PV: (.+).*$");
+  private static Pattern summaryPatternWinrate =
+      Pattern.compile("^ *(\\w\\d*) -> *(\\d+) \\(V: ([^%)]+)%\\) \\([^\\)]+\\) PV: (.+).*$");
+  // support 0.16 0.15
 
   public static int getPlayouts(List<MoveData> moves) {
     int playouts = 0;
