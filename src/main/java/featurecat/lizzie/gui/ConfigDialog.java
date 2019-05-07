@@ -11,6 +11,7 @@ import featurecat.lizzie.theme.Theme;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -59,6 +60,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -80,6 +82,8 @@ import javax.swing.SwingWorker;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
@@ -577,16 +581,15 @@ public class ConfigDialog extends JDialog {
     lblLizzieName.setFont(new Font("Tahoma", Font.BOLD, 24));
     lblLizzieName.setHorizontalAlignment(SwingConstants.CENTER);
 
-    JLabel lblLizzieInfo = new JLabel(resourceBundle.getString("LizzieConfig.lizzie.info"));
+    LinkLabel lblLizzieInfo = new LinkLabel(resourceBundle.getString("LizzieConfig.lizzie.info"));
     lblLizzieInfo.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
-    JLabel lblContributorsTitle =
-        new JLabel(resourceBundle.getString("LizzieConfig.lizzie.contributorsTitle"));
+    LinkLabel lblContributorsTitle =
+        new LinkLabel(resourceBundle.getString("LizzieConfig.lizzie.contributorsTitle"));
     lblContributorsTitle.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-    JLabel lblContributors =
-        new JLabel(resourceBundle.getString("LizzieConfig.lizzie.contributors"));
-    lblContributors.setVerticalAlignment(SwingConstants.TOP);
+    LinkLabel lblContributors =
+        new LinkLabel(resourceBundle.getString("LizzieConfig.lizzie.contributors"));
     lblContributors.setFont(new Font("Tahoma", Font.PLAIN, 14));
     GroupLayout gl = new GroupLayout(aboutTab);
     gl.setHorizontalGroup(
@@ -1763,6 +1766,28 @@ public class ConfigDialog extends JDialog {
 
     @Override
     public void actionPerformed(ActionEvent e) {}
+  }
+
+  private class LinkLabel extends JEditorPane {
+    public LinkLabel(String text) {
+      super("text/html", text);
+      setEditable(false);
+      setOpaque(false);
+      putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+      addHyperlinkListener(
+          new HyperlinkListener() {
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+              if (HyperlinkEvent.EventType.ACTIVATED.equals(e.getEventType())) {
+                if (Desktop.isDesktopSupported()) {
+                  try {
+                    Desktop.getDesktop().browse(e.getURL().toURI());
+                  } catch (Exception ex) {
+                  }
+                }
+              }
+            }
+          });
+    }
   }
 
   class BlunderNodeTableModel extends AbstractTableModel {
