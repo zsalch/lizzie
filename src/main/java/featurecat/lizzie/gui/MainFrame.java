@@ -95,7 +95,7 @@ public abstract class MainFrame extends JFrame {
 
   public abstract void openAvoidMoveDialog();
 
-  public abstract void startNewGame();
+  public abstract void startGame();
 
   public abstract void editGameInfo();
 

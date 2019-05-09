@@ -320,10 +320,11 @@ public class LizzieFrame extends MainFrame {
     }
   }
 
-  public static void startGame() {
+  @Override
+  public void startGame() {
     GameInfo gameInfo = Lizzie.board.getHistory().getGameInfo();
 
-    GameDialog gameDialog = new GameDialog();
+    NewGameDialog gameDialog = new NewGameDialog();
     gameDialog.setGameInfo(gameInfo);
     gameDialog.setVisible(true);
     boolean playerIsBlack = gameDialog.playerIsBlack();
@@ -333,10 +334,6 @@ public class LizzieFrame extends MainFrame {
 
     if (isNewGame) {
       Lizzie.board.clear();
-    } else {
-      //      Lizzie.board.saveMoveNumber();
-      //      Lizzie.leelaz.clear();
-      //      Lizzie.frame.resetTitle();
     }
     Lizzie.leelaz.sendCommand("komi " + gameInfo.getKomi());
 
@@ -356,41 +353,12 @@ public class LizzieFrame extends MainFrame {
         Lizzie.leelaz.genmove("B");
       }
     } else {
-      //      Lizzie.board.restoreMoveNumber();
       Lizzie.board.getHistory().setGameInfo(gameInfo);
       if (Lizzie.frame.playerIsBlack != Lizzie.board.getData().blackToPlay) {
         if (!Lizzie.leelaz.isThinking) {
           Lizzie.leelaz.genmove((Lizzie.board.getData().blackToPlay ? "B" : "W"));
         }
       }
-    }
-  }
-
-  public void startNewGame() {
-    GameInfo gameInfo = Lizzie.board.getHistory().getGameInfo();
-
-    NewGameDialog newGameDialog = new NewGameDialog();
-    newGameDialog.setGameInfo(gameInfo);
-    newGameDialog.setVisible(true);
-    boolean playerIsBlack = newGameDialog.playerIsBlack();
-    newGameDialog.dispose();
-    if (newGameDialog.isCancelled()) return;
-
-    Lizzie.board.clear();
-    Lizzie.board.getHistory().setGameInfo(gameInfo);
-    Lizzie.leelaz.sendCommand("komi " + gameInfo.getKomi());
-
-    Lizzie.leelaz.time_settings();
-    Lizzie.frame.playerIsBlack = playerIsBlack;
-    Lizzie.frame.isPlayingAgainstLeelaz = true;
-
-    boolean isHandicapGame = gameInfo.getHandicap() != 0;
-    if (isHandicapGame) {
-      Lizzie.board.getHistory().getData().blackToPlay = false;
-      Lizzie.leelaz.sendCommand("fixed_handicap " + gameInfo.getHandicap());
-      if (playerIsBlack) Lizzie.leelaz.genmove("W");
-    } else if (!playerIsBlack) {
-      Lizzie.leelaz.genmove("B");
     }
   }
 
