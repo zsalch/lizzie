@@ -23,6 +23,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -113,11 +114,14 @@ public class BoardPane extends LizziePane {
           }
         });
     addMouseMotionListener(
-        new MouseAdapter() {
+        new MouseMotionListener() {
           @Override
           public void mouseMoved(MouseEvent e) {
             onMouseMoved(e.getX(), e.getY());
           }
+
+          @Override
+          public void mouseDragged(MouseEvent e) {}
         });
   }
 

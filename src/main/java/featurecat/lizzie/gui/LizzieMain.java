@@ -228,15 +228,6 @@ public class LizzieMain extends MainFrame {
   }
 
   /**
-   * Draws the game board and interface
-   *
-   * @param g0 not used
-   */
-  public void paint(Graphics g0) {
-    super.paintComponents(g0);
-  }
-
-  /**
    * temporary measure to refresh background. ideally we shouldn't need this (but we want to release
    * Lizzie 0.5 today, not tomorrow!). Refactor me out please! (you need to get blurring to work
    * properly on startup).
