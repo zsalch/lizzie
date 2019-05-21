@@ -37,9 +37,6 @@ public class Board implements LeelazListener {
   // Save the node for restore move when in the branch
   private Optional<BoardHistoryNode> saveNode;
 
-  // Force refresh board
-  private boolean forceRefresh;
-
   public Board() {
     initialize();
   }
@@ -51,7 +48,7 @@ public class Board implements LeelazListener {
     analysisMode = false;
     playoutsAnalysis = 100;
     saveNode = Optional.empty();
-    forceRefresh = false;
+    Lizzie.frame.setForceRefresh(false);
     history = new BoardHistoryList(BoardData.empty(boardSize));
   }
 
@@ -166,16 +163,8 @@ public class Board implements LeelazListener {
       Zobrist.init();
       clear();
       Lizzie.leelaz.sendCommand("boardsize " + boardSize);
-      forceRefresh = true;
+      Lizzie.frame.setForceRefresh(true);
     }
-  }
-
-  public boolean isForceRefresh() {
-    return forceRefresh;
-  }
-
-  public void setForceRefresh(boolean forceRefresh) {
-    this.forceRefresh = forceRefresh;
   }
 
   /**

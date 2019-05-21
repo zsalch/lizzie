@@ -237,7 +237,7 @@ public class SGFParser {
                         .replaceAll("[^0-9]", ""));
             Lizzie.board.getData().setPlayouts(numPlayouts);
             if (numPlayouts > 0 && !line2.isEmpty()) {
-              Lizzie.board.getData().bestMoves = Leelaz.parseInfo(line2);
+              Lizzie.board.getData().bestMoves = Lizzie.leelaz.parseInfo(line2);
             }
           } else if (tag.equals("AB") || tag.equals("AW")) {
             int[] move = convertSgfPosToCoord(tagContent);

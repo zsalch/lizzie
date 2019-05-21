@@ -112,7 +112,7 @@ public class BoardRenderer {
     //        timer.lap("background");
     drawStones();
     //        timer.lap("stones");
-    if (Lizzie.board.inScoreMode() && isMainBoard) {
+    if (Lizzie.board != null && Lizzie.board.inScoreMode() && isMainBoard) {
       drawScore(g);
     } else {
       drawBranch();
@@ -192,10 +192,10 @@ public class BoardRenderer {
         || cachedX != x
         || cachedY != y
         || cachedBackgroundImageHasCoordinatesEnabled != showCoordinates()
-        || Lizzie.board.isForceRefresh()) {
+        || Lizzie.frame.isForceRefresh()) {
 
       cachedBoardLength = boardLength;
-      Lizzie.board.setForceRefresh(false);
+      Lizzie.frame.setForceRefresh(false);
 
       cachedBackgroundImage = new BufferedImage(width, height, TYPE_INT_ARGB);
       Graphics2D g = cachedBackgroundImage.createGraphics();
@@ -313,6 +313,8 @@ public class BoardRenderer {
 
   /** Draw the stones. We cache the image for a performance boost. */
   private void drawStones() {
+    if (Lizzie.board == null) return;
+
     // draw a new image if frame size changes or board state changes
     if (cachedStonesImage.getWidth() != boardLength
         || cachedStonesImage.getHeight() != boardLength
@@ -482,6 +484,7 @@ public class BoardRenderer {
   /** Draw move numbers and/or mark the last played move */
   private void drawMoveNumbers(Graphics2D g) {
     g.setRenderingHint(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
+    if (Lizzie.board == null) return;
     Board board = Lizzie.board;
     Optional<int[]> lastMoveOpt = branchOpt.map(b -> b.data.lastMove).orElse(board.getLastMove());
     if (Lizzie.config.allowMoveNumber == 0 && !branchOpt.isPresent()) {
@@ -768,6 +771,7 @@ public class BoardRenderer {
   }
 
   private void drawNextMoves(Graphics2D g) {
+    if (Lizzie.board == null) return;
     g.setColor(Lizzie.board.getData().blackToPlay ? Color.BLACK : Color.WHITE);
 
     List<BoardHistoryNode> nexts = Lizzie.board.getHistory().getNexts();
@@ -1044,7 +1048,7 @@ public class BoardRenderer {
    * @param g
    */
   private void drawStoneMarkup(Graphics2D g) {
-
+    if (Lizzie.board == null) return;
     BoardData data = Lizzie.board.getHistory().getData();
 
     data.getProperties()
