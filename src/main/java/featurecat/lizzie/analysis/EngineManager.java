@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +28,8 @@ public class EngineManager {
     Lizzie.leelaz = lz;
     Lizzie.board = lz.board;
     lz.startEngine();
-    engineList = new ArrayList();
+    lz.preload = true;
+    engineList = new ArrayList<Leelaz>();
     engineList.add(lz);
     currentEngineNo = 0;
 
@@ -37,25 +39,34 @@ public class EngineManager {
               Optional<JSONArray> enginesOpt =
                   Optional.ofNullable(
                       Lizzie.config.leelazConfig.optJSONArray("engine-command-list"));
+              Optional<JSONArray> enginePreloadOpt =
+                  Optional.ofNullable(
+                      Lizzie.config.leelazConfig.optJSONArray("engine-preload-list"));
               enginesOpt.ifPresent(
                   m -> {
-                    m.forEach(
-                        a -> {
-                          if (a != null && !a.toString().isEmpty()) {
-                            Leelaz e;
-                            try {
-                              e = new Leelaz(a.toString());
-                              // TODO: how sync the board
-                              e.board = Lizzie.board;
-                              e.startEngine();
-                              // TODO: Need keep analyze?
-                              //                  e.togglePonder();
-                              engineList.add(e);
-                            } catch (JSONException | IOException e1) {
-                              e1.printStackTrace();
-                            }
-                          }
-                        });
+                    IntStream.range(0, m.length())
+                        .forEach(
+                            i -> {
+                              String cmd = m.optString(i);
+                              if (cmd != null && !cmd.isEmpty()) {
+                                Leelaz e;
+                                try {
+                                  e = new Leelaz(cmd);
+                                  // TODO: how sync the board
+                                  e.board = Lizzie.board;
+                                  e.preload =
+                                      enginePreloadOpt.map(p -> p.optBoolean(i)).orElse(false);
+                                  if (e.preload) {
+                                    e.startEngine();
+                                  }
+                                  // TODO: Need keep analyze?
+                                  // e.togglePonder();
+                                  engineList.add(e);
+                                } catch (JSONException | IOException e1) {
+                                  e1.printStackTrace();
+                                }
+                              }
+                            });
                   });
             })
         .start();
@@ -95,6 +106,9 @@ public class EngineManager {
       }
       Lizzie.board.restoreMoveNumber();
       this.currentEngineNo = index;
+      if (!curEng.preload) {
+        curEng.normalQuit();
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }

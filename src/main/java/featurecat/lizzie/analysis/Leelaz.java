@@ -63,6 +63,7 @@ public class Leelaz {
   public boolean isThinking = false;
   public boolean isInputCommand = false;
 
+  public boolean preload = false;
   private boolean started = false;
   private boolean isLoaded = false;
   private boolean isCheckingVersion;
