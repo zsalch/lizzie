@@ -262,6 +262,10 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         }
         break;
 
+      case VK_Q:
+        Lizzie.frame.openOnlineDialog();
+        break;
+
       case VK_F:
         Lizzie.config.toggleShowNextMoves();
         break;

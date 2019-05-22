@@ -25,7 +25,12 @@ import javax.swing.JOptionPane;
 import org.json.JSONException;
 
 public class Board implements LeelazListener {
-  public static int boardSize = Lizzie.config.config.getJSONObject("ui").optInt("board-size", 19);
+  public static int boardSize =
+      (Lizzie.config != null
+              && Lizzie.config.config != null
+              && Lizzie.config.config.getJSONObject("ui") != null)
+          ? Lizzie.config.config.getJSONObject("ui").optInt("board-size", 19)
+          : 19;
   private static final String alphabet = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
 
   private BoardHistoryList history;
@@ -576,7 +581,7 @@ public class Board implements LeelazListener {
    * @param zobrist the zobrist object to modify
    * @return number of removed stones
    */
-  private int removeDeadChain(int x, int y, Stone color, Stone[] stones, Zobrist zobrist) {
+  public static int removeDeadChain(int x, int y, Stone color, Stone[] stones, Zobrist zobrist) {
     if (!isValid(x, y) || stones[getIndex(x, y)] != color) return 0;
 
     boolean hasLiberties = hasLibertiesHelper(x, y, color, stones);
@@ -595,7 +600,7 @@ public class Board implements LeelazListener {
    * @param stones the stones array to modify
    * @return whether or not this chain has liberties
    */
-  private boolean hasLibertiesHelper(int x, int y, Stone color, Stone[] stones) {
+  private static boolean hasLibertiesHelper(int x, int y, Stone color, Stone[] stones) {
     if (!isValid(x, y)) return false;
 
     if (stones[getIndex(x, y)] == Stone.EMPTY) return true; // a liberty was found
@@ -627,7 +632,7 @@ public class Board implements LeelazListener {
    *     their unrecursed version
    * @return number of removed stones
    */
-  private int cleanupHasLibertiesHelper(
+  private static int cleanupHasLibertiesHelper(
       int x, int y, Stone color, Stone[] stones, Zobrist zobrist, boolean removeStones) {
     int removed = 0;
     if (!isValid(x, y) || stones[getIndex(x, y)] != color) return 0;

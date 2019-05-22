@@ -1505,6 +1505,7 @@ public class LizzieFrame extends MainFrame {
     }
     Font font = new Font(Lizzie.config.fontName, Font.PLAIN, fontSize);
     commentPane.setFont(font);
+    comment = comment.replaceAll("(\r\n)|(\n)", "<br />").replaceAll(" ", "&nbsp;");
     commentPane.setText(comment);
     commentPane.setSize(w, h);
     createCommentImage(!comment.equals(this.cachedComment), w, h);

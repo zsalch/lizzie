@@ -111,6 +111,11 @@ public abstract class MainFrame extends JFrame {
 
   public abstract void openChangeMoveDialog();
 
+  public void openOnlineDialog() {
+    OnlineDialog onlineDialog = new OnlineDialog();
+    onlineDialog.setVisible(true);
+  }
+
   public abstract boolean playCurrentVariation();
 
   public abstract void playBestMove();

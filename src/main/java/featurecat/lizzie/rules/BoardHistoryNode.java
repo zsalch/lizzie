@@ -530,4 +530,43 @@ public class BoardHistoryNode {
     }
     return moves;
   }
+
+  public boolean compare(BoardHistoryNode node) {
+    BoardData sData = this.getData();
+    BoardData dData = node.getData();
+
+    boolean dMove =
+        sData.lastMove.isPresent() && dData.lastMove.isPresent()
+            || !sData.lastMove.isPresent() && !dData.lastMove.isPresent();
+    if (dMove && sData.lastMove.isPresent()) {
+      int[] sM = sData.lastMove.get();
+      int[] dM = dData.lastMove.get();
+      dMove =
+          (sM != null
+              && sM.length == 2
+              && dM != null
+              && dM.length == 2
+              && sM[0] == dM[0]
+              && sM[1] == dM[1]);
+    }
+    return dMove && sData.comment != null && sData.comment.equals(dData.comment);
+  }
+
+  public void sync(BoardHistoryNode node) {
+    BoardData sData = this.getData();
+    BoardData dData = node.getData();
+    sData.moveMNNumber = dData.moveMNNumber;
+    sData.moveNumber = dData.moveNumber;
+    sData.lastMove = dData.lastMove;
+    sData.moveNumberList = dData.moveNumberList;
+    sData.blackToPlay = dData.blackToPlay;
+    sData.dummy = dData.dummy;
+    sData.lastMoveColor = dData.lastMoveColor;
+    sData.stones = dData.stones;
+    sData.zobrist = dData.zobrist;
+    sData.verify = dData.verify;
+    sData.blackCaptures = dData.blackCaptures;
+    sData.whiteCaptures = dData.whiteCaptures;
+    sData.comment = dData.comment;
+  }
 }

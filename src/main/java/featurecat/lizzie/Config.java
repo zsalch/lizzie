@@ -25,7 +25,7 @@ import org.json.JSONTokener;
 public class Config {
   public String language = "en";
 
-  public boolean panelUI = false;
+  public boolean panelUI = true;
   public boolean showBorder = false;
   public boolean showMoveNumber = false;
   public int onlyLastMoveNumber = 0;
