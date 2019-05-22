@@ -133,7 +133,7 @@ public class SGFParser {
       if (escaping) {
         // Any char following "\" is inserted verbatim
         // (ref) "3.2. Text" in https://www.red-bean.com/sgf/sgf4.html
-        tagContentBuilder.append(c);
+        tagContentBuilder.append(c == 'n' ? "\n" : c);
         escaping = false;
         continue;
       }
@@ -1005,5 +1005,11 @@ public class SGFParser {
     }
 
     return history;
+  }
+
+  private static boolean isSgf(String value) {
+    final Pattern SGF_PATTERN = Pattern.compile("(?s).*?(\\(\\s*;.*\\)).*?");
+    Matcher sgfMatcher = SGF_PATTERN.matcher(value);
+    return sgfMatcher.matches();
   }
 }
