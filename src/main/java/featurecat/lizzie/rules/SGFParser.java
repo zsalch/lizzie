@@ -991,6 +991,8 @@ public class SGFParser {
       }
     }
 
+    Lizzie.frame.setPlayers(whitePlayer, blackPlayer);
+
     // Rewind to game start
     while (history.previous().isPresent()) ;
 
