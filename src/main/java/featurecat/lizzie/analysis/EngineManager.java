@@ -65,6 +65,9 @@ public class EngineManager {
                                 } catch (JSONException | IOException e1) {
                                   e1.printStackTrace();
                                 }
+                              } else {
+                                // empty
+                                engineList.add(null);
                               }
                             });
                   });
@@ -79,6 +82,9 @@ public class EngineManager {
    */
   public void switchEngine(int index) {
     if (index == this.currentEngineNo || index > this.engineList.size()) return;
+    Leelaz newEng = engineList.get(index);
+    if (newEng == null) return;
+
     Leelaz curEng = engineList.get(this.currentEngineNo);
     if (curEng.isThinking) {
       if (Lizzie.frame.isPlayingAgainstLeelaz) {
@@ -93,7 +99,6 @@ public class EngineManager {
     }
     curEng.board.saveMoveNumber();
     try {
-      Leelaz newEng = engineList.get(index);
       Lizzie.leelaz = newEng;
       // TODO: how sync the board
       //      newEng.board = curEng.board;
