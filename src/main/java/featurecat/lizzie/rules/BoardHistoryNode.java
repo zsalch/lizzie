@@ -53,7 +53,7 @@ public class BoardHistoryNode {
   }
 
   public BoardHistoryNode addOrGoto(BoardData data, boolean newBranch) {
-    return addOrGoto(data, false, false);
+    return addOrGoto(data, newBranch, false);
   }
 
   /**
@@ -571,6 +571,19 @@ public class BoardHistoryNode {
     sData.blackCaptures = dData.blackCaptures;
     sData.whiteCaptures = dData.whiteCaptures;
     sData.comment = dData.comment;
-    this.variations = node.variations;
+//    this.variations = node.variations;
+//    if (node.numberOfChildren() > 1) {
+//      for (int i = 0; i < node.numberOfChildren(); i++) {
+//        if (node.getVariation(i).isPresent()) {
+//          if (this.variations.size() > i) {
+//            this.variations.get(i).sync(node.getVariation(i).get());
+//          } else {
+//            BoardHistoryNode vNode = new BoardHistoryNode(node.getVariation(i).get().getData());
+//            vNode.sync(node.getVariation(i).get());
+//            this.variations.add(vNode);
+//          }
+//        }
+//      }
+//    }
   }
 }

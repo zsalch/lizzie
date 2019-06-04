@@ -515,15 +515,16 @@ public class BoardHistoryList {
       if (node == null) {
         // Add
         prev.addOrGoto(newNode.getData());
+        node = prev.next().map(n -> n).orElse(null);
+        node.sync(newNode);
         if (newNode.numberOfChildren() > 1) {
-          for (int i = 1; i < newNode.numberOfChildren(); i++) {
+          for (int i = 0; i < newNode.numberOfChildren(); i++) {
             if (newNode.getVariation(i).isPresent()) {
-              prev.addOrGoto(newNode.getVariation(i).get().getData(), true);
-              prev.getVariation(i).get().sync(newNode.getVariation(i).get());
+              node.addOrGoto(newNode.getVariation(i).get().getData(), (i > 0));
+              node.getVariation(i).get().sync(newNode.getVariation(i).get());
             }
           }
         }
-        node = prev.next().map(n -> n).orElse(null);
         if (diffMoveNo == 0) {
           diffMoveNo = newNode.getData().moveNumber;
         }
