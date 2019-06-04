@@ -77,6 +77,19 @@ public class BoardHistoryList {
     while (previous().isPresent()) ;
   }
 
+  public void toBranchTop() {
+    BoardHistoryNode start = head;
+    BoardHistoryNode top = start;
+    while (start.previous().isPresent()) {
+      BoardHistoryNode pre = start.previous().get();
+      if (pre.next().isPresent() && pre.next().get() != start) {
+        previous();
+        break;
+      }
+      previous();
+      start = pre;
+    }
+  }
   /**
    * moves the pointer to the right, returns the data stored there
    *
@@ -299,7 +312,7 @@ public class BoardHistoryList {
   }
 
   public void place(int x, int y, Stone color, boolean newBranch) {
-    place(x, y, color, false, false);
+    place(x, y, color, newBranch, false);
   }
 
   public void place(int x, int y, Stone color, boolean newBranch, boolean changeMove) {
@@ -467,6 +480,24 @@ public class BoardHistoryList {
     this.setGameInfo(oldHistory.getGameInfo());
   }
 
+  public boolean goToMoveNumber(int moveNumber, boolean withinBranch) {
+    int delta = moveNumber - this.getMoveNumber();
+    boolean moved = false;
+    for (int i = 0; i < Math.abs(delta); i++) {
+      if (withinBranch && delta < 0) {
+        BoardHistoryNode currentNode = this.getCurrentHistoryNode();
+        if (!currentNode.isFirstChild()) {
+          break;
+        }
+      }
+      if (!(delta > 0 ? next().isPresent() : previous().isPresent())) {
+        break;
+      }
+      moved = true;
+    }
+    return moved;
+  }
+  
   public int sync(BoardHistoryList newList) {
     int diffMoveNo = 0;
 
@@ -484,6 +515,14 @@ public class BoardHistoryList {
       if (node == null) {
         // Add
         prev.addOrGoto(newNode.getData());
+        if (newNode.numberOfChildren() > 1) {
+          for (int i = 1; i < newNode.numberOfChildren(); i++) {
+            if (newNode.getVariation(i).isPresent()) {
+              prev.addOrGoto(newNode.getVariation(i).get().getData(), true);
+              prev.getVariation(i).get().sync(newNode.getVariation(i).get());
+            }
+          }
+        }
         node = prev.next().map(n -> n).orElse(null);
         if (diffMoveNo == 0) {
           diffMoveNo = newNode.getData().moveNumber;
@@ -491,6 +530,14 @@ public class BoardHistoryList {
       } else {
         if (!node.compare(newNode)) {
           node.sync(newNode);
+          if (newNode.numberOfChildren() > 1) {
+            for (int i = 1; i < newNode.numberOfChildren(); i++) {
+              if (newNode.getVariation(i).isPresent()) {
+                prev.addOrGoto(newNode.getVariation(i).get().getData(), true);
+                prev.getVariation(i).get().sync(newNode.getVariation(i).get());
+              }
+            }
+          }
           if (diffMoveNo == 0) {
             diffMoveNo = newNode.getData().moveNumber;
           }

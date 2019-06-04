@@ -403,7 +403,7 @@ public class Board implements LeelazListener {
   }
 
   public void place(int x, int y, Stone color, boolean newBranch) {
-    place(x, y, color, false, false);
+    place(x, y, color, newBranch, false);
   }
 
   /**

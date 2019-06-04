@@ -89,6 +89,9 @@ public class BoardHistoryNode {
           //                    variations.set(i, variations.get(0));
           //                    variations.set(0, currentNext);
           //                }
+          if (i != 0 && changeMove) {
+            break;
+          }
           return variations.get(i);
         }
       }
@@ -568,5 +571,6 @@ public class BoardHistoryNode {
     sData.blackCaptures = dData.blackCaptures;
     sData.whiteCaptures = dData.whiteCaptures;
     sData.comment = dData.comment;
+    this.variations = node.variations;
   }
 }
