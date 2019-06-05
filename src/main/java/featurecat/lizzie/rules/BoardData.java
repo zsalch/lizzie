@@ -192,4 +192,26 @@ public class BoardData {
   public int getPlayouts() {
     return playouts;
   }
+
+  public void sync(BoardData data) {
+    this.moveMNNumber = data.moveMNNumber;
+    this.moveNumber = data.moveNumber;
+    this.lastMove = data.lastMove;
+    this.moveNumberList = data.moveNumberList;
+    this.blackToPlay = data.blackToPlay;
+    this.dummy = data.dummy;
+    this.lastMoveColor = data.lastMoveColor;
+    this.stones = data.stones;
+    this.zobrist = data.zobrist;
+    this.verify = data.verify;
+    this.blackCaptures = data.blackCaptures;
+    this.whiteCaptures = data.whiteCaptures;
+    this.comment = data.comment;
+  }
+
+  public BoardData clone() {
+    BoardData data = BoardData.empty(19);
+    data.sync(this);
+    return data;
+  }
 }

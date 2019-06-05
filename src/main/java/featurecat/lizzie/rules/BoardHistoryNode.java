@@ -552,38 +552,36 @@ public class BoardHistoryNode {
               && sM[0] == dM[0]
               && sM[1] == dM[1]);
     }
-    return dMove && sData.comment != null && sData.comment.equals(dData.comment);
+    return dMove
+        && sData.comment != null
+        && sData.comment.equals(dData.comment)
+        && this.numberOfChildren() == node.numberOfChildren();
   }
 
   public void sync(BoardHistoryNode node) {
-    BoardData sData = this.getData();
-    BoardData dData = node.getData();
-    sData.moveMNNumber = dData.moveMNNumber;
-    sData.moveNumber = dData.moveNumber;
-    sData.lastMove = dData.lastMove;
-    sData.moveNumberList = dData.moveNumberList;
-    sData.blackToPlay = dData.blackToPlay;
-    sData.dummy = dData.dummy;
-    sData.lastMoveColor = dData.lastMoveColor;
-    sData.stones = dData.stones;
-    sData.zobrist = dData.zobrist;
-    sData.verify = dData.verify;
-    sData.blackCaptures = dData.blackCaptures;
-    sData.whiteCaptures = dData.whiteCaptures;
-    sData.comment = dData.comment;
-//    this.variations = node.variations;
-//    if (node.numberOfChildren() > 1) {
-//      for (int i = 0; i < node.numberOfChildren(); i++) {
-//        if (node.getVariation(i).isPresent()) {
-//          if (this.variations.size() > i) {
-//            this.variations.get(i).sync(node.getVariation(i).get());
-//          } else {
-//            BoardHistoryNode vNode = new BoardHistoryNode(node.getVariation(i).get().getData());
-//            vNode.sync(node.getVariation(i).get());
-//            this.variations.add(vNode);
-//          }
-//        }
-//      }
-//    }
+    if (node == null) return;
+
+    BoardHistoryNode cur = this;
+    // Compare
+    while (node != null) {
+      if (!cur.compare(node)) {
+        BoardData sData = cur.getData();
+        sData.sync(node.getData());
+        if (node.numberOfChildren() > 0) {
+          for (int i = 0; i < node.numberOfChildren(); i++) {
+            if (node.getVariation(i).isPresent()) {
+              if (cur.variations.size() <= i) {
+                cur.addOrGoto(node.getVariation(i).get().getData().clone(), (i > 0));
+              }
+              if (i > 0) {
+                cur.variations.get(i).sync(node.getVariation(i).get());
+              }
+            }
+          }
+        }
+      }
+      cur = cur.next().map(n -> n).orElse(null);
+      node = node.next().map(n -> n).orElse(null);
+    }
   }
 }

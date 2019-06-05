@@ -497,9 +497,9 @@ public class BoardHistoryList {
     }
     return moved;
   }
-  
+
   public int sync(BoardHistoryList newList) {
-    int diffMoveNo = 0;
+    int diffMoveNo = -1;
 
     BoardHistoryNode node = this.getCurrentHistoryNode();
     BoardHistoryNode prev = node.previous().map(p -> p).orElse(null);
@@ -514,34 +514,20 @@ public class BoardHistoryList {
     while (newNode != null) {
       if (node == null) {
         // Add
-        prev.addOrGoto(newNode.getData());
+        prev.addOrGoto(newNode.getData().clone());
         node = prev.next().map(n -> n).orElse(null);
-        node.sync(newNode);
-        if (newNode.numberOfChildren() > 1) {
-          for (int i = 0; i < newNode.numberOfChildren(); i++) {
-            if (newNode.getVariation(i).isPresent()) {
-              node.addOrGoto(newNode.getVariation(i).get().getData(), (i > 0));
-              node.getVariation(i).get().sync(newNode.getVariation(i).get());
-            }
-          }
-        }
-        if (diffMoveNo == 0) {
+        if (diffMoveNo < 0) {
           diffMoveNo = newNode.getData().moveNumber;
         }
+        node.sync(newNode);
+        break;
       } else {
         if (!node.compare(newNode)) {
-          node.sync(newNode);
-          if (newNode.numberOfChildren() > 1) {
-            for (int i = 1; i < newNode.numberOfChildren(); i++) {
-              if (newNode.getVariation(i).isPresent()) {
-                prev.addOrGoto(newNode.getVariation(i).get().getData(), true);
-                prev.getVariation(i).get().sync(newNode.getVariation(i).get());
-              }
-            }
-          }
-          if (diffMoveNo == 0) {
+          if (diffMoveNo < 0) {
             diffMoveNo = newNode.getData().moveNumber;
           }
+          node.sync(newNode);
+          break;
         }
       }
       prev = node;
