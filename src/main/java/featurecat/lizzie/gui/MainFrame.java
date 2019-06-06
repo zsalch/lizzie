@@ -19,6 +19,7 @@ public abstract class MainFrame extends JFrame {
   public static Font winrateFont;
   // Force refresh board
   private boolean forceRefresh;
+  public OnlineDialog onlineDialog = null;
 
   public MainFrame(String title) throws HeadlessException {
     super(title);
@@ -112,7 +113,9 @@ public abstract class MainFrame extends JFrame {
   public abstract void openChangeMoveDialog();
 
   public void openOnlineDialog() {
-    OnlineDialog onlineDialog = new OnlineDialog();
+    if (onlineDialog == null) {
+      onlineDialog = new OnlineDialog();
+    }
     onlineDialog.setVisible(true);
   }
 
