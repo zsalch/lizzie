@@ -8,7 +8,10 @@ import featurecat.lizzie.rules.BoardData;
 import featurecat.lizzie.rules.BoardHistoryNode;
 import java.awt.Color;
 import java.awt.FontMetrics;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import javax.swing.JTextField;
 
 public class Utils {
 
@@ -111,6 +114,30 @@ public class Utils {
       return Lizzie.config.blunderNodeColors.map(m -> m.get(st.get())).get();
     } else {
       return Color.WHITE;
+    }
+  }
+
+  public static Integer txtFieldValue(JTextField txt) {
+    if (txt.getText().trim().isEmpty()
+        || txt.getText().trim().length() >= String.valueOf(Integer.MAX_VALUE).length()) {
+      return 0;
+    } else {
+      return Integer.parseInt(txt.getText().trim());
+    }
+  }
+
+  public static int intOfMap(Map map, String key) {
+    if (map == null) {
+      return 0;
+    }
+    List s = (List<String>) map.get(key);
+    if (s == null || s.size() <= 0) {
+      return 0;
+    }
+    try {
+      return Integer.parseInt((String) s.get(0));
+    } catch (NumberFormatException e) {
+      return 0;
     }
   }
 }

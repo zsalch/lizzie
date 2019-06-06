@@ -988,7 +988,7 @@ public class Board implements LeelazListener {
   public void deleteMove() {
     synchronized (this) {
       BoardHistoryNode currentNode = history.getCurrentHistoryNode();
-      if (currentNode.next().isPresent()) {
+      if (currentNode.next(true).isPresent()) {
         // Will delete more than one move, ask for confirmation
         int ret =
             JOptionPane.showConfirmDialog(

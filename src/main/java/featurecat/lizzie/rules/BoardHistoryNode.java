@@ -112,7 +112,7 @@ public class BoardHistoryNode {
     }
     BoardHistoryNode node = new BoardHistoryNode(data);
     if (changeMove) {
-      Optional<BoardHistoryNode> next = next();
+      Optional<BoardHistoryNode> next = next(true);
       next.ifPresent(
           n -> {
             node.variations = n.variations;
@@ -144,7 +144,17 @@ public class BoardHistoryNode {
   }
 
   public Optional<BoardHistoryNode> next() {
-    return variations.isEmpty() ? Optional.empty() : Optional.of(variations.get(0));
+    return next(false);
+  }
+
+  public Optional<BoardHistoryNode> next(boolean includeDummy) {
+    return variations.isEmpty() || (!includeDummy && variations.get(0).isEndDummay())
+        ? Optional.empty()
+        : Optional.of(variations.get(0));
+  }
+
+  public boolean isEndDummay() {
+    return this.data.dummy && variations.isEmpty();
   }
 
   public BoardHistoryNode topOfBranch() {
@@ -371,7 +381,7 @@ public class BoardHistoryNode {
    * @return index of child node, -1 if child node not a child of parent
    */
   public int indexOfNode(BoardHistoryNode childNode) {
-    if (!next().isPresent()) {
+    if (!next(true).isPresent()) {
       return -1;
     }
     for (int i = 0; i < numberOfChildren(); i++) {
@@ -580,8 +590,8 @@ public class BoardHistoryNode {
           }
         }
       }
-      cur = cur.next().map(n -> n).orElse(null);
-      node = node.next().map(n -> n).orElse(null);
+      cur = cur.next(true).map(n -> n).orElse(null);
+      node = node.next(true).map(n -> n).orElse(null);
     }
   }
 }

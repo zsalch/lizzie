@@ -82,7 +82,7 @@ public class BoardHistoryList {
     BoardHistoryNode top = start;
     while (start.previous().isPresent()) {
       BoardHistoryNode pre = start.previous().get();
-      if (pre.next().isPresent() && pre.next().get() != start) {
+      if (pre.next(true).isPresent() && pre.next(true).get() != start) {
         previous();
         break;
       }
@@ -96,7 +96,11 @@ public class BoardHistoryList {
    * @return the data of next node, Optional.empty if there is no next node
    */
   public Optional<BoardData> next() {
-    Optional<BoardHistoryNode> n = head.next();
+    return next(false);
+  }
+
+  public Optional<BoardData> next(boolean includeDummay) {
+    Optional<BoardHistoryNode> n = head.next(includeDummay);
     n.ifPresent(x -> head = x);
     return n.map(x -> x.getData());
   }
@@ -531,8 +535,8 @@ public class BoardHistoryList {
         }
       }
       prev = node;
-      node = node.next().map(n -> n).orElse(null);
-      newNode = newNode.next().map(n -> n).orElse(null);
+      node = node.next(true).map(n -> n).orElse(null);
+      newNode = newNode.next(true).map(n -> n).orElse(null);
     }
 
     return diffMoveNo;
