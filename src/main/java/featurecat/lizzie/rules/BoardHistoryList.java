@@ -122,7 +122,11 @@ public class BoardHistoryList {
    * @return the data stored at the next index, if any, Optional.empty otherwise.
    */
   public Optional<BoardData> getNext() {
-    return head.next().map(x -> x.getData());
+    return getNext(false);
+  }
+
+  public Optional<BoardData> getNext(boolean includeDummy) {
+    return head.next(includeDummy).map(x -> x.getData());
   }
 
   /** @return nexts for display */
@@ -286,7 +290,7 @@ public class BoardHistoryList {
       Zobrist zobrist = this.getZobrist();
       int moveNumber = this.getMoveNumber() + 1;
       int[] moveNumberList =
-          newBranch && this.getNext().isPresent()
+          newBranch && this.getNext(true).isPresent()
               ? new int[Board.boardSize * Board.boardSize]
               : this.getMoveNumberList().clone();
 
@@ -348,7 +352,7 @@ public class BoardHistoryList {
       int moveMNNumber =
           this.getMoveMNNumber() > -1 && !newBranch ? this.getMoveMNNumber() + 1 : -1;
       int[] moveNumberList =
-          newBranch && this.getNext().isPresent()
+          newBranch && this.getNext(true).isPresent()
               ? new int[Board.boardSize * Board.boardSize]
               : this.getMoveNumberList().clone();
 

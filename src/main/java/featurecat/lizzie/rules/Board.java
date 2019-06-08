@@ -354,7 +354,7 @@ public class Board implements LeelazListener {
       Zobrist zobrist = history.getZobrist();
       int moveNumber = history.getMoveNumber() + 1;
       int[] moveNumberList =
-          newBranch && history.getNext().isPresent()
+          newBranch && history.getNext(true).isPresent()
               ? new int[Board.boardSize * Board.boardSize]
               : history.getMoveNumberList().clone();
 
@@ -459,7 +459,7 @@ public class Board implements LeelazListener {
       int moveMNNumber =
           history.getMoveMNNumber() > -1 && !newBranch ? history.getMoveMNNumber() + 1 : -1;
       int[] moveNumberList =
-          newBranch && history.getNext().isPresent()
+          newBranch && history.getNext(true).isPresent()
               ? new int[Board.boardSize * Board.boardSize]
               : history.getMoveNumberList().clone();
 
@@ -503,6 +503,7 @@ public class Board implements LeelazListener {
               nextWinrate,
               0);
       newState.moveMNNumber = moveMNNumber;
+      newState.dummy = false;
 
       // don't make this coordinate if it is suicidal or violates superko
       if (isSuicidal > 0 || history.violatesKoRule(newState)) return;

@@ -140,4 +140,19 @@ public class Utils {
       return 0;
     }
   }
+
+  public static String stringOfMap(Map map, String key) {
+    if (map == null) {
+      return "";
+    }
+    List s = (List<String>) map.get(key);
+    if (s == null || s.size() <= 0) {
+      return "";
+    }
+    try {
+      return (String) s.get(0);
+    } catch (NumberFormatException e) {
+      return "";
+    }
+  }
 }
