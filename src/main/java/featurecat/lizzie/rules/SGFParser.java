@@ -763,7 +763,7 @@ public class SGFParser {
     BoardHistoryList history = null;
 
     // Drop anything outside "(;...)"
-    final Pattern SGF_PATTERN = Pattern.compile("(?s).*?(\\(\\s*;.*\\)).*?");
+    final Pattern SGF_PATTERN = Pattern.compile("(?s).*?(\\(\\s*;.*\\))(?s).*?");
     Matcher sgfMatcher = SGF_PATTERN.matcher(value);
     if (sgfMatcher.matches()) {
       value = sgfMatcher.group(1);

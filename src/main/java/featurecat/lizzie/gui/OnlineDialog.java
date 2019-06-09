@@ -9,18 +9,29 @@ import featurecat.lizzie.rules.Stone;
 import featurecat.lizzie.util.AjaxHttpRequest;
 import featurecat.lizzie.util.Utils;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.ByteBuffer;
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -55,16 +66,35 @@ public class OnlineDialog extends JDialog {
   private ScheduledExecutorService online = Executors.newScheduledThreadPool(1);
   private ScheduledFuture<?> schedule = null;
   private WebSocketClient client;
+  private int type = 0;
   private JFormattedTextField txtRefreshTime;
-  int refreshTime;
+  private JLabel lblError;
+  private int refreshTime;
   private JTextField txtUrl;
   private String ajaxUrl = "";
   private Map queryMap = null;
+  private String query = "";
   private String whitePlayer = "";
   private String blackPlayer = "";
   private int seqs = 0;
+  private boolean done = false;
   private BoardHistoryList history = null;
   private int boardSize = 19;
+  private byte[] b = {
+    119, 115, 58, 47, 47, 119, 115, 46, 104, 117, 97, 110, 108, 101, 46, 113, 113, 46, 99, 111, 109,
+    47, 119, 113, 98, 114, 111, 97, 100, 99, 97, 115, 116, 108, 111, 116, 117, 115
+  };
+  private byte[] b2 = {
+    119, 115, 58, 47, 47, 119, 115, 104, 97, 108, 108, 46, 104, 117, 97, 110, 108, 101, 46, 113,
+    113, 46, 99, 111, 109, 47, 78, 101, 119, 69, 97, 103, 108, 101, 69, 121, 101, 76, 111, 116, 117,
+    115
+  };
+  private byte[] b3 = {
+    104, 116, 116, 112, 58, 47, 47, 119, 101, 105, 113, 105, 46, 113, 113, 46, 99, 111, 109, 47,
+    111, 112, 101, 110, 113, 105, 112, 117, 47, 103, 101, 116, 113, 105, 112, 117, 63, 99, 97, 108,
+    108, 98, 97, 99, 107, 61, 106, 81, 117, 101, 114, 121, 49, 38, 103, 97, 109, 101, 99, 111, 100,
+    101, 61
+  };
 
   public OnlineDialog() {
     setTitle(resourceBundle.getString("OnlineDialog.title.config"));
@@ -99,7 +129,7 @@ public class OnlineDialog extends JDialog {
     buttonPane.add(cancelButton);
 
     JLabel lblUrl = new JLabel(resourceBundle.getString("OnlineDialog.title.url"));
-    lblUrl.setBounds(10, 51, 56, 14);
+    lblUrl.setBounds(10, 60, 56, 14);
     buttonPane.add(lblUrl);
     lblUrl.setHorizontalAlignment(SwingConstants.LEFT);
 
@@ -107,16 +137,23 @@ public class OnlineDialog extends JDialog {
     nf.setGroupingUsed(false);
 
     txtUrl = new JTextField();
-    txtUrl.setBounds(69, 48, 319, 20);
+    txtUrl.addFocusListener(
+        new FocusAdapter() {
+          @Override
+          public void focusGained(FocusEvent e) {
+            txtUrl.selectAll();
+          }
+        });
+    txtUrl.setBounds(71, 60, 319, 20);
     buttonPane.add(txtUrl);
     txtUrl.setColumns(10);
 
     JLabel lblRefresh = new JLabel(resourceBundle.getString("OnlineDialog.title.refresh"));
-    lblRefresh.setBounds(10, 82, 56, 14);
+    lblRefresh.setBounds(10, 100, 56, 14);
     buttonPane.add(lblRefresh);
 
     JLabel lblRefreshTime = new JLabel(resourceBundle.getString("OnlineDialog.title.refreshTime"));
-    lblRefreshTime.setBounds(113, 79, 81, 14);
+    lblRefreshTime.setBounds(119, 100, 81, 14);
     buttonPane.add(lblRefreshTime);
 
     txtRefreshTime =
@@ -128,14 +165,20 @@ public class OnlineDialog extends JDialog {
 
               private DocumentFilter filter = new DigitOnlyFilter();
             });
-    txtRefreshTime.setBounds(69, 79, 36, 20);
+    txtRefreshTime.setBounds(71, 97, 47, 20);
     txtRefreshTime.setText("10");
     buttonPane.add(txtRefreshTime);
     txtRefreshTime.setColumns(10);
 
     JLabel lblPrompt1 = new JLabel(resourceBundle.getString("OnlineDialog.lblPrompt1.text"));
-    lblPrompt1.setBounds(10, 11, 398, 14);
+    lblPrompt1.setBounds(10, 16, 398, 14);
     buttonPane.add(lblPrompt1);
+
+    lblError = new JLabel(resourceBundle.getString("OnlineDialog.lblError.text"));
+    lblError.setForeground(Color.RED);
+    lblError.setBounds(171, 100, 316, 16);
+    lblError.setVisible(false);
+    buttonPane.add(lblError);
 
     txtUrl.selectAll();
 
@@ -144,15 +187,18 @@ public class OnlineDialog extends JDialog {
 
   private void applyChange() {
     //
-    int type = checkUrl();
+    type = checkUrl();
 
     if (type > 0) {
+      error(false);
       setVisible(false);
       try {
-        proc(type);
+        proc();
       } catch (IOException | URISyntaxException e) {
         e.printStackTrace();
       }
+    } else {
+      error(true);
     }
   }
 
@@ -176,6 +222,11 @@ public class OnlineDialog extends JDialog {
     }
   }
 
+  private void error(boolean e) {
+    lblError.setVisible(e);
+    setVisible(true);
+  }
+
   private int checkUrl() {
     int type = 0;
     String id = null;
@@ -186,7 +237,7 @@ public class OnlineDialog extends JDialog {
     Matcher um = up.matcher(url);
     if (um.matches() && um.groupCount() >= 3) {
       id = um.group(3);
-      if (id != null && !id.isEmpty()) {
+      if (!Utils.isBlank(id)) {
         ajaxUrl = "https://api." + um.group(1) + "/golive/dtl?id=" + id;
         return 1;
       }
@@ -196,7 +247,7 @@ public class OnlineDialog extends JDialog {
     um = up.matcher(url);
     if (um.matches() && um.groupCount() >= 3) {
       id = um.group(3);
-      if (id != null && !id.isEmpty()) {
+      if (!Utils.isBlank(id)) {
         ajaxUrl = "https://api." + um.group(1) + "/golive/dtl?id=" + id;
         return 1;
       }
@@ -206,28 +257,40 @@ public class OnlineDialog extends JDialog {
     um = up.matcher(url);
     if (um.matches() && um.groupCount() >= 3) {
       id = um.group(3);
-      if (id != null && !id.isEmpty()) {
+      if (!Utils.isBlank(id)) {
         ajaxUrl = "https://api." + um.group(1) + "/golive/dtl?id=" + id;
+        // TODO
         return 0;
       }
     }
 
     try {
-      queryMap = splitQuery(new URI(url));
-      System.out.println("Query:" + queryMap.toString());
-      if (queryMap != null
-          && queryMap.get("gameid") != null
-          && queryMap.get("createtime") != null) {
-        return 3;
+      URI uri = new URI(url);
+      queryMap = splitQuery(uri);
+      //      System.out.println("Query:" + queryMap.toString());
+      if (queryMap != null) {
+        if (queryMap.get("gameid") != null && queryMap.get("createtime") != null) {
+          return 3;
+        } else if (queryMap.get("gametag") != null && queryMap.get("uin") != null) {
+          query = uri.getRawQuery();
+          ajaxUrl =
+              "http://wshall."
+                  + uri.getHost()
+                  + "/wxnseed/Broadcast/RequestBroadcast?callback=jQuery1&"
+                  + query;
+          return 4;
+        }
       }
     } catch (URISyntaxException e) {
       e.printStackTrace();
     }
 
-    return type;
+    // Try
+    ajaxUrl = url;
+    return 99;
   }
 
-  private void proc(int type) throws IOException, URISyntaxException {
+  private void proc() throws IOException, URISyntaxException {
     refreshTime = Utils.txtFieldValue(txtRefreshTime);
     refreshTime = (refreshTime > 0 ? refreshTime : 10);
     //    if (!online.isShutdown()) {
@@ -243,14 +306,142 @@ public class OnlineDialog extends JDialog {
       case 2:
         break;
       case 3:
+        done = false;
+        history = null;
+        Lizzie.board.clear();
         req();
+        break;
+      case 4:
+        history = null;
+        Lizzie.board.clear();
+        req0();
+        break;
+      case 99:
+        history = null;
+        Lizzie.board.clear();
+        get();
         break;
       default:
         break;
     }
   }
 
+  public void parseSgf(String sgf, String format, int num, boolean decode) {
+    if (!Utils.isBlank(format)) {
+      Pattern sp = Pattern.compile(format);
+      Matcher sm = sp.matcher(sgf);
+      if (sm.matches() && sm.groupCount() >= num) {
+        sgf = sm.group(num);
+        if (decode) {
+          sgf = URLDecoder.decode(sgf);
+        }
+      }
+    }
+    try {
+      BoardHistoryList liveNode = SGFParser.parseSgf(sgf);
+      if (liveNode != null) {
+        int diffMove = Lizzie.board.getHistory().sync(liveNode);
+        // System.out.println(liveNode + "diff:" + diffMove);
+        if (diffMove >= 0) {
+          Lizzie.board.goToMoveNumberBeyondBranch(diffMove > 0 ? diffMove - 1 : 0);
+          while (Lizzie.board.nextMove()) ;
+        }
+      } else {
+        error(true);
+      }
+    } catch (NullPointerException e) {
+      error(true);
+    }
+  }
+
+  public void get() throws IOException {
+
+    URL url = new URL(ajaxUrl);
+    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+    con.setRequestMethod("GET");
+    con.setRequestProperty(
+        "User-Agent",
+        "Mozilla/5.0 (Linux; U; Android 2.3.6; zh-cn; GT-S5660 Build/GINGERBREAD) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 MicroMessenger/4.5.255");
+
+    int responseCode = con.getResponseCode();
+    //        System.out.println("Response Code : " + responseCode);
+
+    BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+    StringBuffer response = new StringBuffer();
+    String line;
+    while ((line = in.readLine()) != null) {
+      response.append(line);
+    }
+    in.close();
+    //        System.out.println(response.toString());
+    String sgf = response.toString();
+    parseSgf(sgf, "", 0, false);
+  }
+
   public void refresh(String format) throws IOException {
+    refresh(format, 2, true, false);
+  }
+
+  public void refresh(String format, int num, boolean needSchedule, boolean decode)
+      throws IOException {
+    Map params = new HashMap();
+    final AjaxHttpRequest ajax = new AjaxHttpRequest();
+
+    ajax.setReadyStateChangeListener(
+        new AjaxHttpRequest.ReadyStateChangeListener() {
+          public void onReadyStateChange() {
+            int readyState = ajax.getReadyState();
+            //            System.out.println("Ajax getReadyState:" + ajax.getReadyState());
+            if (readyState == AjaxHttpRequest.STATE_COMPLETE) {
+              //                            System.out.println(ajax.getResponseText());
+              String sgf = ajax.getResponseText();
+              parseSgf(sgf, format, num, decode);
+            }
+          }
+        });
+
+    if (needSchedule) {
+      if (schedule == null || schedule.isCancelled() || schedule.isDone()) {
+        schedule =
+            online.scheduleAtFixedRate(
+                new Runnable() {
+                  @Override
+                  public void run() {
+                    try {
+                      ajax.open("GET", ajaxUrl, true);
+                      ajax.send(params);
+                    } catch (IOException e) {
+                      e.printStackTrace();
+                    }
+                  }
+                },
+                1,
+                refreshTime,
+                TimeUnit.SECONDS);
+      }
+    } else {
+      try {
+        ajax.open("GET", ajaxUrl, true);
+        ajax.send(params);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  public void getSgf(String chessid) {
+    if (!Utils.isBlank(chessid)) {
+      ajaxUrl = new String(b3) + chessid;
+      try {
+        refresh("(jQuery1\\(\\\")([^\\\"]+)(?s).*", 2, false, true);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  public void req0() throws IOException {
     Map params = new HashMap();
     final AjaxHttpRequest ajax = new AjaxHttpRequest();
 
@@ -260,50 +451,53 @@ public class OnlineDialog extends JDialog {
             int readyState = ajax.getReadyState();
             if (readyState == AjaxHttpRequest.STATE_COMPLETE) {
               // System.out.println(ajax.getResponseText());
+              String format =
+                  "(?s).*?\"ShowType\":([^,]+),\"ShowID\":([^,]+),\"CreateTime\":([^,]+),(?s).*";
               Pattern sp = Pattern.compile(format);
               Matcher sm = sp.matcher(ajax.getResponseText());
-              if (sm.matches() && sm.groupCount() >= 2) {
-                String sgf = sm.group(2);
-                // System.out.println(sgf);
-                BoardHistoryList liveNode = SGFParser.parseSgf(sgf);
-                int diffMove = Lizzie.board.getHistory().sync(liveNode);
-                // System.out.println(liveNode + "diff:" + diffMove);
-                if (diffMove >= 0) {
-                  Lizzie.board.goToMoveNumberBeyondBranch(diffMove > 0 ? diffMove - 1 : 0);
-                  while (Lizzie.board.nextMove()) ;
+              if (sm.matches() && sm.groupCount() == 3) {
+                List list = new ArrayList();
+                list.add("369");
+                queryMap.put("gameid", list);
+                list = new ArrayList();
+                list.add(sm.group(1));
+                queryMap.put("showtype", list);
+                list = new ArrayList();
+                list.add(sm.group(2));
+                queryMap.put("showid", list);
+                list = new ArrayList();
+                list.add(sm.group(3));
+                queryMap.put("createtime", list);
+
+                try {
+                  req();
+                } catch (URISyntaxException e) {
+                  e.printStackTrace();
                 }
               }
             }
           }
         });
 
-    if (schedule == null || schedule.isCancelled() || schedule.isDone()) {
-      schedule =
-          online.scheduleAtFixedRate(
-              new Runnable() {
-                @Override
-                public void run() {
-                  try {
-                    ajax.open("GET", ajaxUrl, true);
-                    ajax.send(params);
-                  } catch (IOException e) {
-                    e.printStackTrace();
-                  }
-                }
-              },
-              1,
-              refreshTime,
-              TimeUnit.SECONDS);
+    try {
+      ajax.open("GET", ajaxUrl, true);
+      ajax.send(params);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void reReq() {
+    try {
+      req();
+    } catch (URISyntaxException e) {
+      e.printStackTrace();
     }
   }
 
   private void req() throws URISyntaxException {
     seqs = 0;
-    byte[] b = {
-      119, 115, 58, 47, 47, 119, 115, 46, 104, 117, 97, 110, 108, 101, 46, 113, 113, 46, 99, 111,
-      109, 47, 119, 113, 98, 114, 111, 97, 100, 99, 97, 115, 116, 108, 111, 116, 117, 115
-    };
-    URI uri = new URI(new String(b));
+    URI uri = new URI(new String(type == 3 ? b : b2));
 
     Lizzie.board.clear();
     if (client != null && client.isOpen()) {
@@ -313,24 +507,25 @@ public class OnlineDialog extends JDialog {
         new WebSocketClient(uri) {
 
           public void onOpen(ServerHandshake arg0) {
-            System.out.println("socket open");
+            //            System.out.println("socket open");
           }
 
           public void onMessage(String arg0) {
-            System.out.println("socket message" + arg0);
+            //            System.out.println("socket message" + arg0);
           }
 
           public void onError(Exception arg0) {
-            arg0.printStackTrace();
-            System.out.println("socket error");
+            //            arg0.printStackTrace();
+            //            System.out.println("socket error");
           }
 
           public void onClose(int arg0, String arg1, boolean arg2) {
-            System.out.println("socket close");
+            //            System.out.println("socket close");
           }
 
           public void onMessage(ByteBuffer bytes) {
-            System.out.println("socket message ByteBuffer" + byteArrayToHexString(bytes.array()));
+            //            System.out.println("socket message ByteBuffer" +
+            // byteArrayToHexString(bytes.array()));
             parseReq(bytes);
           }
         };
@@ -340,7 +535,7 @@ public class OnlineDialog extends JDialog {
     while (!client.getReadyState().equals(ReadyState.OPEN)) {
       // System.out.println("socket pending");
     }
-    System.out.println("socket opened");
+    //    System.out.println("socket opened");
     byte[] req1 =
         req1(
             90,
@@ -350,7 +545,7 @@ public class OnlineDialog extends JDialog {
             Utils.intOfMap(queryMap, "showtype"),
             Utils.intOfMap(queryMap, "showid"),
             Utils.intOfMap(queryMap, "createtime"));
-    System.out.println("socket send ByteBuffer" + byteArrayToHexString(req1));
+    //    System.out.println("socket send ByteBuffer" + byteArrayToHexString(req1));
     client.send(req1);
   }
 
@@ -424,7 +619,7 @@ public class OnlineDialog extends JDialog {
     int bodyFlag = res.get();
     int option = res.get();
     int msgID = res.getShort();
-    System.out.println("recv msgID:" + msgID);
+    //    System.out.println("recv msgID:" + msgID);
     if (msgID == 23406) {
       int msgType = res.getShort();
       int MsgSeq = res.getInt();
@@ -441,14 +636,21 @@ public class OnlineDialog extends JDialog {
       int startReq = res.getInt();
       int showFragmentNum = res.getInt();
       List<Fragment> fragmentList = new ArrayList<Fragment>();
-      for (int i = 0; i < showFragmentNum; i++) {
-        int len = res.getShort();
-        byte[] frag = new byte[len];
-        res.get(frag, res.arrayOffset(), len);
-        fragmentList.add(new Fragment(len, frag));
+      if (showFragmentNum > 0) {
+        for (int i = 0; i < showFragmentNum; i++) {
+          int len = res.getShort();
+          byte[] frag = new byte[len];
+          res.get(frag, res.arrayOffset(), len);
+          fragmentList.add(new Fragment(len, frag));
+        }
+
+        processFrag(fragmentList);
       }
 
-      processFrag(fragmentList);
+      if (resultId == 23409 || resultId == 23412) {
+        done = true;
+        getSgf(Utils.stringOfMap(queryMap, "chessid"));
+      }
 
       int isSplitPkg = res.getInt();
       int lastSeq = res.getInt();
@@ -460,16 +662,22 @@ public class OnlineDialog extends JDialog {
       } else {
         int transparent = res.get();
       }
-      int version = res.getInt();
-      int createTime = res.getInt();
-      int srcType = res.getInt();
+      if (type == 3) {
+        int version = res.getInt();
+        int createTime = res.getInt();
+        int srcType = res.getInt();
+      }
 
-      if (schedule == null || schedule.isCancelled() || schedule.isDone()) {
+      if (!done && (schedule == null || schedule.isCancelled() || schedule.isDone())) {
+        //        System.out.println(dateStr() + "client status" + client.isOpen() + "s open:");
         schedule =
             online.scheduleAtFixedRate(
                 new Runnable() {
                   @Override
                   public void run() {
+                    //                    System.out.println(
+                    //                        dateStr() + "client status" + client.isOpen() + "s:" +
+                    // schedule.isDone());
                     if (client.isOpen()) {
                       byte[] req2 =
                           req2(
@@ -480,10 +688,25 @@ public class OnlineDialog extends JDialog {
                               Utils.intOfMap(queryMap, "showtype"),
                               Utils.intOfMap(queryMap, "showid"),
                               Utils.intOfMap(queryMap, "createtime"));
-                      System.out.println(
-                          "socket send req2 ByteBuffer" + byteArrayToHexString(req2));
+                      //                      System.out.println(
+                      //                          "socket send req2 ByteBuffer" +
+                      // byteArrayToHexString(req2));
                       client.send(req2);
+                    } else {
+                      //                      System.out.println(
+                      //                          dateStr()
+                      //                              + "client status"
+                      //                              + client.isOpen()
+                      //                              + "cancel s:"
+                      //                              + schedule.isDone());
+                      schedule.cancel(false);
+                      if (!done) {
+                        reReq();
+                      }
                     }
+                    //                    System.out.println(
+                    //                        dateStr() + "client status" + client.isOpen() + "s:" +
+                    // schedule.isDone());
                   }
                 },
                 1,
@@ -505,14 +728,16 @@ public class OnlineDialog extends JDialog {
       int startReq = res.getInt();
       int showFragmentNum = res.getInt();
       List<Fragment> fragmentList = new ArrayList<Fragment>();
-      for (int i = 0; i < showFragmentNum; i++) {
-        int len = res.getShort();
-        byte[] frag = new byte[len];
-        res.get(frag, res.arrayOffset(), len);
-        fragmentList.add(new Fragment(len, frag));
-      }
+      if (showFragmentNum > 0) {
+        for (int i = 0; i < showFragmentNum; i++) {
+          int len = res.getShort();
+          byte[] frag = new byte[len];
+          res.get(frag, res.arrayOffset(), len);
+          fragmentList.add(new Fragment(len, frag));
+        }
 
-      processFrag(fragmentList);
+        processFrag(fragmentList);
+      }
 
     } else if (msgID == 23413) {
       int msgType = res.getShort();
@@ -544,9 +769,11 @@ public class OnlineDialog extends JDialog {
       } else {
         int transparent = res.get();
       }
-      int version = res.getInt();
-      int createTime = res.getInt();
-      int srcType = res.getInt();
+      if (type == 3) {
+        int version = res.getInt();
+        int createTime = res.getInt();
+        int srcType = res.getInt();
+      }
     }
   }
 
@@ -554,7 +781,8 @@ public class OnlineDialog extends JDialog {
 
     for (Fragment f : fragmentList) {
       if (f != null) {
-        System.out.println("Msg:" + f.type + ":" + (f.line != null ? f.line.toString() : ""));
+        //        System.out.println("Msg:" + f.type + ":" + (f.line != null ? f.line.toString() :
+        // ""));
         if (f.type == 20032) {
           int size = ((JSONObject) f.line.opt("AAA307")).optInt("AAA16");
           if (size > 0) {
@@ -578,8 +806,16 @@ public class OnlineDialog extends JDialog {
           } else {
             break;
           }
+        } else if (f.type == 4116) {
+          String t = whitePlayer;
+          whitePlayer = blackPlayer;
+          blackPlayer = t;
+          Lizzie.frame.setPlayers(whitePlayer, blackPlayer);
         } else if (f.type == 7005) {
           int num = f.line.optInt("AAA102");
+          if (num == 0) {
+            num = history.getData().moveNumber + 1;
+          }
           Stone color = (num % 2 != 0) ? Stone.BLACK : Stone.WHITE;
           int index = f.line.optInt("AAA106");
           int[] coord = asCoord(Stone.BLACK.equals(color) ? index : index - 1024);
@@ -589,10 +825,11 @@ public class OnlineDialog extends JDialog {
             int cur = history.getMoveNumber();
             for (int i = num; i <= cur; i++) {
               BoardHistoryNode currentNode = history.getCurrentHistoryNode();
+              boolean isSameMove = (i == cur && currentNode.getData().isSameCoord(coord));
               if (currentNode.previous().isPresent()) {
                 BoardHistoryNode pre = currentNode.previous().get();
                 history.previous();
-                if (pre.numberOfChildren() <= 1) {
+                if (pre.numberOfChildren() <= 1 && !isSameMove) {
                   int idx = pre.indexOfNode(currentNode);
                   pre.deleteChild(idx);
                   changeMove = false;
@@ -611,8 +848,11 @@ public class OnlineDialog extends JDialog {
         } else if (f.type == 8005) {
           int num = f.line.optInt("AAA72");
           String comment = f.line.optString("AAA37");
-          // TOOD Check Move Number?
-          history.getData().comment += comment + "\n";
+          if (num > 0 && !Utils.isBlank(comment)) {
+            history.goToMoveNumber(num, false);
+            history.getData().comment += comment + "\n";
+            while (history.next(true).isPresent()) ;
+          }
         } else if (f.type == 8185) {
           JSONObject branch = (JSONObject) f.line.opt("AAA79");
           if (branch != null) {
@@ -647,20 +887,90 @@ public class OnlineDialog extends JDialog {
               }
             }
           }
+        } else if (f.type == 7185 || f.type == 7186) {
+          done = true;
+          if (schedule != null && !schedule.isCancelled() && !schedule.isDone()) {
+            schedule.cancel(false);
+          }
+          if (client != null && client.isOpen()) {
+            client.close();
+          }
+          String result = result(f.type, f.line);
+          while (history.next().isPresent()) ;
+          history.getData().comment = result + "\n" + history.getData().comment;
         }
       }
     }
+    if (history != null) {
+      while (history.previous().isPresent()) ;
+      int diffMove = Lizzie.board.getHistory().sync(history);
+      //      System.out.println("Diff Move:" + diffMove);
+      if (diffMove >= 0) {
+        Lizzie.board.goToMoveNumberBeyondBranch(diffMove > 0 ? diffMove - 1 : 0);
+        while (Lizzie.board.nextMove()) {
+          //          System.out.println("Diff Move NextMove");
+        }
+      }
+      while (history.next(true).isPresent()) ;
+    }
+  }
 
-    while (history.previous().isPresent()) ;
-    int diffMove = Lizzie.board.getHistory().sync(history);
-    System.out.println("Diff Move:" + diffMove);
-    if (diffMove >= 0) {
-      Lizzie.board.goToMoveNumberBeyondBranch(diffMove > 0 ? diffMove - 1 : 0);
-      while (Lizzie.board.nextMove()) {
-        System.out.println("Diff Move NextMove");
+  private String decimalToFraction(double e) {
+    int c = 0;
+    int b = 10;
+    while (e != Math.floor(e)) {
+      e *= b;
+      c++;
+    }
+    b = (int) Math.pow(b, c);
+    int nor = (int) e;
+    int gcd = gcd(nor, b);
+
+    return String.valueOf(nor / gcd) + "/" + String.valueOf(b / gcd);
+  }
+
+  private int gcd(int a, int b) {
+    if (a == 0) {
+      return b;
+    }
+    return gcd(b % a, a);
+  }
+
+  private String result(long type, JSONObject i) {
+    String F = "";
+    if (type == 7185) {
+      if (i.optDouble("AAA167") > 0) {
+        double w = i.optDouble("AAA167") / 100;
+        if (1 == i.optInt("AAA166")) {
+          int I = (int) w;
+          double b = w - I;
+          String C = decimalToFraction(b);
+          F = true ? (0 != I ? "黑胜" + I + "又" + C + "子" : "黑胜" + C + "子") : "黑胜" + w + "目";
+        } else if (2 == i.optInt("AAA166")) {
+          int E = (int) w;
+          double d = w - E;
+          String D = decimalToFraction(d);
+          F = true ? (0 != E ? "白胜" + E + "又" + D + "子" : "白胜" + D + "子") : "白胜" + w + "目";
+        } else {
+          F = "和棋";
+        }
+      } else {
+        F = (1 == i.optInt("AAA166") ? "黑中盘胜" : (2 == i.optInt("AAA166") ? "白中盘胜" : "和棋"));
+      }
+    } else if (type == 7186) {
+      F = "";
+      if (i.optDouble("AAA167") > 0) {
+        String[] w = String.valueOf(i.optDouble("AAA167") / 100).split(".");
+        String w1 = w.length >= 2 ? "半" : "";
+        F =
+            (1 == i.optInt("AAA166")
+                ? "黑" + w[0] + "目" + w1 + "胜"
+                : (2 == i.optInt("AAA166") ? "白" + w[0] + "目" + w1 + "胜" : "和棋"));
+      } else {
+        F = (1 == i.optInt("AAA166") ? "黑中盘胜" : (2 == i.optInt("AAA166") ? "白中盘胜" : "和棋"));
       }
     }
-    while (history.next(true).isPresent()) ;
+    return F;
   }
 
   private int[] asCoord(int index) {
@@ -688,6 +998,8 @@ public class OnlineDialog extends JDialog {
       this.type = o.type;
       if (o.type == 20032) {
         line = decode52(ByteBuffer.wrap(o.raw));
+      } else if (o.type == 4116) {
+        line = decode53(ByteBuffer.wrap(o.raw));
       } else if (o.type == 7005) {
         line = decode20(ByteBuffer.wrap(o.raw));
       } else if (o.type == 8005) {
@@ -697,6 +1009,8 @@ public class OnlineDialog extends JDialog {
         o.type = 0;
       } else if (o.type == 8185) {
         line = decode17(ByteBuffer.wrap(o.raw));
+      } else if (o.type == 7185) {
+        line = decode35(ByteBuffer.wrap(o.raw));
       }
     }
 
@@ -889,6 +1203,60 @@ public class OnlineDialog extends JDialog {
       return m;
     }
 
+    private JSONObject decode35(ByteBuffer buf) {
+      JSONObject m = new JSONObject();
+      while (buf.position() < buf.array().length) {
+        long tl = uint32(buf);
+        int t = (int) (tl >>> 3);
+        switch (t) {
+          case 1:
+            m.put("AAA311", uint32(buf));
+            break;
+          case 2:
+            m.put("AAA303", uint64(buf));
+            break;
+          case 3:
+            m.put("AAA312", uint32(buf));
+            break;
+          case 4:
+            m.put("AAA166", uint32(buf));
+            break;
+          case 5:
+            m.put("AAA167", (int) uint32(buf));
+            break;
+          case 6:
+            m.put("AAA168", uint32(buf));
+            break;
+          default:
+            // r.skipType(t&7)
+            // break;
+            return m;
+        }
+      }
+      return m;
+    }
+
+    private JSONObject decode53(ByteBuffer buf) {
+      JSONObject m = new JSONObject();
+      while (buf.position() < buf.array().length) {
+        long tl = uint32(buf);
+        int t = (int) (tl >>> 3);
+        switch (t) {
+          case 1:
+            m.put("AAA311", uint32(buf));
+            break;
+          case 2:
+            m.put("AAA312", uint32(buf));
+            break;
+          default:
+            // r.skipType(t&7)
+            // break;
+            return m;
+        }
+      }
+      return m;
+    }
+
     private JSONObject decode7(ByteBuffer buf) {
       JSONObject m = new JSONObject();
       while (buf.position() < buf.array().length) {
@@ -1035,19 +1403,19 @@ public class OnlineDialog extends JDialog {
       long b = buf.get() & 0xFF;
       i = (127 & b) >>> 0;
       if (b < 128) return i;
-      b = buf.get();
+      b = buf.get() & 0xFF;
       i = (i | (127 & b) << 7) >>> 0;
       if (b < 128) return i;
-      b = buf.get();
+      b = buf.get() & 0xFF;
       i = (i | (127 & b) << 14) >>> 0;
       if (b < 128) return i;
-      b = buf.get();
+      b = buf.get() & 0xFF;
       i = (i | (127 & b) << 21) >>> 0;
       if (b < 128) return i;
-      b = buf.get();
+      b = buf.get() & 0xFF;
       i = (i | (15 & b) << 28) >>> 0;
       if (b < 128) return i;
-      b = buf.get();
+      b = buf.get() & 0xFF;
       // TODO
       return i;
     }
@@ -1261,6 +1629,11 @@ public class OnlineDialog extends JDialog {
     final String key = idx > 0 ? it.substring(0, idx) : it;
     final String value = idx > 0 && it.length() > idx + 1 ? it.substring(idx + 1) : null;
     return new SimpleImmutableEntry<>(key, value);
+  }
+
+  private String dateStr() {
+    DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:sss");
+    return df.format(new Date());
   }
 
   public static void main(String[] args) {
