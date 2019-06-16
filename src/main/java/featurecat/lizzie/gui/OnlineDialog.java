@@ -56,7 +56,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.InternationalFormatter;
 import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.enums.ReadyState;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -76,6 +75,10 @@ public class OnlineDialog extends JDialog {
   private String query = "";
   private String whitePlayer = "";
   private String blackPlayer = "";
+  private long wuid = 0;
+  private long buid = 0;
+  private String wTime = "";
+  private String bTime = "";
   private int seqs = 0;
   private boolean done = false;
   private BoardHistoryList history = null;
@@ -299,6 +302,7 @@ public class OnlineDialog extends JDialog {
     if (schedule != null && !schedule.isCancelled() && !schedule.isDone()) {
       schedule.cancel(false);
     }
+    done = false;
     switch (type) {
       case 1:
         refresh("(?s).*?(\\\"Content\\\":\\\")(.+)(\\\",\\\")(?s).*");
@@ -306,7 +310,6 @@ public class OnlineDialog extends JDialog {
       case 2:
         break;
       case 3:
-        done = false;
         history = null;
         Lizzie.board.clear();
         req();
@@ -507,46 +510,46 @@ public class OnlineDialog extends JDialog {
         new WebSocketClient(uri) {
 
           public void onOpen(ServerHandshake arg0) {
-            //            System.out.println("socket open");
+            System.out.println("socket open");
+            byte[] req1 =
+                req1(
+                    90,
+                    ++seqs,
+                    23406,
+                    Utils.intOfMap(queryMap, "gameid"),
+                    Utils.intOfMap(queryMap, "showtype"),
+                    Utils.intOfMap(queryMap, "showid"),
+                    Utils.intOfMap(queryMap, "createtime"));
+            //        System.out.println("socket send ByteBuffer" + byteArrayToHexString(req1));
+            client.send(req1);
           }
 
           public void onMessage(String arg0) {
-            //            System.out.println("socket message" + arg0);
+            System.out.println("socket message" + arg0);
           }
 
           public void onError(Exception arg0) {
-            //            arg0.printStackTrace();
-            //            System.out.println("socket error");
+            arg0.printStackTrace();
+            System.out.println("socket error");
           }
 
           public void onClose(int arg0, String arg1, boolean arg2) {
-            //            System.out.println("socket close");
+            System.out.println("socket close:" + arg0 + ":" + arg1 + ":" + arg2);
           }
 
           public void onMessage(ByteBuffer bytes) {
-            //            System.out.println("socket message ByteBuffer" +
-            // byteArrayToHexString(bytes.array()));
+            //                        System.out.println("socket message ByteBuffer" +
+            //             byteArrayToHexString(bytes.array()));
             parseReq(bytes);
           }
         };
 
     client.connect();
 
-    while (!client.getReadyState().equals(ReadyState.OPEN)) {
-      // System.out.println("socket pending");
-    }
-    //    System.out.println("socket opened");
-    byte[] req1 =
-        req1(
-            90,
-            ++seqs,
-            23406,
-            Utils.intOfMap(queryMap, "gameid"),
-            Utils.intOfMap(queryMap, "showtype"),
-            Utils.intOfMap(queryMap, "showid"),
-            Utils.intOfMap(queryMap, "createtime"));
-    //    System.out.println("socket send ByteBuffer" + byteArrayToHexString(req1));
-    client.send(req1);
+    //    while (!client.getReadyState().equals(ReadyState.OPEN)) {
+    //      // System.out.println("socket pending");
+    //    }
+    //        System.out.println("socket opened");
   }
 
   public byte[] req1(int len, int seq, int msgID, int gameId, int showType, int showId, int time) {
@@ -619,7 +622,7 @@ public class OnlineDialog extends JDialog {
     int bodyFlag = res.get();
     int option = res.get();
     int msgID = res.getShort();
-    //    System.out.println("recv msgID:" + msgID);
+    System.out.println("recv msgID:" + msgID);
     if (msgID == 23406) {
       int msgType = res.getShort();
       int MsgSeq = res.getInt();
@@ -668,16 +671,28 @@ public class OnlineDialog extends JDialog {
         int srcType = res.getInt();
       }
 
+      System.out.println(
+          dateStr()
+              + "need schedule client status"
+              + client.isOpen()
+              + ":done:"
+              + done
+              + ":sc:"
+              + (schedule == null)
+              + ":sc:"
+              + schedule.isCancelled()
+              + ":sc:"
+              + schedule.isDone());
       if (!done && (schedule == null || schedule.isCancelled() || schedule.isDone())) {
-        //        System.out.println(dateStr() + "client status" + client.isOpen() + "s open:");
+        System.out.println(
+            dateStr() + "start schedule client status" + client.isOpen() + "s open:");
         schedule =
             online.scheduleAtFixedRate(
                 new Runnable() {
                   @Override
                   public void run() {
-                    //                    System.out.println(
-                    //                        dateStr() + "client status" + client.isOpen() + "s:" +
-                    // schedule.isDone());
+                    System.out.println(
+                        dateStr() + "client status" + client.isOpen() + "s:" + schedule.isDone());
                     if (client.isOpen()) {
                       byte[] req2 =
                           req2(
@@ -688,25 +703,28 @@ public class OnlineDialog extends JDialog {
                               Utils.intOfMap(queryMap, "showtype"),
                               Utils.intOfMap(queryMap, "showid"),
                               Utils.intOfMap(queryMap, "createtime"));
-                      //                      System.out.println(
-                      //                          "socket send req2 ByteBuffer" +
-                      // byteArrayToHexString(req2));
+                      //                                            System.out.println(
+                      //                                                "socket send req2
+                      // ByteBuffer" +
+                      //                       byteArrayToHexString(req2));
                       client.send(req2);
                     } else {
-                      //                      System.out.println(
-                      //                          dateStr()
-                      //                              + "client status"
-                      //                              + client.isOpen()
-                      //                              + "cancel s:"
-                      //                              + schedule.isDone());
+                      System.out.println(
+                          dateStr()
+                              + "client status"
+                              + client.isOpen()
+                              + "cancel s:"
+                              + schedule.isDone());
                       schedule.cancel(false);
                       if (!done) {
+                        System.out.println("reReq");
                         reReq();
                       }
                     }
-                    //                    System.out.println(
-                    //                        dateStr() + "client status" + client.isOpen() + "s:" +
-                    // schedule.isDone());
+                    //                                        System.out.println(
+                    //                                            dateStr() + "client status" +
+                    // client.isOpen() + "s:" +
+                    //                     schedule.isDone());
                   }
                 },
                 1,
@@ -735,7 +753,6 @@ public class OnlineDialog extends JDialog {
           res.get(frag, res.arrayOffset(), len);
           fragmentList.add(new Fragment(len, frag));
         }
-
         processFrag(fragmentList);
       }
 
@@ -755,24 +772,59 @@ public class OnlineDialog extends JDialog {
       int online = res.getInt();
       int status = res.getInt();
       int tipsLen = res.getInt();
-      for (int i = 0; i < tipsLen; i++) {
-        int len = res.getShort();
-        byte[] tips = new byte[len];
-        res.get(tips, res.arrayOffset(), len);
-        // TODO
+      if (tipsLen > 0) {
+        for (int i = 0; i < tipsLen; i++) {
+          int len = res.getShort();
+          byte[] tips = new byte[len];
+          res.get(tips, res.arrayOffset(), len);
+          // TODO
+        }
       }
       int curRound = res.getInt();
       int transparentLen = res.getShort();
+      System.out.println(
+          "23413:msgType:"
+              + msgType
+              + "resultId:"
+              + resultId
+              + "online:"
+              + online
+              + "status:"
+              + status
+              + "tipsLen:"
+              + tipsLen
+              + "transparentLen:"
+              + transparentLen);
       // TODO
       if (transparentLen > 0) {
         // Transparent
-      } else {
-        int transparent = res.get();
       }
       if (type == 3) {
         int version = res.getInt();
         int createTime = res.getInt();
         int srcType = res.getInt();
+      }
+    } else if (msgID == 23414) {
+      int msgType = res.getShort();
+      int MsgSeq = res.getInt();
+      int srcFe = res.get();
+      int dstFe = res.get();
+      int srcId = res.getShort();
+      int dstId = res.getShort();
+      int bodyLen = res.getShort();
+
+      int svrID = res.getInt();
+      int gameId = res.getInt();
+      int showType = res.getInt();
+      int showId = res.getInt();
+      int type = res.getInt();
+      int transparentDataLen = res.getShort();
+      List<Fragment> fragmentList = new ArrayList<Fragment>();
+      if (transparentDataLen > 0) {
+        byte[] frag = new byte[transparentDataLen];
+        res.get(frag, res.arrayOffset(), transparentDataLen);
+        fragmentList.add(new Fragment(transparentDataLen, frag));
+        processFrag(fragmentList);
       }
     }
   }
@@ -781,8 +833,7 @@ public class OnlineDialog extends JDialog {
 
     for (Fragment f : fragmentList) {
       if (f != null) {
-        //        System.out.println("Msg:" + f.type + ":" + (f.line != null ? f.line.toString() :
-        // ""));
+        System.out.println("Msg:" + f.type + ":" + (f.line != null ? f.line.toString() : ""));
         if (f.type == 20032) {
           int size = ((JSONObject) f.line.opt("AAA307")).optInt("AAA16");
           if (size > 0) {
@@ -807,16 +858,30 @@ public class OnlineDialog extends JDialog {
             break;
           }
         } else if (f.type == 4116) {
+          long tu = wuid;
+          wuid = buid;
+          buid = tu;
+          String tt = wTime;
+          wTime = bTime;
+          bTime = tt;
           String t = whitePlayer;
           whitePlayer = blackPlayer;
           blackPlayer = t;
           Lizzie.frame.setPlayers(whitePlayer, blackPlayer);
         } else if (f.type == 7005) {
+          long uid = f.line.optLong("AAA303");
           int num = f.line.optInt("AAA102");
           if (num == 0) {
             num = history.getData().moveNumber + 1;
           }
           Stone color = (num % 2 != 0) ? Stone.BLACK : Stone.WHITE;
+          if (uid > 0) {
+            if (Stone.BLACK.equals(color)) {
+              buid = uid;
+            } else {
+              wuid = uid;
+            }
+          }
           int index = f.line.optInt("AAA106");
           int[] coord = asCoord(Stone.BLACK.equals(color) ? index : index - 1024);
           boolean changeMove = false;
@@ -845,6 +910,24 @@ public class OnlineDialog extends JDialog {
           // } else {
           history.place(coord[0], coord[1], color, false, changeMove);
           // }
+        } else if (f.type == 7198) {
+          long uid = f.line.optLong("AAA303");
+          int time = f.line.optInt("AAA196");
+          int readCount = f.line.optInt("AAA197");
+          int readTime = f.line.optInt("AAA198");
+          if (uid > 0) {
+            if (uid == buid) {
+              bTime =
+                  String.format(
+                      "%d:%02d %d %d", (int) (time / 60), (int) (time % 60), readCount, readTime);
+            } else {
+              wTime =
+                  String.format(
+                      "%d:%02d %d %d", (int) (time / 60), (int) (time % 60), readCount, readTime);
+            }
+          }
+          Lizzie.frame.updateBasicInfo(bTime, wTime);
+          System.out.println("bTime:" + bTime + " wTime:" + wTime);
         } else if (f.type == 8005) {
           int num = f.line.optInt("AAA72");
           String comment = f.line.optString("AAA37");
@@ -993,8 +1076,8 @@ public class OnlineDialog extends JDialog {
       this.len = len;
       this.frag = frag;
       Proto o = parseProto(frag);
-      // System.out.println("type:" + o.type);
-      // System.out.println("raw:" + byteArrayToHexString(o.raw));
+      System.out.println("type:" + o.type);
+      //       System.out.println("raw:" + byteArrayToHexString(o.raw));
       this.type = o.type;
       if (o.type == 20032) {
         line = decode52(ByteBuffer.wrap(o.raw));
@@ -1011,6 +1094,8 @@ public class OnlineDialog extends JDialog {
         line = decode17(ByteBuffer.wrap(o.raw));
       } else if (o.type == 7185) {
         line = decode35(ByteBuffer.wrap(o.raw));
+      } else if (o.type == 7198) {
+        line = decode42(ByteBuffer.wrap(o.raw));
       }
     }
 
@@ -1355,6 +1440,39 @@ public class OnlineDialog extends JDialog {
               m.put("AAA37", new JSONArray("[]"));
             }
             m.getJSONArray("AAA37").put(readString(buf));
+            break;
+          default:
+            // r.skipType(t&7)
+            // break;
+            return m;
+        }
+      }
+      return m;
+    }
+
+    public JSONObject decode42(ByteBuffer buf) {
+      JSONObject m = new JSONObject();
+      while (buf.position() < buf.array().length) {
+        long tl = uint32(buf);
+        int t = (int) (tl >>> 3);
+        switch (t) {
+          case 1:
+            m.put("AAA311", uint32(buf));
+            break;
+          case 2:
+            m.put("AAA303", uint64(buf));
+            break;
+          case 3:
+            m.put("AAA312", uint32(buf));
+            break;
+          case 4:
+            m.put("AAA196", uint32(buf));
+            break;
+          case 5:
+            m.put("AAA197", uint32(buf));
+            break;
+          case 6:
+            m.put("AAA198", uint32(buf));
             break;
           default:
             // r.skipType(t&7)

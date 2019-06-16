@@ -33,6 +33,8 @@ public abstract class MainFrame extends JFrame {
 
   public void updateBasicInfo() {}
 
+  public void updateBasicInfo(String bTime, String wTime) {}
+
   public void refresh() {
     repaint();
   }
