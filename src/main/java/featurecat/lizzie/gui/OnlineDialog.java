@@ -270,7 +270,6 @@ public class OnlineDialog extends JDialog {
     try {
       URI uri = new URI(url);
       queryMap = splitQuery(uri);
-      //      System.out.println("Query:" + queryMap.toString());
       if (queryMap != null) {
         if (queryMap.get("gameid") != null && queryMap.get("createtime") != null) {
           return 3;
@@ -344,7 +343,6 @@ public class OnlineDialog extends JDialog {
       BoardHistoryList liveNode = SGFParser.parseSgf(sgf);
       if (liveNode != null) {
         int diffMove = Lizzie.board.getHistory().sync(liveNode);
-        // System.out.println(liveNode + "diff:" + diffMove);
         if (diffMove >= 0) {
           Lizzie.board.goToMoveNumberBeyondBranch(diffMove > 0 ? diffMove - 1 : 0);
           while (Lizzie.board.nextMove()) ;
@@ -368,7 +366,6 @@ public class OnlineDialog extends JDialog {
         "Mozilla/5.0 (Linux; U; Android 2.3.6; zh-cn; GT-S5660 Build/GINGERBREAD) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 MicroMessenger/4.5.255");
 
     int responseCode = con.getResponseCode();
-    //        System.out.println("Response Code : " + responseCode);
 
     BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
     StringBuffer response = new StringBuffer();
@@ -377,7 +374,6 @@ public class OnlineDialog extends JDialog {
       response.append(line);
     }
     in.close();
-    //        System.out.println(response.toString());
     String sgf = response.toString();
     parseSgf(sgf, "", 0, false);
   }
@@ -395,9 +391,7 @@ public class OnlineDialog extends JDialog {
         new AjaxHttpRequest.ReadyStateChangeListener() {
           public void onReadyStateChange() {
             int readyState = ajax.getReadyState();
-            //            System.out.println("Ajax getReadyState:" + ajax.getReadyState());
             if (readyState == AjaxHttpRequest.STATE_COMPLETE) {
-              //                            System.out.println(ajax.getResponseText());
               String sgf = ajax.getResponseText();
               parseSgf(sgf, format, num, decode);
             }
@@ -453,7 +447,6 @@ public class OnlineDialog extends JDialog {
           public void onReadyStateChange() {
             int readyState = ajax.getReadyState();
             if (readyState == AjaxHttpRequest.STATE_COMPLETE) {
-              // System.out.println(ajax.getResponseText());
               String format =
                   "(?s).*?\"ShowType\":([^,]+),\"ShowID\":([^,]+),\"CreateTime\":([^,]+),(?s).*";
               Pattern sp = Pattern.compile(format);
@@ -510,7 +503,6 @@ public class OnlineDialog extends JDialog {
         new WebSocketClient(uri) {
 
           public void onOpen(ServerHandshake arg0) {
-            System.out.println("socket open");
             byte[] req1 =
                 req1(
                     90,
@@ -520,21 +512,20 @@ public class OnlineDialog extends JDialog {
                     Utils.intOfMap(queryMap, "showtype"),
                     Utils.intOfMap(queryMap, "showid"),
                     Utils.intOfMap(queryMap, "createtime"));
-            //        System.out.println("socket send ByteBuffer" + byteArrayToHexString(req1));
             client.send(req1);
           }
 
           public void onMessage(String arg0) {
-            System.out.println("socket message" + arg0);
+            //            System.out.println("socket message" + arg0);
           }
 
           public void onError(Exception arg0) {
-            arg0.printStackTrace();
-            System.out.println("socket error");
+            //            arg0.printStackTrace();
+            //            System.out.println("socket error");
           }
 
           public void onClose(int arg0, String arg1, boolean arg2) {
-            System.out.println("socket close:" + arg0 + ":" + arg1 + ":" + arg2);
+            //            System.out.println("socket close:" + arg0 + ":" + arg1 + ":" + arg2);
           }
 
           public void onMessage(ByteBuffer bytes) {
@@ -545,11 +536,6 @@ public class OnlineDialog extends JDialog {
         };
 
     client.connect();
-
-    //    while (!client.getReadyState().equals(ReadyState.OPEN)) {
-    //      // System.out.println("socket pending");
-    //    }
-    //        System.out.println("socket opened");
   }
 
   public byte[] req1(int len, int seq, int msgID, int gameId, int showType, int showId, int time) {
@@ -622,7 +608,7 @@ public class OnlineDialog extends JDialog {
     int bodyFlag = res.get();
     int option = res.get();
     int msgID = res.getShort();
-    System.out.println("recv msgID:" + msgID);
+    //    System.out.println("recv msgID:" + msgID);
     if (msgID == 23406) {
       int msgType = res.getShort();
       int MsgSeq = res.getInt();
@@ -671,26 +657,12 @@ public class OnlineDialog extends JDialog {
         int srcType = res.getInt();
       }
 
-      System.out.println(
-          dateStr()
-              + "need schedule client status"
-              + client.isOpen()
-              + ":done:"
-              + done
-              + ":sc:"
-              + ((schedule == null)
-                  ? ""
-                  : ":sc:" + schedule.isCancelled() + ":sc:" + schedule.isDone()));
       if (!done && (schedule == null || schedule.isCancelled() || schedule.isDone())) {
-        System.out.println(
-            dateStr() + "start schedule client status" + client.isOpen() + "s open:");
         schedule =
             online.scheduleAtFixedRate(
                 new Runnable() {
                   @Override
                   public void run() {
-                    System.out.println(
-                        dateStr() + "client status" + client.isOpen() + "s:" + schedule.isDone());
                     if (client.isOpen()) {
                       byte[] req2 =
                           req2(
@@ -701,28 +673,13 @@ public class OnlineDialog extends JDialog {
                               Utils.intOfMap(queryMap, "showtype"),
                               Utils.intOfMap(queryMap, "showid"),
                               Utils.intOfMap(queryMap, "createtime"));
-                      //                                            System.out.println(
-                      //                                                "socket send req2
-                      // ByteBuffer" +
-                      //                       byteArrayToHexString(req2));
                       client.send(req2);
                     } else {
-                      System.out.println(
-                          dateStr()
-                              + "client status"
-                              + client.isOpen()
-                              + "cancel s:"
-                              + schedule.isDone());
                       schedule.cancel(false);
                       if (!done) {
-                        System.out.println("reReq");
                         reReq();
                       }
                     }
-                    //                                        System.out.println(
-                    //                                            dateStr() + "client status" +
-                    // client.isOpen() + "s:" +
-                    //                     schedule.isDone());
                   }
                 },
                 1,
@@ -780,19 +737,6 @@ public class OnlineDialog extends JDialog {
       }
       int curRound = res.getInt();
       int transparentLen = res.getShort();
-      System.out.println(
-          "23413:msgType:"
-              + msgType
-              + "resultId:"
-              + resultId
-              + "online:"
-              + online
-              + "status:"
-              + status
-              + "tipsLen:"
-              + tipsLen
-              + "transparentLen:"
-              + transparentLen);
       // TODO
       if (transparentLen > 0) {
         // Transparent
@@ -831,7 +775,8 @@ public class OnlineDialog extends JDialog {
 
     for (Fragment f : fragmentList) {
       if (f != null) {
-        System.out.println("Msg:" + f.type + ":" + (f.line != null ? f.line.toString() : ""));
+        //        System.out.println("Msg:" + f.type + ":" + (f.line != null ? f.line.toString() :
+        // ""));
         if (f.type == 20032) {
           int size = ((JSONObject) f.line.opt("AAA307")).optInt("AAA16");
           if (size > 0) {
@@ -925,7 +870,6 @@ public class OnlineDialog extends JDialog {
             }
           }
           Lizzie.frame.updateBasicInfo(bTime, wTime);
-          System.out.println("bTime:" + bTime + " wTime:" + wTime);
         } else if (f.type == 8005) {
           int num = f.line.optInt("AAA72");
           String comment = f.line.optString("AAA37");
@@ -985,12 +929,9 @@ public class OnlineDialog extends JDialog {
     if (history != null) {
       while (history.previous().isPresent()) ;
       int diffMove = Lizzie.board.getHistory().sync(history);
-      //      System.out.println("Diff Move:" + diffMove);
       if (diffMove >= 0) {
         Lizzie.board.goToMoveNumberBeyondBranch(diffMove > 0 ? diffMove - 1 : 0);
-        while (Lizzie.board.nextMove()) {
-          //          System.out.println("Diff Move NextMove");
-        }
+        while (Lizzie.board.nextMove()) {}
       }
       while (history.next(true).isPresent()) ;
     }
@@ -1081,7 +1022,7 @@ public class OnlineDialog extends JDialog {
       this.len = len;
       this.frag = frag;
       Proto o = parseProto(frag);
-      System.out.println("type:" + o.type);
+      //      System.out.println("type:" + o.type);
       //       System.out.println("raw:" + byteArrayToHexString(o.raw));
       this.type = o.type;
       if (o.type == 20032) {
