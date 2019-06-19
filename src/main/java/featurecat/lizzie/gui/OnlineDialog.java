@@ -678,11 +678,9 @@ public class OnlineDialog extends JDialog {
               + ":done:"
               + done
               + ":sc:"
-              + (schedule == null)
-              + ":sc:"
-              + schedule.isCancelled()
-              + ":sc:"
-              + schedule.isDone());
+              + ((schedule == null)
+                  ? ""
+                  : ":sc:" + schedule.isCancelled() + ":sc:" + schedule.isDone()));
       if (!done && (schedule == null || schedule.isCancelled() || schedule.isDone())) {
         System.out.println(
             dateStr() + "start schedule client status" + client.isOpen() + "s open:");
@@ -999,6 +997,7 @@ public class OnlineDialog extends JDialog {
   }
 
   private String decimalToFraction(double e) {
+    if (e == 0.0) return "";
     int c = 0;
     int b = 10;
     while (e != Math.floor(e)) {
@@ -1028,12 +1027,18 @@ public class OnlineDialog extends JDialog {
           int I = (int) w;
           double b = w - I;
           String C = decimalToFraction(b);
-          F = true ? (0 != I ? "黑胜" + I + "又" + C + "子" : "黑胜" + C + "子") : "黑胜" + w + "目";
+          F =
+              true
+                  ? (0 != I ? "黑胜" + I + (Utils.isBlank(C) ? "" : "又" + C) + "子" : "黑胜" + C + "子")
+                  : "黑胜" + w + "目";
         } else if (2 == i.optInt("AAA166")) {
           int E = (int) w;
           double d = w - E;
           String D = decimalToFraction(d);
-          F = true ? (0 != E ? "白胜" + E + "又" + D + "子" : "白胜" + D + "子") : "白胜" + w + "目";
+          F =
+              true
+                  ? (0 != E ? "白胜" + E + (Utils.isBlank(D) ? "" : "又" + D) + "子" : "白胜" + D + "子")
+                  : "白胜" + w + "目";
         } else {
           F = "和棋";
         }
