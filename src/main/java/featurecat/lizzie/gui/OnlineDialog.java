@@ -287,6 +287,18 @@ public class OnlineDialog extends JDialog {
       }
     }
 
+    up =
+        Pattern.compile(
+            "https*://(?s).*?([^\\./]+\\.[^\\./]+)/(?s).*?(room=)([0-9]+)(&hall)(?s).*?");
+    um = up.matcher(url);
+    if (um.matches() && um.groupCount() >= 3) {
+      roomId = Long.parseLong(um.group(3));
+      if (roomId > 0) { // !Utils.isBlank(id)) {
+        ajaxUrl = "https://api." + um.group(1) + "/golive/dtl?id=" + id;
+        return 1;
+      }
+    }
+
     try {
       URI uri = new URI(url);
       queryMap = splitQuery(uri);
@@ -1769,6 +1781,10 @@ public class OnlineDialog extends JDialog {
   }
 
   public void req2() throws URISyntaxException {
+    Lizzie.board.clear();
+    if (sio != null) {
+      sio.close();
+    }
     seqs = 0;
     URI uri = new URI(new String(c1));
     sio = IO.socket(uri);
@@ -1993,7 +2009,7 @@ public class OnlineDialog extends JDialog {
         new Ack() {
           @Override
           public void call(Object... args) {
-            entry();
+            //            entry();
           }
         });
   }
@@ -2029,6 +2045,16 @@ public class OnlineDialog extends JDialog {
       if (diffMove >= 0) {
         Lizzie.board.goToMoveNumberBeyondBranch(diffMove > 0 ? diffMove - 1 : 0);
         while (Lizzie.board.nextMove()) ;
+      }
+      if ("3".equals(info.optString("status"))) {
+        sio.close();
+        String result = info.optString("resultDesc");
+        if (!Utils.isBlank(result)) {
+          Lizzie.board.getHistory().getData().comment =
+              result + "\n" + Lizzie.board.getHistory().getData().comment;
+          Lizzie.board.previousMove();
+          Lizzie.board.nextMove();
+        }
       }
     } else {
       //      error(true);
@@ -2239,6 +2265,8 @@ public class OnlineDialog extends JDialog {
         while (Lizzie.board.getHistory().next().isPresent()) ;
         Lizzie.board.getHistory().getData().comment =
             result + "\n" + Lizzie.board.getHistory().getData().comment;
+        Lizzie.board.previousMove();
+        Lizzie.board.nextMove();
       }
     }
   }
