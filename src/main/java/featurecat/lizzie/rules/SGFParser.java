@@ -1007,6 +1007,224 @@ public class SGFParser {
     return history;
   }
 
+  public static int parseBranch(BoardHistoryList history, String value) {
+    int subTreeDepth = 0;
+    // Save the variation step count
+    Map<Integer, Integer> subTreeStepMap = new HashMap<Integer, Integer>();
+    // Comment of the game head
+    String headComment = "";
+    // Game properties
+    Map<String, String> gameProperties = new HashMap<String, String>();
+    Map<String, String> pendingProps = new HashMap<String, String>();
+    boolean inTag = false,
+        isMultiGo = false,
+        escaping = false,
+        moveStart = false,
+        addPassForMove = true;
+    boolean inProp = false;
+    String tag = "";
+    StringBuilder tagBuilder = new StringBuilder();
+    StringBuilder tagContentBuilder = new StringBuilder();
+    // MultiGo 's branch: (Main Branch (Main Branch) (Branch) )
+    // Other 's branch: (Main Branch (Branch) Main Branch)
+    if (value.matches("(?s).*\\)\\s*\\)")) {
+      isMultiGo = true;
+    }
+    subTreeDepth += 1;
+    // Initialize the step count
+    subTreeStepMap.put(subTreeDepth, 0);
+
+    String blackPlayer = "", whitePlayer = "";
+
+    for (int i = 0; i < value.length(); i++) {
+      char c = value.charAt(i);
+      if (escaping) {
+        tagContentBuilder.append(c == 'n' ? "\n" : c);
+        escaping = false;
+        continue;
+      }
+      switch (c) {
+        case '(':
+          if (!inTag) {
+            subTreeDepth += 1;
+            // Initialize the step count
+            subTreeStepMap.put(subTreeDepth, 0);
+            addPassForMove = true;
+            pendingProps = new HashMap<String, String>();
+          } else {
+            if (i > 0) {
+              // Allow the comment tag includes '('
+              tagContentBuilder.append(c);
+            }
+          }
+          break;
+        case ')':
+          if (!inTag) {
+            if (isMultiGo) {
+              // Restore to the variation node
+              int varStep = subTreeStepMap.get(subTreeDepth);
+              for (int s = 0; s < varStep; s++) {
+                history.previous();
+              }
+            }
+            subTreeDepth -= 1;
+          } else {
+            // Allow the comment tag includes '('
+            tagContentBuilder.append(c);
+          }
+          break;
+        case '[':
+          if (!inProp) {
+            inProp = true;
+            if (subTreeDepth > 1 && !isMultiGo) {
+              break;
+            }
+            inTag = true;
+            String tagTemp = tagBuilder.toString();
+            if (!tagTemp.isEmpty()) {
+              // Ignore small letters in tags for the long format Smart-Go file.
+              // (ex) "PlayerBlack" ==> "PB"
+              // It is the default format of mgt, an old SGF tool.
+              // (Mgt is still supported in Debian and Ubuntu.)
+              tag = tagTemp.replaceAll("[a-z]", "");
+            }
+            tagContentBuilder = new StringBuilder();
+          } else {
+            tagContentBuilder.append(c);
+          }
+          break;
+        case ']':
+          if (subTreeDepth > 1 && !isMultiGo) {
+            break;
+          }
+          inTag = false;
+          inProp = false;
+          tagBuilder = new StringBuilder();
+          String tagContent = tagContentBuilder.toString();
+          // We got tag, we can parse this tag now.
+          if (tag.equals("B") || tag.equals("W")) {
+            moveStart = true;
+            addPassForMove = true;
+            int[] move = convertSgfPosToCoord(tagContent);
+            // Save the step count
+            subTreeStepMap.put(subTreeDepth, subTreeStepMap.get(subTreeDepth) + 1);
+            Stone color = tag.equals("B") ? Stone.BLACK : Stone.WHITE;
+            boolean newBranch = (subTreeStepMap.get(subTreeDepth) == 1);
+            if (move == null) {
+              history.pass(color, newBranch, false);
+            } else {
+              history.place(move[0], move[1], color, newBranch);
+            }
+            if (newBranch) {
+              processPendingPros(history, pendingProps);
+            }
+          } else if (tag.equals("C")) {
+            // Support comment
+            if (!moveStart) {
+              headComment = tagContent;
+            } else {
+              history.getData().comment = tagContent;
+            }
+          } else if (tag.equals("AB") || tag.equals("AW")) {
+            int[] move = convertSgfPosToCoord(tagContent);
+            Stone color = tag.equals("AB") ? Stone.BLACK : Stone.WHITE;
+            if (moveStart) {
+              // add to node properties
+              history.addNodeProperty(tag, tagContent);
+              if (addPassForMove) {
+                // Save the step count
+                subTreeStepMap.put(subTreeDepth, subTreeStepMap.get(subTreeDepth) + 1);
+                boolean newBranch = (subTreeStepMap.get(subTreeDepth) == 1);
+                history.pass(color, newBranch, true);
+                if (newBranch) {
+                  processPendingPros(history, pendingProps);
+                }
+                addPassForMove = false;
+              }
+              history.addNodeProperty(tag, tagContent);
+              if (move != null) {
+                history.addStone(move[0], move[1], color);
+              }
+            } else {
+              if (move == null) {
+                history.pass(color);
+              } else {
+                history.place(move[0], move[1], color);
+              }
+              history.flatten();
+            }
+          } else if (tag.equals("PB")) {
+            blackPlayer = tagContent;
+          } else if (tag.equals("PW")) {
+            whitePlayer = tagContent;
+          } else if (tag.equals("KM")) {
+            try {
+              if (tagContent.trim().isEmpty()) {
+                tagContent = "0.0";
+              }
+              history.getGameInfo().setKomi(Double.parseDouble(tagContent));
+            } catch (NumberFormatException e) {
+              e.printStackTrace();
+            }
+          } else {
+            if (moveStart) {
+              // Other SGF node properties
+              if ("AE".equals(tag)) {
+                // remove a stone
+                if (addPassForMove) {
+                  // Save the step count
+                  subTreeStepMap.put(subTreeDepth, subTreeStepMap.get(subTreeDepth) + 1);
+                  Stone color =
+                      history.getLastMoveColor() == Stone.WHITE ? Stone.BLACK : Stone.WHITE;
+                  boolean newBranch = (subTreeStepMap.get(subTreeDepth) == 1);
+                  history.pass(color, newBranch, true);
+                  if (newBranch) {
+                    processPendingPros(history, pendingProps);
+                  }
+                  addPassForMove = false;
+                }
+                history.addNodeProperty(tag, tagContent);
+                int[] move = convertSgfPosToCoord(tagContent);
+                if (move != null) {
+                  history.removeStone(
+                      move[0], move[1], tag.equals("AB") ? Stone.BLACK : Stone.WHITE);
+                }
+              } else {
+                boolean firstProp = (subTreeStepMap.get(subTreeDepth) == 0);
+                if (firstProp) {
+                  addProperty(pendingProps, tag, tagContent);
+                } else {
+                  history.addNodeProperty(tag, tagContent);
+                }
+              }
+            } else {
+              addProperty(gameProperties, tag, tagContent);
+            }
+          }
+          break;
+        case ';':
+          break;
+        default:
+          if (subTreeDepth > 1 && !isMultiGo) {
+            break;
+          }
+          if (inTag) {
+            if (c == '\\') {
+              escaping = true;
+              continue;
+            }
+            tagContentBuilder.append(c);
+          } else {
+            if (c != '\n' && c != '\r' && c != '\t' && c != ' ') {
+              tagBuilder.append(c);
+            }
+          }
+      }
+    }
+    history.toBranchTop();
+    return history.getCurrentHistoryNode().numberOfChildren() - 1;
+  }
+
   private static boolean isSgf(String value) {
     final Pattern SGF_PATTERN = Pattern.compile("(?s).*?(\\(\\s*;.*\\)).*?");
     Matcher sgfMatcher = SGF_PATTERN.matcher(value);

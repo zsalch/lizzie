@@ -8,6 +8,10 @@ import featurecat.lizzie.rules.SGFParser;
 import featurecat.lizzie.rules.Stone;
 import featurecat.lizzie.util.AjaxHttpRequest;
 import featurecat.lizzie.util.Utils;
+import io.socket.client.Ack;
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -58,6 +62,7 @@ import javax.swing.text.InternationalFormatter;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class OnlineDialog extends JDialog {
@@ -65,6 +70,7 @@ public class OnlineDialog extends JDialog {
   private ScheduledExecutorService online = Executors.newScheduledThreadPool(1);
   private ScheduledFuture<?> schedule = null;
   private WebSocketClient client;
+  private Socket sio;
   private int type = 0;
   private JFormattedTextField txtRefreshTime;
   private JLabel lblError;
@@ -83,6 +89,13 @@ public class OnlineDialog extends JDialog {
   private boolean done = false;
   private BoardHistoryList history = null;
   private int boardSize = 19;
+  private long userId = -1000000;
+  private long roomId = 0;
+  private String channel = "";
+  private Map<Integer, Map<Integer, JSONObject>> branchs =
+      new HashMap<Integer, Map<Integer, JSONObject>>();
+  private Map<Integer, Map<Integer, JSONObject>> comments =
+      new HashMap<Integer, Map<Integer, JSONObject>>();
   private byte[] b = {
     119, 115, 58, 47, 47, 119, 115, 46, 104, 117, 97, 110, 108, 101, 46, 113, 113, 46, 99, 111, 109,
     47, 119, 113, 98, 114, 111, 97, 100, 99, 97, 115, 116, 108, 111, 116, 117, 115
@@ -97,6 +110,10 @@ public class OnlineDialog extends JDialog {
     111, 112, 101, 110, 113, 105, 112, 117, 47, 103, 101, 116, 113, 105, 112, 117, 63, 99, 97, 108,
     108, 98, 97, 99, 107, 61, 106, 81, 117, 101, 114, 121, 49, 38, 103, 97, 109, 101, 99, 111, 100,
     101, 61
+  };
+  private byte[] c1 = {
+    104, 116, 116, 112, 115, 58, 47, 47, 114, 116, 103, 97, 109, 101, 46, 121, 105, 107, 101, 119,
+    101, 105, 113, 105, 46, 99, 111, 109
   };
 
   public OnlineDialog() {
@@ -236,34 +253,37 @@ public class OnlineDialog extends JDialog {
     String url = txtUrl.getText().trim();
 
     Pattern up =
-        Pattern.compile("https*://(?s).*?([^\\./]+\\.[^\\./]+)/(?s).*?(live/room/)([^/]+)/[^\\n]*");
+        Pattern.compile(
+            "https*://(?s).*?([^\\./]+\\.[^\\./]+)/(?s).*?(live/[a-zA-Z]+/)([^/]+)/[0-9]+/([^/]+)[^\\n]*");
     Matcher um = up.matcher(url);
-    if (um.matches() && um.groupCount() >= 3) {
+    if (um.matches() && um.groupCount() >= 4) {
       id = um.group(3);
-      if (!Utils.isBlank(id)) {
+      roomId = Long.parseLong(um.group(4));
+      if (!Utils.isBlank(id) && roomId > 0) {
         ajaxUrl = "https://api." + um.group(1) + "/golive/dtl?id=" + id;
         return 1;
       }
     }
 
-    up = Pattern.compile("https*://(?s).*?([^\\./]+\\.[^\\./]+)/(?s).*?(live/board/)([^/]+)");
+    up = Pattern.compile("https*://(?s).*?([^\\./]+\\.[^\\./]+)/(?s).*?(live/[a-zA-Z]+/)([^/]+)");
     um = up.matcher(url);
     if (um.matches() && um.groupCount() >= 3) {
       id = um.group(3);
       if (!Utils.isBlank(id)) {
         ajaxUrl = "https://api." + um.group(1) + "/golive/dtl?id=" + id;
-        return 1;
+        return 2;
       }
     }
 
-    up = Pattern.compile("https*://(?s).*?([^\\./]+\\.[^\\./]+)/(?s).*?(game/play/)[0-9]+/([^/]+)");
+    up =
+        Pattern.compile(
+            "https*://(?s).*?([^\\./]+\\.[^\\./]+)/(?s).*?(game/[a-zA-Z]+/)[0-9]+/([^/]+)");
     um = up.matcher(url);
     if (um.matches() && um.groupCount() >= 3) {
-      id = um.group(3);
-      if (!Utils.isBlank(id)) {
+      roomId = Long.parseLong(um.group(3));
+      if (roomId > 0) { // !Utils.isBlank(id)) {
         ajaxUrl = "https://api." + um.group(1) + "/golive/dtl?id=" + id;
-        // TODO
-        return 0;
+        return 1;
       }
     }
 
@@ -302,25 +322,22 @@ public class OnlineDialog extends JDialog {
       schedule.cancel(false);
     }
     done = false;
+    history = null;
+    Lizzie.board.clear();
     switch (type) {
       case 1:
-        refresh("(?s).*?(\\\"Content\\\":\\\")(.+)(\\\",\\\")(?s).*");
+        req2();
         break;
       case 2:
+        refresh("(?s).*?(\\\"Content\\\":\\\")(.+)(\\\",\\\")(?s).*");
         break;
       case 3:
-        history = null;
-        Lizzie.board.clear();
         req();
         break;
       case 4:
-        history = null;
-        Lizzie.board.clear();
         req0();
         break;
       case 99:
-        history = null;
-        Lizzie.board.clear();
         get();
         break;
       default:
@@ -328,15 +345,33 @@ public class OnlineDialog extends JDialog {
     }
   }
 
-  public void parseSgf(String sgf, String format, int num, boolean decode) {
-    if (!Utils.isBlank(format)) {
-      Pattern sp = Pattern.compile(format);
-      Matcher sm = sp.matcher(sgf);
-      if (sm.matches() && sm.groupCount() >= num) {
-        sgf = sm.group(num);
-        if (decode) {
-          sgf = URLDecoder.decode(sgf);
+  public void parseSgf(String data, String format, int num, boolean decode) {
+    JSONObject o = null;
+    JSONObject live = null;
+    try {
+      o = new JSONObject(data);
+      o = o.optJSONObject("Result");
+      if (o != null) {
+        live = o.optJSONObject("live");
+      }
+    } catch (JSONException e) {
+    }
+    String sgf = "";
+    if (live != null) {
+      sgf = live.optString("Content");
+    }
+    if (Utils.isBlank(sgf)) {
+      if (!Utils.isBlank(format)) {
+        Pattern sp = Pattern.compile(format);
+        Matcher sm = sp.matcher(data);
+        if (sm.matches() && sm.groupCount() >= num) {
+          sgf = sm.group(num);
+          if (decode) {
+            sgf = URLDecoder.decode(sgf);
+          }
         }
+      } else {
+        sgf = data;
       }
     }
     try {
@@ -346,6 +381,39 @@ public class OnlineDialog extends JDialog {
         if (diffMove >= 0) {
           Lizzie.board.goToMoveNumberBeyondBranch(diffMove > 0 ? diffMove - 1 : 0);
           while (Lizzie.board.nextMove()) ;
+        }
+        if (live != null) {
+          blackPlayer = live.optString("BlackPlayer");
+          whitePlayer = live.optString("WhitePlayer");
+        }
+        if (Utils.isBlank(blackPlayer)) {
+          Pattern spb =
+              Pattern.compile("(?s).*?(\\\"BlackPlayer\\\":\\\")([^\"]+)(\\\",\\\")(?s).*");
+          Matcher smb = spb.matcher(data);
+          if (smb.matches() && smb.groupCount() >= 2) {
+            blackPlayer = smb.group(2);
+          }
+        }
+        if (Utils.isBlank(whitePlayer)) {
+          Pattern spw =
+              Pattern.compile("(?s).*?(\\\"WhitePlayer\\\":\\\")([^\\\"]+)(\\\",\\\")(?s).*");
+          Matcher smw = spw.matcher(data);
+          if (smw.matches() && smw.groupCount() >= 2) {
+            whitePlayer = smw.group(2);
+          }
+        }
+        Lizzie.frame.setPlayers(whitePlayer, blackPlayer);
+        if (live != null && "3".equals(live.optString("Status"))) {
+          if (schedule != null && !schedule.isCancelled() && !schedule.isDone()) {
+            schedule.cancel(false);
+          }
+          String result = live.optString("GameResult");
+          if (!Utils.isBlank(result)) {
+            Lizzie.board.getHistory().getData().comment =
+                result + "\n" + Lizzie.board.getHistory().getData().comment;
+            Lizzie.board.previousMove();
+            Lizzie.board.nextMove();
+          }
         }
       } else {
         error(true);
@@ -1698,6 +1766,523 @@ public class OnlineDialog extends JDialog {
   private String dateStr() {
     DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:sss");
     return df.format(new Date());
+  }
+
+  public void req2() throws URISyntaxException {
+    seqs = 0;
+    URI uri = new URI(new String(c1));
+    sio = IO.socket(uri);
+    sio.on(
+            Socket.EVENT_CONNECT,
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:connect");
+                login();
+              }
+            })
+        .on(
+            Socket.EVENT_MESSAGE,
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:message");
+              }
+            })
+        .on(
+            Socket.EVENT_DISCONNECT,
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:disconnect");
+              }
+            })
+        .on(
+            Socket.EVENT_ERROR,
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:error");
+              }
+            })
+        .on(
+            Socket.EVENT_PING,
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:ping");
+              }
+            })
+        .on(
+            Socket.EVENT_PONG,
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:pong");
+              }
+            })
+        .on(
+            Socket.EVENT_CONNECT_ERROR,
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:EVENT_CONNECT_ERROR");
+              }
+            })
+        .on(
+            Socket.EVENT_CONNECT_TIMEOUT,
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:EVENT_CONNECT_TIMEOUT");
+              }
+            })
+        .on(
+            Socket.EVENT_CONNECTING,
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:EVENT_CONNECTING");
+              }
+            })
+        .on(
+            Socket.EVENT_RECONNECT,
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:EVENT_RECONNECT");
+              }
+            })
+        .on(
+            Socket.EVENT_RECONNECT_ATTEMPT,
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:EVENT_RECONNECT_ATTEMPT");
+              }
+            })
+        .on(
+            Socket.EVENT_RECONNECT_FAILED,
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:EVENT_RECONNECT_FAILED");
+              }
+            })
+        .on(
+            Socket.EVENT_RECONNECT_ERROR,
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:EVENT_RECONNECT_ERROR");
+              }
+            })
+        .on(
+            Socket.EVENT_RECONNECTING,
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:EVENT_RECONNECTING");
+              }
+            })
+        .on(
+            "heartbeat",
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:heartbeat:" + strJson(args));
+              }
+            })
+        .on(
+            "userinfo",
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:userinfo:" + strJson(args));
+                //                System.out.println(
+                //                    "io:userinfo:userid:"
+                //                        + (args == null || args.length < 1
+                //                            ? ""
+                //                            : ((JSONObject) args[0]).opt("user_id").toString()));
+                userId =
+                    (args == null || args.length < 1
+                        ? userId
+                        : ((JSONObject) args[0]).optLong("user_id"));
+                entry();
+              }
+            })
+        .on(
+            "init",
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:init:" + strJson(args));
+                initData(args == null || args.length < 1 ? null : ((JSONObject) args[0]));
+              }
+            })
+        .on(
+            "move",
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:move:" + strJson(args));
+                move(args == null || args.length < 1 ? null : (JSONObject) args[0]);
+                sync();
+              }
+            })
+        .on(
+            "update_game",
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:update_game:" + strJson(args));
+                updateGame(args == null || args.length < 1 ? null : (JSONObject) args[0]);
+              }
+            })
+        .on(
+            "move_delete",
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:move_delete:" + strJson(args));
+              }
+            })
+        .on(
+            "comments",
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:comments:" + strJson(args));
+                procComments(args == null || args.length < 1 ? null : (JSONObject) args[0]);
+                sync();
+              }
+            })
+        .on(
+            "notice",
+            new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                //                System.out.println("io:notice:" + strJson(args));
+              }
+            });
+    sio.connect();
+  }
+
+  private String strJson(Object... args) {
+    return (args == null || args.length <= 0 ? "null" : args[0].toString());
+  }
+
+  private void clear2() {
+    userId = -1000000;
+    roomId = 0;
+    channel = "";
+    branchs = new HashMap<Integer, Map<Integer, JSONObject>>();
+    comments = new HashMap<Integer, Map<Integer, JSONObject>>();
+  }
+
+  private void login() {
+    JSONObject data = new JSONObject();
+    data.put("hall", "1");
+    data.put("room", roomId);
+    data.put("token", -1);
+    data.put("user_id", userId);
+    data.put("platform", 3);
+    sendData(
+        "login",
+        data,
+        new Ack() {
+          @Override
+          public void call(Object... args) {
+            entry();
+          }
+        });
+  }
+
+  private void entry() {
+    JSONObject data = new JSONObject();
+    data.put("hall", "1");
+    data.put("room", roomId);
+    data.put("platform", 3);
+    data.put("user_id", userId);
+    sendData(
+        "entry_room",
+        data,
+        new Ack() {
+          @Override
+          public void call(Object... args) {
+            channel();
+          }
+        });
+  }
+
+  private void initData(JSONObject data) {
+    if (data == null) return;
+    JSONObject info = data.optJSONObject("game_info");
+    int size = info.optInt("boardSize", 19);
+    boardSize = size;
+    history = new BoardHistoryList(BoardData.empty(size));
+    blackPlayer = info.optString("blackName");
+    whitePlayer = info.optString("whiteName");
+    history = SGFParser.parseSgf(info.optString("sgf"));
+    if (history != null) {
+      int diffMove = Lizzie.board.getHistory().sync(history);
+      if (diffMove >= 0) {
+        Lizzie.board.goToMoveNumberBeyondBranch(diffMove > 0 ? diffMove - 1 : 0);
+        while (Lizzie.board.nextMove()) ;
+      }
+    } else {
+      //      error(true);
+      sio.close();
+      try {
+        refresh("(?s).*?(\\\"Content\\\":\\\")(.+)(\\\",\\\")(?s).*");
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
+    Lizzie.frame.setPlayers(whitePlayer, blackPlayer);
+  }
+
+  private void channel() {
+    JSONObject data = new JSONObject();
+    data.put("hall", "1");
+    data.put("room", roomId);
+    data.put("platform", 3);
+    data.put("channel", "chat_1_" + roomId); // channel);
+    sendData(
+        "channel/add",
+        data,
+        new Ack() {
+          @Override
+          public void call(Object... args) {
+            listen();
+          }
+        });
+  }
+
+  private void listen() {
+    JSONObject data = new JSONObject();
+    data.put("hall", "1");
+    data.put("room", roomId);
+    data.put("platform", 3);
+    sendData(
+        "comment/listen",
+        data,
+        new Ack() {
+          @Override
+          public void call(Object... args) {
+            //            System.out.println(
+            //                "listen callback:"
+            //                    + (args == null || args.length <= 0 ? "null" :
+            // args[0].toString()));
+            listenBack(args == null || args.length <= 0 ? null : (JSONArray) args[0]);
+          }
+        });
+  }
+
+  private void listenBack(JSONArray data) {
+    if (data == null) return;
+    for (Object o : data) {
+      JSONObject d = (JSONObject) o;
+      switch (d.optInt("type", 0)) {
+        case 1:
+          addBranch(d);
+          break;
+        case 2:
+          addComment(d, true);
+          break;
+      }
+    }
+    sync();
+  }
+
+  void sync() {
+    while (history.previous().isPresent()) ;
+    int diffMove = Lizzie.board.getHistory().sync(history);
+    if (diffMove >= 0) {
+      Lizzie.board.goToMoveNumberBeyondBranch(diffMove > 0 ? diffMove - 1 : 0);
+      while (Lizzie.board.nextMove()) ;
+    }
+  }
+
+  private void procComments(JSONObject cb) {
+    if (cb == null) return;
+    String type = cb.optString("type", "");
+    if ("add".equals(type) || "update".equals(type)) {
+      // TODO
+      JSONObject d = ((JSONObject) cb.opt("content"));
+      switch (d.optInt("type", 0)) {
+        case 1:
+          addBranch(d);
+          break;
+        case 2:
+          addComment(d, "add".equals(type));
+          break;
+      }
+    }
+  }
+
+  private void addBranch(JSONObject branch) {
+    if (branch == null) return;
+    int move = branch.optInt("handsCount");
+    int id = branch.optInt("id");
+    Map<Integer, JSONObject> b = null;
+    if (!branchs.containsKey(move)) {
+      b = new HashMap<Integer, JSONObject>();
+      branchs.put(move, b);
+    } else {
+      b = branchs.get(move);
+    }
+    if (!b.containsKey(id)) {
+      b.put(id, branch);
+      int subIndex = addBranch(move, branch.optString("content"));
+    } else {
+      // TODO update
+    }
+  }
+
+  private int addBranch(int move, String sgf) {
+    int subIndex = -1;
+    if (!Utils.isBlank(sgf)) {
+      if (move > 0) {
+        history.goToMoveNumber(move, false);
+        if (history.getCurrentHistoryNode().numberOfChildren() == 0) {
+          Stone color = history.getLastMoveColor() == Stone.WHITE ? Stone.BLACK : Stone.WHITE;
+          history.pass(color, false, true);
+          history.previous();
+        }
+        subIndex = SGFParser.parseBranch(history, sgf);
+        while (history.next(true).isPresent()) ;
+      }
+    }
+    return subIndex;
+  }
+
+  private void addComment(JSONObject c, boolean add) {
+    if (c == null) return;
+    JSONObject extend = new JSONObject(c.optString("extend"));
+    String member = extend == null ? "" : extend.optString("LiveMember");
+    String content = c.optString("content");
+    int move = c.optInt("handsCount");
+    int id = c.optInt("id");
+    Map<Integer, JSONObject> b = null;
+    if (!comments.containsKey(move)) {
+      b = new HashMap<Integer, JSONObject>();
+      comments.put(move, b);
+    } else {
+      b = comments.get(move);
+    }
+    //    if (!b.containsKey(id)) {
+    b.put(id, c);
+    //    }
+    addComment(move, Utils.isBlank(member) ? content : member + "：" + content, add);
+  }
+
+  private void addComment(int move, String comment, boolean add) {
+    if (!Utils.isBlank(comment)) {
+      history.goToMoveNumber(move, false);
+      if (add) {
+        history.getData().comment += comment + "\n";
+      } else {
+        history.getData().comment = comment + "\n";
+      }
+      while (history.next(true).isPresent()) ;
+    }
+  }
+
+  private void move(JSONObject d) {
+    if (d == null || d.opt("move") == null) return;
+    JSONObject m = (JSONObject) d.get("move");
+    int move = m.optInt("mcnt");
+    if (move > 0) {
+      int[] c = new int[2];
+      c[0] = m.optInt("x");
+      c[1] = m.optInt("y");
+      Stone color = (move % 2 != 0) ? Stone.BLACK : Stone.WHITE;
+      boolean changeMove = false;
+      while (history.next(true).isPresent()) ;
+      if (move <= history.getMoveNumber()) {
+        int cur = history.getMoveNumber();
+        for (int i = move; i <= cur; i++) {
+          BoardHistoryNode currentNode = history.getCurrentHistoryNode();
+          boolean isSameMove = (i == cur && currentNode.getData().isSameCoord(c));
+          if (currentNode.previous().isPresent()) {
+            BoardHistoryNode pre = currentNode.previous().get();
+            history.previous();
+            if (pre.numberOfChildren() <= 1 && !isSameMove) {
+              int idx = pre.indexOfNode(currentNode);
+              pre.deleteChild(idx);
+              changeMove = false;
+            } else {
+              changeMove = true;
+            }
+          }
+        }
+      }
+
+      // if (coord == null) {
+      // history.pass(color, newBranch, false);
+      // } else {
+      history.place(c[0], c[1], color, false, changeMove);
+
+      sync();
+    }
+  }
+
+  private void updateGame(JSONObject g) {
+    if (g == null) return;
+    int status = g.optInt("status");
+    if (status == 3) {
+      sio.close();
+      String result = g.optString("resultDesc");
+      if (!Utils.isBlank(result)) {
+        while (Lizzie.board.getHistory().next().isPresent()) ;
+        Lizzie.board.getHistory().getData().comment =
+            result + "\n" + Lizzie.board.getHistory().getData().comment;
+      }
+    }
+  }
+
+  private void sendData(String id, JSONObject data, final Ack ack) { // callback i
+    if (data == null) data = new JSONObject();
+    sio.emit(
+        id,
+        data,
+        new Ack() {
+          @Override
+          public void call(Object... args) {
+            Object t = null;
+            if (args != null && args.length > 0) {
+              JSONObject e = (JSONObject) args[0];
+              switch ((int) e.get("code")) {
+                case 0:
+                  if (e.opt("data") instanceof JSONArray) {
+                    t = (JSONArray) e.opt("data");
+                  } else {
+                    t = (JSONObject) e.opt("data");
+                  }
+                  break;
+                case 1:
+                case 2:
+                  if (e.opt("message") instanceof JSONArray) {
+                    t = (JSONArray) e.opt("message");
+                  } else {
+                    t = (JSONObject) e.opt("message");
+                  }
+                  break;
+                case 10:
+                  sio.disconnect();
+              }
+            }
+            if (ack != null) {
+              if (t == null) {
+                ack.call();
+              } else {
+                ack.call(t);
+              }
+            }
+          }
+        });
   }
 
   public static void main(String[] args) {
