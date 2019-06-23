@@ -887,16 +887,18 @@ public class BoardRenderer {
       int squareWidth = calculateSquareWidth(availableWidth);
       int squareHeight = calculateSquareHeight(availableHeight);
       if (squareWidth > squareHeight) {
-        int diff = (squareWidth - squareHeight) * (Board.boardWidth - 1);
         squareWidth = squareHeight;
+        int newWidth = squareWidth * (Board.boardWidth - 1);
+        int diff = availableWidth - newWidth;
+        availableWidth = newWidth;
         boardWidth -= diff + (scaledMarginWidth - scaledMarginHeight) * 2;
-        availableWidth -= diff;
         scaledMarginWidth = scaledMarginHeight;
-      } else {
-        int diff = (squareHeight - squareWidth) * (Board.boardHeight - 1);
+      } else if (squareWidth < squareHeight) {
         squareHeight = squareWidth;
+        int newHeight = squareHeight * (Board.boardHeight - 1);
+        int diff = availableHeight - newHeight;
+        availableHeight = newHeight;
         boardHeight -= diff + (scaledMarginHeight - scaledMarginWidth) * 2;
-        availableHeight -= diff;
         scaledMarginHeight = scaledMarginWidth;
       }
     } else {

@@ -317,7 +317,7 @@ public class LizzieLayout implements LayoutManager2, java.io.Serializable {
 
       // board
       int maxSize0 = (int) (min(width - leftInset - rightInset, height - topInset - bottomInset));
-      int maxw = maxSize0;
+      int maxw = maxSize0;  //Board.boardWidth > Board.boardHeight ? (width - leftInset - rightInset) * 3 / 4 : maxSize0;
       int maxh = maxSize0;
       if (noBasic && noWinrate && noSubBoard) {
         maxw = width - leftInset - rightInset;
