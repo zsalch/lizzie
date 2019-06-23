@@ -145,7 +145,7 @@ public class Board implements LeelazListener {
   }
 
   public static String asName(int c, boolean isName) {
-    if (boardWidth >= 25 && isName) {
+    if (boardWidth > 25 && isName) {
       return String.valueOf(c + 1);
     }
     StringBuilder name = new StringBuilder();
@@ -173,7 +173,7 @@ public class Board implements LeelazListener {
    */
   public static String convertCoordinatesToName(int x, int y) {
     // coordinates take the form C16 A19 Q5 K10 etc. I is not used.
-    if (boardWidth >= 25 || boardHeight >= 25) {
+    if (boardWidth > 25 || boardHeight > 25) {
       return String.format("(%d,%d)", x, y); // boardHeight - y - 1);
     } else {
       return asName(x, false) + (boardHeight - y);
