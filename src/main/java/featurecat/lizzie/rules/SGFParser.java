@@ -64,22 +64,25 @@ public class SGFParser {
     return parse(sgfString);
   }
 
+  public static String passPos() {
+    return (Lizzie.board.boardWidth <= 51 && Lizzie.board.boardHeight <= 51)
+        ? String.format(
+            "%c%c",
+            alphabet.charAt(Lizzie.board.boardWidth), alphabet.charAt(Lizzie.board.boardHeight))
+        : "";
+  }
+
   public static boolean isPassPos(String pos) {
     // TODO
-    String passPos =
-        Lizzie.board.boardSize <= 52
-            ? String.format(
-                "%c%c",
-                alphabet.charAt(Lizzie.board.boardSize), alphabet.charAt(Lizzie.board.boardSize))
-            : "";
+    String passPos = passPos();
     return pos.isEmpty() || passPos.equals(pos);
   }
 
   public static int[] convertSgfPosToCoord(String pos) {
     if (isPassPos(pos)) return null;
     int[] ret = new int[2];
-    ret[0] = (int) pos.charAt(0) - 'a';
-    ret[1] = (int) pos.charAt(1) - 'a';
+    ret[0] = alphabet.indexOf(pos.charAt(0));
+    ret[1] = alphabet.indexOf(pos.charAt(1));
     return ret;
   }
 
@@ -94,12 +97,21 @@ public class SGFParser {
     }
 
     // Determine the SZ property
-    Pattern szPattern = Pattern.compile("(?s).*?SZ\\[(\\d+)\\](?s).*");
+    Pattern szPattern = Pattern.compile("(?s).*?SZ\\[([\\d:]+)\\](?s).*");
     Matcher szMatcher = szPattern.matcher(value);
     if (szMatcher.matches()) {
-      Lizzie.board.reopen(Integer.parseInt(szMatcher.group(1)));
+      String sizeStr = szMatcher.group(1);
+      Pattern sizePattern = Pattern.compile("([\\d]+):([\\d]+)");
+      Matcher sizeMatcher = sizePattern.matcher(sizeStr);
+      if (sizeMatcher.matches()) {
+        Lizzie.board.reopen(
+            Integer.parseInt(sizeMatcher.group(1)), Integer.parseInt(sizeMatcher.group(2)));
+      } else {
+        int boardSize = Integer.parseInt(sizeStr);
+        Lizzie.board.reopen(boardSize, boardSize);
+      }
     } else {
-      Lizzie.board.reopen(19);
+      Lizzie.board.reopen(19, 19);
     }
 
     int subTreeDepth = 0;
@@ -384,8 +396,14 @@ public class SGFParser {
     if (handicap != 0) generalProps.append(String.format("HA[%s]", handicap));
     generalProps.append(
         String.format(
-            "KM[%s]PW[%s]PB[%s]DT[%s]AP[Lizzie: %s]SZ[%d]",
-            komi, playerW, playerB, date, Lizzie.lizzieVersion, Board.boardSize));
+            "KM[%s]PW[%s]PB[%s]DT[%s]AP[Lizzie: %s]SZ[%s]",
+            komi,
+            playerW,
+            playerB,
+            date,
+            Lizzie.lizzieVersion,
+            Board.boardWidth
+                + (Board.boardWidth != Board.boardHeight ? ":" + Board.boardHeight : "")));
 
     // To append the winrate to the comment of sgf we might need to update the Winrate
     if (Lizzie.config.appendWinrateToComment) {
@@ -406,13 +424,7 @@ public class SGFParser {
       for (int i = 0; i < stones.length; i++) {
         Stone stone = stones[i];
         if (stone.isBlack()) {
-          // i = x * Board.BOARD_SIZE + y;
-          int corY = i % Board.boardSize;
-          int corX = (i - corY) / Board.boardSize;
-
-          char x = (char) (corX + 'a');
-          char y = (char) (corY + 'a');
-          builder.append(String.format("[%c%c]", x, y));
+          builder.append(String.format("[%s]", asCoord(i)));
         }
       }
     } else {
@@ -423,17 +435,10 @@ public class SGFParser {
       for (int i = 0; i < stones.length; i++) {
         Stone stone = stones[i];
         if (stone.isBlack() || stone.isWhite()) {
-          // i = x * Board.BOARD_SIZE + y;
-          int corY = i % Board.boardSize;
-          int corX = (i - corY) / Board.boardSize;
-
-          char x = (char) (corX + 'a');
-          char y = (char) (corY + 'a');
-
           if (stone.isBlack()) {
-            abStone.append(String.format("[%c%c]", x, y));
+            abStone.append(String.format("[%s]", asCoord(i)));
           } else {
-            awStone.append(String.format("[%c%c]", x, y));
+            awStone.append(String.format("[%s]", asCoord(i)));
           }
         }
       }
@@ -477,9 +482,10 @@ public class SGFParser {
 
         builder.append(";");
         if (!data.dummy) {
-          char x = data.lastMove.isPresent() ? (char) (data.lastMove.get()[0] + 'a') : 't';
-          char y = data.lastMove.isPresent() ? (char) (data.lastMove.get()[1] + 'a') : 't';
-          builder.append(String.format("%s[%c%c]", stone, x, y));
+          builder.append(
+              String.format(
+                  "%s[%s]",
+                  stone, data.lastMove.isPresent() ? asCoord(data.lastMove.get()) : passPos()));
         }
 
         // Node properties
@@ -774,11 +780,20 @@ public class SGFParser {
     // Determine the SZ property
     Pattern szPattern = Pattern.compile("(?s).*?SZ\\[(\\d+)\\](?s).*");
     Matcher szMatcher = szPattern.matcher(value);
-    int boardSize = 19;
+    int boardWidth = 19;
+    int boardHeight = 19;
     if (szMatcher.matches()) {
-      boardSize = Integer.parseInt(szMatcher.group(1));
+      String sizeStr = szMatcher.group(1);
+      Pattern sizePattern = Pattern.compile("([\\d]+):([\\d]+)");
+      Matcher sizeMatcher = sizePattern.matcher(sizeStr);
+      if (sizeMatcher.matches()) {
+        boardWidth = Integer.parseInt(sizeMatcher.group(1));
+        boardHeight = Integer.parseInt(sizeMatcher.group(2));
+      } else {
+        boardWidth = boardHeight = Integer.parseInt(sizeStr);
+      }
     }
-    history = new BoardHistoryList(BoardData.empty(boardSize));
+    history = new BoardHistoryList(BoardData.empty(boardWidth, boardHeight));
 
     int subTreeDepth = 0;
     // Save the variation step count
@@ -1229,5 +1244,18 @@ public class SGFParser {
     final Pattern SGF_PATTERN = Pattern.compile("(?s).*?(\\(\\s*;.*\\)).*?");
     Matcher sgfMatcher = SGF_PATTERN.matcher(value);
     return sgfMatcher.matches();
+  }
+
+  private static String asCoord(int i) {
+    int[] cor = Lizzie.board.getCoord(i);
+
+    return asCoord(cor);
+  }
+
+  private static String asCoord(int[] c) {
+    char x = alphabet.charAt(c[0]);
+    char y = alphabet.charAt(c[1]);
+
+    return String.format("%c%c", x, y);
   }
 }

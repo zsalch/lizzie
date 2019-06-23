@@ -861,7 +861,7 @@ public class OnlineDialog extends JDialog {
           int size = ((JSONObject) f.line.opt("AAA307")).optInt("AAA16");
           if (size > 0) {
             boardSize = size;
-            history = new BoardHistoryList(BoardData.empty(size));
+            history = new BoardHistoryList(BoardData.empty(size, size)); // TODO boardSize
             JSONObject a309 = ((JSONObject) f.line.opt("AAA309"));
             blackPlayer =
                 a309 == null
@@ -2036,7 +2036,7 @@ public class OnlineDialog extends JDialog {
     JSONObject info = data.optJSONObject("game_info");
     int size = info.optInt("boardSize", 19);
     boardSize = size;
-    history = new BoardHistoryList(BoardData.empty(size));
+    history = new BoardHistoryList(BoardData.empty(size, size)); // TODO boardSize
     blackPlayer = info.optString("blackName");
     whitePlayer = info.optString("whiteName");
     history = SGFParser.parseSgf(info.optString("sgf"));

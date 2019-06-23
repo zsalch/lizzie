@@ -69,7 +69,7 @@ public class SubBoardPane extends LizziePane {
       if (Lizzie.config.showSubBoard) {
         try {
           subBoardRenderer.setLocation(x, y);
-          subBoardRenderer.setBoardLength(width);
+          subBoardRenderer.setBoardLength(width, height);
           subBoardRenderer.draw(g);
         } catch (Exception e) {
           // This can happen when no space is left for subboard.

@@ -145,7 +145,9 @@ public class ConfigDialog extends JDialog {
   private JRadioButton rdoLcb;
 
   // UI Tab
-  public JTextField txtBoardSize;
+  public JLabel lblBoardSign;
+  public JTextField txtBoardWidth;
+  public JTextField txtBoardHeight;
   public JRadioButton rdoBoardSizeOther;
   public JRadioButton rdoBoardSize19;
   public JRadioButton rdoBoardSize13;
@@ -794,9 +796,11 @@ public class ConfigDialog extends JDialog {
           new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
               if (rdoBoardSizeOther.isSelected()) {
-                txtBoardSize.setEnabled(true);
+                txtBoardWidth.setEnabled(true);
+                txtBoardHeight.setEnabled(true);
               } else {
-                txtBoardSize.setEnabled(false);
+                txtBoardWidth.setEnabled(false);
+                txtBoardHeight.setEnabled(false);
               }
             }
           });
@@ -814,7 +818,7 @@ public class ConfigDialog extends JDialog {
 
       NumberFormat nf = NumberFormat.getIntegerInstance();
       nf.setGroupingUsed(false);
-      txtBoardSize =
+      txtBoardWidth =
           new JFormattedTextField(
               new InternationalFormatter(nf) {
                 protected DocumentFilter getDocumentFilter() {
@@ -823,9 +827,26 @@ public class ConfigDialog extends JDialog {
 
                 private DocumentFilter filter = new DigitOnlyFilter();
               });
-      txtBoardSize.setBounds(564, 1, 52, 26);
-      uiTab.add(txtBoardSize);
-      txtBoardSize.setColumns(10);
+      txtBoardWidth.setBounds(554, 1, 38, 26);
+      uiTab.add(txtBoardWidth);
+      txtBoardWidth.setColumns(10);
+
+      lblBoardSign = new JLabel("x");
+      lblBoardSign.setBounds(594, 3, 26, 20);
+      uiTab.add(lblBoardSign);
+
+      txtBoardHeight =
+          new JFormattedTextField(
+              new InternationalFormatter(nf) {
+                protected DocumentFilter getDocumentFilter() {
+                  return filter;
+                }
+
+                private DocumentFilter filter = new DigitOnlyFilter();
+              });
+      txtBoardHeight.setBounds(604, 1, 38, 26);
+      uiTab.add(txtBoardHeight);
+      txtBoardHeight.setColumns(10);
 
       JLabel lblPanelUI = new JLabel(resourceBundle.getString("LizzieConfig.title.panelUI"));
       lblPanelUI.setBounds(6, 38, 157, 16);
@@ -1436,10 +1457,10 @@ public class ConfigDialog extends JDialog {
                 int stoneY = y + squareLength * 3;
 
                 g.setColor(Color.BLACK);
-                for (int i = 0; i < Board.boardSize; i++) {
+                for (int i = 0; i < Board.boardWidth; i++) {
                   g.drawLine(x, y + squareLength * i, height, y + squareLength * i);
                 }
-                for (int i = 0; i < Board.boardSize; i++) {
+                for (int i = 0; i < Board.boardHeight; i++) {
                   g.drawLine(x + squareLength * i, y, x + squareLength * i, width);
                 }
 
@@ -1673,7 +1694,8 @@ public class ConfigDialog extends JDialog {
   }
 
   private void applyChange() {
-    Lizzie.board.reopen(getBoardSize());
+    int[] size = getBoardSize();
+    Lizzie.board.reopen(size[0], size[1]);
   }
 
   private Integer txtFieldIntValue(JTextField txt) {
@@ -1965,7 +1987,11 @@ public class ConfigDialog extends JDialog {
 
   private void setBoardSize() {
     int size = Lizzie.config.uiConfig.optInt("board-size", 19);
-    txtBoardSize.setEnabled(false);
+    int width = Lizzie.config.uiConfig.optInt("board-width", size);
+    int height = Lizzie.config.uiConfig.optInt("board-height", size);
+    size = width == height ? width : 0;
+    txtBoardWidth.setEnabled(false);
+    txtBoardHeight.setEnabled(false);
     switch (size) {
       case 19:
         rdoBoardSize19.setSelected(true);
@@ -1986,32 +2012,38 @@ public class ConfigDialog extends JDialog {
         rdoBoardSize4.setSelected(true);
         break;
       default:
-        txtBoardSize.setText(String.valueOf(size));
+        txtBoardWidth.setText(String.valueOf(width));
+        txtBoardHeight.setText(String.valueOf(height));
         rdoBoardSizeOther.setSelected(true);
-        txtBoardSize.setEnabled(true);
+        txtBoardWidth.setEnabled(true);
+        txtBoardHeight.setEnabled(true);
         break;
     }
   }
 
-  private int getBoardSize() {
+  private int[] getBoardSize() {
     if (rdoBoardSize19.isSelected()) {
-      return 19;
+      return new int[] {19, 19};
     } else if (rdoBoardSize13.isSelected()) {
-      return 13;
+      return new int[] {13, 13};
     } else if (rdoBoardSize9.isSelected()) {
-      return 9;
+      return new int[] {9, 9};
     } else if (rdoBoardSize7.isSelected()) {
-      return 7;
+      return new int[] {7, 7};
     } else if (rdoBoardSize5.isSelected()) {
-      return 5;
+      return new int[] {5, 5};
     } else if (rdoBoardSize4.isSelected()) {
-      return 4;
+      return new int[] {4, 4};
     } else {
-      int size = Integer.parseInt(txtBoardSize.getText().trim());
-      if (size < 2) {
-        size = 19;
+      int width = Integer.parseInt(txtBoardWidth.getText().trim());
+      if (width < 2) {
+        width = 19;
       }
-      return size;
+      int height = Integer.parseInt(txtBoardHeight.getText().trim());
+      if (height < 2) {
+        height = 19;
+      }
+      return new int[] {width, height};
     }
   }
 
@@ -2232,13 +2264,17 @@ public class ConfigDialog extends JDialog {
       JSONArray preloads = new JSONArray();
       Arrays.asList(chkPreloads).forEach(t -> preloads.put(t.isSelected()));
       leelazConfig.put("engine-preload-list", preloads);
-      Lizzie.config.uiConfig.put("board-size", getBoardSize());
+      int[] size = getBoardSize();
+      if (size[0] == size[1]) {
+        Lizzie.config.uiConfig.put("board-size", size[0]);
+      }
+      Lizzie.config.uiConfig.put("board-width", size[0]);
+      Lizzie.config.uiConfig.put("board-height", size[1]);
       Lizzie.config.uiConfig.putOpt("panel-ui", chkPanelUI.isSelected());
       Lizzie.config.minPlayoutRatioForStats = txtFieldDoubleValue(txtMinPlayoutRatioForStats);
       Lizzie.config.uiConfig.put(
           "min-playout-ratio-for-stats", Lizzie.config.minPlayoutRatioForStats);
       Lizzie.config.uiConfig.putOpt("show-coordinates", chkShowCoordinates.isSelected());
-      Lizzie.config.uiConfig.put("board-size", getBoardSize());
       Lizzie.config.showMoveNumber = !rdoShowMoveNumberNo.isSelected();
       Lizzie.config.onlyLastMoveNumber =
           rdoShowMoveNumberLast.isSelected() ? txtFieldIntValue(txtShowMoveNumber) : 0;
