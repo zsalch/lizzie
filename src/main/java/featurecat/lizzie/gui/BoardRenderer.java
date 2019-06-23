@@ -263,7 +263,7 @@ public class BoardRenderer {
               x + scaledMarginWidth / 3,
               y + scaledMarginHeight + squareHeight * i,
               MainFrame.uiFont,
-              "" + (Board.boardHeight - i),
+              "" + (Board.boardHeight <= 25 ? (Board.boardHeight - i) : (i + 1)),
               stoneRadius * 4 / 5,
               stoneRadius);
           drawString(
@@ -271,7 +271,7 @@ public class BoardRenderer {
               x - scaledMarginWidth / 3 + boardWidth,
               y + scaledMarginHeight + squareHeight * i,
               MainFrame.uiFont,
-              "" + (Board.boardHeight - i),
+              "" + (Board.boardHeight <= 25 ? (Board.boardHeight - i) : (i + 1)),
               stoneRadius * 4 / 5,
               stoneRadius);
         }

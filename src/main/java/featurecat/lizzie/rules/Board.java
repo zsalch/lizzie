@@ -112,7 +112,7 @@ public class Board implements LeelazListener {
       m = p.matcher(namedCoordinate);
       if (m.find() && m.groupCount() == 2) {
         int x = Integer.parseInt(m.group(1));
-        int y = boardHeight - Integer.parseInt(m.group(2)) - 1;
+        int y = Integer.parseInt(m.group(2)); // boardHeight - Integer.parseInt(m.group(2)) - 1;
         return Optional.of(new int[] {x, y});
       } else {
         return Optional.empty();
@@ -173,8 +173,8 @@ public class Board implements LeelazListener {
    */
   public static String convertCoordinatesToName(int x, int y) {
     // coordinates take the form C16 A19 Q5 K10 etc. I is not used.
-    if (x >= 25 || y >= 25) {
-      return String.format("(%d,%d)", x, boardHeight - y - 1);
+    if (boardWidth >= 25 || boardHeight >= 25) {
+      return String.format("(%d,%d)", x, y); // boardHeight - y - 1);
     } else {
       return asName(x, false) + (boardHeight - y);
     }
