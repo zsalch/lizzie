@@ -861,6 +861,7 @@ public class OnlineDialog extends JDialog {
           int size = ((JSONObject) f.line.opt("AAA307")).optInt("AAA16");
           if (size > 0) {
             boardSize = size;
+            Lizzie.board.reopen(boardSize, boardSize);
             history = new BoardHistoryList(BoardData.empty(size, size)); // TODO boardSize
             JSONObject a309 = ((JSONObject) f.line.opt("AAA309"));
             blackPlayer =
@@ -928,11 +929,14 @@ public class OnlineDialog extends JDialog {
             }
           }
 
-          // if (coord == null) {
-          // history.pass(color, newBranch, false);
-          // } else {
-          history.place(coord[0], coord[1], color, false, changeMove);
-          // }
+          if (coord == null || !Lizzie.board.isValid(coord)) {
+            history.pass(color, false, false);
+          } else {
+            history.place(coord[0], coord[1], color, false, changeMove);
+          }
+        } else if (f.type == 7045) {
+          Stone color = history.getLastMoveColor() == Stone.WHITE ? Stone.BLACK : Stone.WHITE;
+          history.pass(color, false, false);
         } else if (f.type == 7198) {
           long uid = f.line.optLong("AAA303");
           int time = f.line.optInt("AAA196");
@@ -2036,6 +2040,7 @@ public class OnlineDialog extends JDialog {
     JSONObject info = data.optJSONObject("game_info");
     int size = info.optInt("boardSize", 19);
     boardSize = size;
+    Lizzie.board.reopen(boardSize, boardSize);
     history = new BoardHistoryList(BoardData.empty(size, size)); // TODO boardSize
     blackPlayer = info.optString("blackName");
     whitePlayer = info.optString("whiteName");
@@ -2246,10 +2251,11 @@ public class OnlineDialog extends JDialog {
         }
       }
 
-      // if (coord == null) {
-      // history.pass(color, newBranch, false);
-      // } else {
-      history.place(c[0], c[1], color, false, changeMove);
+      if (c == null || !Lizzie.board.isValid(c)) {
+        history.pass(color, false, false);
+      } else {
+        history.place(c[0], c[1], color, false, changeMove);
+      }
 
       sync();
     }
