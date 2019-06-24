@@ -1,8 +1,10 @@
 package featurecat.lizzie.gui;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
+import static java.lang.Math.max;
 
 import featurecat.lizzie.Lizzie;
+import featurecat.lizzie.rules.Board;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -69,7 +71,14 @@ public class SubBoardPane extends LizziePane {
       if (Lizzie.config.showSubBoard) {
         try {
           subBoardRenderer.setLocation(x, y);
-          subBoardRenderer.setBoardLength(width, height);
+          if (boardParams == null) {
+            boardParams =
+                subBoardRenderer.availableLength(
+                    max(width, Board.boardWidth + 5),
+                    max(height, Board.boardHeight + 5),
+                    Lizzie.config.showCoordinates);
+          }
+          subBoardRenderer.setBoardParam(boardParams);
           subBoardRenderer.draw(g);
         } catch (Exception e) {
           // This can happen when no space is left for subboard.

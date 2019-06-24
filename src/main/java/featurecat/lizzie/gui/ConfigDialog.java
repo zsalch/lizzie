@@ -788,7 +788,7 @@ public class ConfigDialog extends JDialog {
       uiTab.add(rdoBoardSize5);
 
       rdoBoardSize4 = new JRadioButton("4x4");
-      rdoBoardSize4.setBounds(460, 2, 67, 23);
+      rdoBoardSize4.setBounds(460, 2, 60, 23);
       uiTab.add(rdoBoardSize4);
 
       rdoBoardSizeOther = new JRadioButton("");
@@ -804,7 +804,7 @@ public class ConfigDialog extends JDialog {
               }
             }
           });
-      rdoBoardSizeOther.setBounds(530, 2, 29, 23);
+      rdoBoardSizeOther.setBounds(524, 2, 27, 23);
       uiTab.add(rdoBoardSizeOther);
 
       ButtonGroup group = new ButtonGroup();
@@ -827,12 +827,12 @@ public class ConfigDialog extends JDialog {
 
                 private DocumentFilter filter = new DigitOnlyFilter();
               });
-      txtBoardWidth.setBounds(554, 1, 38, 26);
+      txtBoardWidth.setBounds(551, 1, 38, 26);
       uiTab.add(txtBoardWidth);
       txtBoardWidth.setColumns(10);
 
       lblBoardSign = new JLabel("x");
-      lblBoardSign.setBounds(594, 3, 26, 20);
+      lblBoardSign.setBounds(591, 3, 26, 20);
       uiTab.add(lblBoardSign);
 
       txtBoardHeight =
@@ -844,7 +844,7 @@ public class ConfigDialog extends JDialog {
 
                 private DocumentFilter filter = new DigitOnlyFilter();
               });
-      txtBoardHeight.setBounds(604, 1, 38, 26);
+      txtBoardHeight.setBounds(601, 1, 38, 26);
       uiTab.add(txtBoardHeight);
       txtBoardHeight.setColumns(10);
 

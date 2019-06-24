@@ -105,7 +105,7 @@ public class BoardRenderer {
 
   /** Draw a go board */
   public void draw(Graphics2D g) {
-    setupSizeParameters();
+    //    setupSizeParameters();
 
     //        Stopwatch timer = new Stopwatch();
     drawGoban(g);
@@ -158,12 +158,12 @@ public class BoardRenderer {
   public static int[] availableLength(int boardWidth, int boardHeight, boolean showCoordinates) {
     int[] calculatedPixelMargins = calculatePixelMargins(boardWidth, boardHeight, showCoordinates);
     return (calculatedPixelMargins != null && calculatedPixelMargins.length >= 6)
-        ? new int[] {calculatedPixelMargins[0], calculatedPixelMargins[3]}
-        : new int[] {boardWidth, boardHeight};
+        ? calculatedPixelMargins
+        : new int[] {boardWidth, 0, boardWidth, boardHeight, 0, boardHeight};
   }
 
   /** Calculate good values for boardLength, scaledMargin, availableLength, and squareLength */
-  private void setupSizeParameters() {
+  public void setupSizeParameters() {
     int boardWidth0 = boardWidth;
     int boardHeight0 = boardHeight;
 
@@ -179,8 +179,18 @@ public class BoardRenderer {
     squareHeight = calculateSquareHeight(availableHeight);
     if (squareWidth > squareHeight) {
       squareWidth = squareHeight;
-    } else {
+      int newWidth = squareWidth * (Board.boardWidth - 1) + 1;
+      int diff = availableWidth - newWidth;
+      availableWidth = newWidth;
+      boardWidth -= diff + (scaledMarginWidth - scaledMarginHeight) * 2;
+      scaledMarginWidth = scaledMarginHeight;
+    } else if (squareWidth < squareHeight) {
       squareHeight = squareWidth;
+      int newHeight = squareHeight * (Board.boardHeight - 1) + 1;
+      int diff = availableHeight - newHeight;
+      availableHeight = newHeight;
+      boardHeight -= diff + (scaledMarginHeight - scaledMarginWidth) * 2;
+      scaledMarginHeight = scaledMarginWidth;
     }
     stoneRadius = max(squareWidth, squareHeight) < 4 ? 1 : max(squareWidth, squareHeight) / 2 - 1;
 
@@ -873,6 +883,8 @@ public class BoardRenderer {
       availableWidth = boardWidth - 2 * scaledMarginWidth;
     } while (!((availableWidth - 1) % (Board.boardWidth - 1) == 0));
     // this will be true if BOARD_SIZE - 1 square intersections, plus one line, will fit
+    int squareWidth = 0;
+    int squareHeight = 0;
     if (Board.boardWidth != Board.boardHeight) {
       double marginHeight =
           (showCoordinates ? (Board.boardHeight > 3 ? 0.06 : 0.04) : 0.03)
@@ -884,18 +896,18 @@ public class BoardRenderer {
         scaledMarginHeight = (int) (marginHeight * boardHeight);
         availableHeight = boardHeight - 2 * scaledMarginHeight;
       } while (!((availableHeight - 1) % (Board.boardHeight - 1) == 0));
-      int squareWidth = calculateSquareWidth(availableWidth);
-      int squareHeight = calculateSquareHeight(availableHeight);
+      squareWidth = calculateSquareWidth(availableWidth);
+      squareHeight = calculateSquareHeight(availableHeight);
       if (squareWidth > squareHeight) {
         squareWidth = squareHeight;
-        int newWidth = squareWidth * (Board.boardWidth - 1);
+        int newWidth = squareWidth * (Board.boardWidth - 1) + 1;
         int diff = availableWidth - newWidth;
         availableWidth = newWidth;
         boardWidth -= diff + (scaledMarginWidth - scaledMarginHeight) * 2;
         scaledMarginWidth = scaledMarginHeight;
       } else if (squareWidth < squareHeight) {
         squareHeight = squareWidth;
-        int newHeight = squareHeight * (Board.boardHeight - 1);
+        int newHeight = squareHeight * (Board.boardHeight - 1) + 1;
         int diff = availableHeight - newHeight;
         availableHeight = newHeight;
         boardHeight -= diff + (scaledMarginHeight - scaledMarginWidth) * 2;
@@ -906,7 +918,6 @@ public class BoardRenderer {
       scaledMarginHeight = scaledMarginWidth;
       availableHeight = availableWidth;
     }
-
     return new int[] {
       boardWidth,
       scaledMarginWidth,
@@ -1279,6 +1290,29 @@ public class BoardRenderer {
     this.y = y + 2 * shadowRadius;
   }
 
+  public void setBoardParam(int[] param) {
+    boardWidth = param[0];
+    scaledMarginWidth = param[1];
+    availableWidth = param[2];
+    boardHeight = param[3];
+    scaledMarginHeight = param[4];
+    availableHeight = param[5];
+
+    squareWidth = calculateSquareWidth(availableWidth);
+    squareHeight = calculateSquareHeight(availableHeight);
+    stoneRadius = max(squareWidth, squareHeight) < 4 ? 1 : max(squareWidth, squareHeight) / 2 - 1;
+
+    // re-center board
+    //    setLocation(x + (boardWidth0 - boardWidth) / 2, y + (boardHeight0 - boardHeight) / 2);
+
+    this.shadowRadius =
+        Lizzie.config.showBorder ? (int) (max(boardWidth, boardHeight) * MARGIN / 6) : 0;
+    this.boardWidth = boardWidth - 4 * shadowRadius;
+    this.boardHeight = boardHeight - 4 * shadowRadius;
+    this.x = x + 2 * shadowRadius;
+    this.y = y + 2 * shadowRadius;
+  }
+
   /**
    * @return the actual board length, including the shadows drawn at the edge of the wooden board
    */
@@ -1303,20 +1337,10 @@ public class BoardRenderer {
     int boardHeightWithoutMargins; // the pixel height of the game board without margins
 
     // calculate a good set of boardLength, scaledMargin, and boardLengthWithoutMargins to use
-    int[] calculatedPixelMargins = calculatePixelMargins();
-    setBoardLength(calculatedPixelMargins[0], calculatedPixelMargins[3]);
-    marginWidth = calculatedPixelMargins[1];
-    boardWidthWithoutMargins = calculatedPixelMargins[2];
-    marginHeight = calculatedPixelMargins[4];
-    boardHeightWithoutMargins = calculatedPixelMargins[5];
-
-    int squareWidth = calculateSquareWidth(boardWidthWithoutMargins);
-    int squareHeight = calculateSquareHeight(boardHeightWithoutMargins);
-    if (squareWidth > squareHeight) {
-      squareWidth = squareHeight;
-    } else {
-      squareHeight = squareWidth;
-    }
+    //    int[] calculatedPixelMargins = calculatePixelMargins();
+    //    setBoardLength(calculatedPixelMargins[0], calculatedPixelMargins[3]);
+    marginWidth = this.scaledMarginWidth;
+    marginHeight = this.scaledMarginHeight;
 
     // transform the pixel coordinates to board coordinates
     x =

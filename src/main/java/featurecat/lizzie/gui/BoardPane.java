@@ -1,6 +1,7 @@
 package featurecat.lizzie.gui;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import com.jhlabs.image.GaussianFilter;
@@ -155,7 +156,14 @@ public class BoardPane extends LizziePane {
       g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
       boardRenderer.setLocation(0, 0);
-      boardRenderer.setBoardLength(width, height);
+      if (boardParams == null) {
+        boardParams =
+            boardRenderer.availableLength(
+                max(width, Board.boardWidth + 5),
+                max(height, Board.boardHeight + 5),
+                Lizzie.config.showCoordinates);
+      }
+      boardRenderer.setBoardParam(boardParams);
       boardRenderer.draw(g);
 
       owner.repaintSub();

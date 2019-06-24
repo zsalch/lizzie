@@ -779,6 +779,7 @@ public class LizzieFrame extends MainFrame {
 
       boardRenderer.setLocation(boardX, boardY);
       boardRenderer.setBoardLength(maxSize, maxSize); // TODO boardSize
+      boardRenderer.setupSizeParameters();
       boardRenderer.draw(g);
 
       if (Lizzie.leelaz != null && Lizzie.leelaz.isLoaded()) {
@@ -825,6 +826,7 @@ public class LizzieFrame extends MainFrame {
           try {
             subBoardRenderer.setLocation(subBoardX, subBoardY);
             subBoardRenderer.setBoardLength(subBoardLength, subBoardLength); // TODO boardSize
+            subBoardRenderer.setupSizeParameters();
             subBoardRenderer.draw(g);
           } catch (Exception e) {
             // This can happen when no space is left for subboard.
