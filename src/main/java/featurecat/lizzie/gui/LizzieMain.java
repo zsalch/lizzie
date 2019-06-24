@@ -150,13 +150,15 @@ public class LizzieMain extends MainFrame {
               Graphics2D bsGraphics = (Graphics2D) g; // bs.getDrawGraphics();
               bsGraphics.setRenderingHint(
                   RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+              bsGraphics.setRenderingHint(
+                  RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
               bsGraphics.drawImage(cachedBackground, 0, 0, null);
 
               // pondering message
               int maxBound = Math.max(width, height);
               double ponderingSize = .02;
               int ponderingX = 0;
-              int ponderingY = height - (int) (maxBound * 0.033) - (int) (maxBound * ponderingSize);
+              int ponderingY = height - (int) (maxBound * ponderingSize);
 
               // dynamic komi
               double dynamicKomiSize = .02;

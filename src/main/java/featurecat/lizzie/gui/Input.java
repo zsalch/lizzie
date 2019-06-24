@@ -465,7 +465,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
       case VK_9:
         if (controlIsPressed(e)) {
           Lizzie.engineManager.switchEngine(e.getKeyCode() - VK_0);
-          refreshType = 2;
+          refreshType = 0;
         }
         break;
       default:

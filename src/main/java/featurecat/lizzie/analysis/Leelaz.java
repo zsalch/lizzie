@@ -123,6 +123,7 @@ public class Leelaz {
       return;
     }
 
+    isLoaded = false;
     commands = splitCommand(engineCommand);
 
     // Get weight name
@@ -262,6 +263,9 @@ public class Leelaz {
       } else if (line.equals("\n")) {
         // End of response
       } else if (line.startsWith("info")) {
+        if (!isLoaded) {
+          Lizzie.frame.refresh();
+        }
         isLoaded = true;
         // Clear switching prompt
         switching = false;
@@ -279,6 +283,9 @@ public class Leelaz {
           }
         }
       } else if (line.contains(" -> ")) {
+        if (!isLoaded) {
+          Lizzie.frame.refresh();
+        }
         isLoaded = true;
         if (isResponseUpToDate()
             || isThinking
