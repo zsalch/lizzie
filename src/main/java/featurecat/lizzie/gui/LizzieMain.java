@@ -10,9 +10,12 @@ import featurecat.lizzie.analysis.GameInfo;
 import featurecat.lizzie.analysis.MoveData;
 import featurecat.lizzie.rules.GIBParser;
 import featurecat.lizzie.rules.SGFParser;
+import featurecat.lizzie.util.Utils;
 import featurecat.lizzie.util.WindowPosition;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.awt.FontMetrics;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -148,6 +151,51 @@ public class LizzieMain extends MainFrame {
               bsGraphics.setRenderingHint(
                   RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
               bsGraphics.drawImage(cachedBackground, 0, 0, null);
+
+              // pondering message
+              int maxBound = Math.max(width, height);
+              double ponderingSize = .02;
+              int ponderingX = 0;
+              int ponderingY = height - (int) (maxBound * 0.033) - (int) (maxBound * ponderingSize);
+
+              // dynamic komi
+              double dynamicKomiSize = .02;
+              int dynamicKomiX = 0;
+              int dynamicKomiY = ponderingY - (int) (maxBound * dynamicKomiSize);
+              int dynamicKomiLabelX = 0;
+              int dynamicKomiLabelY = dynamicKomiY - (int) (maxBound * dynamicKomiSize);
+
+              // loading message;
+              double loadingSize = 0.03;
+              int loadingX = ponderingX;
+              int loadingY = ponderingY - (int) (maxBound * (loadingSize - ponderingSize));
+
+              if (Lizzie.leelaz != null && Lizzie.leelaz.isLoaded()) {
+                if (Lizzie.config.showStatus) {
+                  String statusKey =
+                      "LizzieFrame.display." + (Lizzie.leelaz.isPondering() ? "on" : "off");
+                  String statusText = resourceBundle.getString(statusKey);
+                  String ponderingText = resourceBundle.getString("LizzieFrame.display.pondering");
+                  String switching = resourceBundle.getString("LizzieFrame.prompt.switching");
+                  String switchingText = Lizzie.leelaz.switching() ? switching : "";
+                  String weightText = Lizzie.leelaz.currentWeight();
+                  String text =
+                      ponderingText + " " + statusText + " " + weightText + " " + switchingText;
+                  drawPonderingState(bsGraphics, text, ponderingX, ponderingY, ponderingSize);
+                }
+
+                Optional<String> dynamicKomi = Lizzie.leelaz.getDynamicKomi();
+                if (Lizzie.config.showDynamicKomi && dynamicKomi.isPresent()) {
+                  String text = resourceBundle.getString("LizzieFrame.display.dynamic-komi");
+                  drawPonderingState(
+                      bsGraphics, text, dynamicKomiLabelX, dynamicKomiLabelY, dynamicKomiSize);
+                  drawPonderingState(
+                      bsGraphics, dynamicKomi.get(), dynamicKomiX, dynamicKomiY, dynamicKomiSize);
+                }
+              } else if (Lizzie.config.showStatus) {
+                String loadingText = resourceBundle.getString("LizzieFrame.display.loading");
+                drawPonderingState(bsGraphics, loadingText, loadingX, loadingY, loadingSize);
+              }
             }
           }
         };
@@ -260,6 +308,44 @@ public class LizzieMain extends MainFrame {
     drawTextureImage(g, wallpaper, 0, 0, drawWidth, drawHeight);
 
     return g;
+  }
+
+  private void drawPonderingState(Graphics2D g, String text, int x, int y, double size) {
+    int fontSize = (int) (max(getWidth(), getHeight()) * size);
+    Font font = new Font(Lizzie.config.fontName, Font.PLAIN, fontSize);
+    FontMetrics fm = g.getFontMetrics(font);
+    int stringWidth = fm.stringWidth(text);
+    // Truncate too long text when display switching prompt
+    if (Lizzie.leelaz != null && Lizzie.leelaz.isLoaded()) {
+      int mainBoardX = boardPane.getLocation().x;
+      if (getWidth() > getHeight() && (mainBoardX > x) && stringWidth > (mainBoardX - x)) {
+        text = Utils.truncateStringByWidth(text, fm, mainBoardX - x);
+        stringWidth = fm.stringWidth(text);
+      }
+    }
+    // Do nothing when no text
+    if (stringWidth <= 0) {
+      return;
+    }
+    int stringHeight = fm.getAscent() - fm.getDescent();
+    int width = max(stringWidth, 1);
+    int height = max((int) (stringHeight * 1.2), 1);
+
+    BufferedImage result = new BufferedImage(width, height, TYPE_INT_ARGB);
+    // commenting this out for now... always causing an exception on startup. will fix in the
+    // upcoming refactoring
+    //        filter20.filter(cachedBackground.getSubimage(x, y, result.getWidth(),
+    // result.getHeight()), result);
+    g.drawImage(result, x, y, null);
+
+    g.setColor(new Color(0, 0, 0, 130));
+    g.fillRect(x, y, width, height);
+    g.drawRect(x, y, width, height);
+
+    g.setColor(Color.white);
+    g.setFont(font);
+    g.drawString(
+        text, x + (width - stringWidth) / 2, y + stringHeight + (height - stringHeight) / 2);
   }
 
   private GaussianFilter filter20 = new GaussianFilter(20);
