@@ -158,8 +158,7 @@ public class LizzieMain extends MainFrame {
               int maxBound = Math.max(width, height);
               double ponderingSize = .02;
               int ponderingX = 0;
-              int ponderingY =
-                  height - this.getParent().getInsets().bottom - (int) (maxBound * ponderingSize);
+              int ponderingY = height - 2 - (int) (maxBound * ponderingSize);
 
               // dynamic komi
               double dynamicKomiSize = .02;
