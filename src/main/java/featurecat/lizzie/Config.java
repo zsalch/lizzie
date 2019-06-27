@@ -330,6 +330,10 @@ public class Config {
     colorByWinrateInsteadOfVisits = !colorByWinrateInsteadOfVisits;
   }
 
+  public void toggleShowSubBoard() {
+    showSubBoard = !showSubBoard;
+  }
+
   public boolean showLargeSubBoard() {
     return showSubBoard && largeSubBoard;
   }
