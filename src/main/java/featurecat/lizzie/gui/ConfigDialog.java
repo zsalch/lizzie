@@ -186,6 +186,7 @@ public class ConfigDialog extends JDialog {
   public ColorLabel lblWinrateLineColor;
   public ColorLabel lblWinrateMissLineColor;
   public ColorLabel lblBlunderBarColor;
+  public ColorLabel lblScoreMeanLineColor;
   public ColorLabel lblCommentBackgroundColor;
   public ColorLabel lblCommentFontColor;
   public JTextField txtCommentFontSize;
@@ -1214,6 +1215,15 @@ public class ConfigDialog extends JDialog {
       lblBlunderBarColor.setBounds(175, 410, 167, 9);
       themeTab.add(lblBlunderBarColor);
 
+      JLabel lblScoreMeanLineColorTitle =
+          new JLabel(resourceBundle.getString("LizzieConfig.title.scoreMeanLineColor"));
+      lblScoreMeanLineColorTitle.setHorizontalAlignment(SwingConstants.LEFT);
+      lblScoreMeanLineColorTitle.setBounds(10, 420, 163, 16);
+      themeTab.add(lblScoreMeanLineColorTitle);
+      lblScoreMeanLineColor = new ColorLabel(owner);
+      lblScoreMeanLineColor.setBounds(175, 425, 167, 9);
+      themeTab.add(lblScoreMeanLineColor);
+
       JLabel lblCommentBackgroundColorTitle =
           new JLabel(resourceBundle.getString("LizzieConfig.title.commentBackgroundColor"));
       lblCommentBackgroundColorTitle.setHorizontalAlignment(SwingConstants.LEFT);
@@ -2099,6 +2109,7 @@ public class ConfigDialog extends JDialog {
         lblWinrateLineColor.setColor(theme.winrateLineColor());
         lblWinrateMissLineColor.setColor(theme.winrateMissLineColor());
         lblBlunderBarColor.setColor(theme.blunderBarColor());
+        lblScoreMeanLineColor.setColor(theme.scoreMeanLineColor());
         chkSolidStoneIndicator.setSelected(theme.solidStoneIndicator());
         chkShowCommentNodeColor.setSelected(theme.showCommentNodeColor());
         lblCommentNodeColor.setColor(theme.commentNodeColor());
@@ -2147,6 +2158,8 @@ public class ConfigDialog extends JDialog {
         theme.config.put(
             "winrate-miss-line-color", Theme.color2Array(lblWinrateMissLineColor.getColor()));
         theme.config.put("blunder-bar-color", Theme.color2Array(lblBlunderBarColor.getColor()));
+        theme.config.put(
+            "scoremean-line-color", Theme.color2Array(lblScoreMeanLineColor.getColor()));
         theme.config.put("solid-stone-indicator", chkSolidStoneIndicator.isSelected());
         theme.config.put("show-comment-node-color", chkShowCommentNodeColor.isSelected());
         theme.config.put("comment-node-color", Theme.color2Array(lblCommentNodeColor.getColor()));
@@ -2193,6 +2206,9 @@ public class ConfigDialog extends JDialog {
     lblBlunderBarColor.setColor(
         Theme.array2Color(
             Lizzie.config.uiConfig.optJSONArray("blunder-bar-color"), new Color(255, 0, 0, 150)));
+    lblScoreMeanLineColor.setColor(
+        Theme.array2Color(
+            Lizzie.config.uiConfig.optJSONArray("scoremean-line-color"), Color.magenta.brighter()));
     chkSolidStoneIndicator.setSelected(Lizzie.config.uiConfig.optBoolean("solid-stone-indicator"));
     chkShowCommentNodeColor.setSelected(
         Lizzie.config.uiConfig.optBoolean("show-comment-node-color"));
@@ -2231,6 +2247,8 @@ public class ConfigDialog extends JDialog {
         "winrate-miss-line-color", Theme.color2Array(lblWinrateMissLineColor.getColor()));
     Lizzie.config.uiConfig.put(
         "blunder-bar-color", Theme.color2Array(lblBlunderBarColor.getColor()));
+    Lizzie.config.uiConfig.put(
+        "scoremean-line-color", Theme.color2Array(lblScoreMeanLineColor.getColor()));
     Lizzie.config.uiConfig.put("solid-stone-indicator", chkSolidStoneIndicator.isSelected());
     Lizzie.config.uiConfig.put("show-comment-node-color", chkShowCommentNodeColor.isSelected());
     Lizzie.config.uiConfig.put(
