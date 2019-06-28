@@ -66,6 +66,7 @@ public class Leelaz {
   public boolean preload = false;
   private boolean started = false;
   private boolean isLoaded = false;
+  private boolean isCheckingName;
   private boolean isCheckingVersion;
 
   // for Multiple Engine
@@ -171,6 +172,11 @@ public class Leelaz {
     process = processBuilder.start();
 
     initializeStreams();
+
+    // Send a name request to check if the engine is KataGo
+    // Response handled in parseLine
+    isCheckingName = true;
+    sendCommand("name");
 
     // Send a version request to check that we have a supported version
     // Response handled in parseLine
@@ -462,7 +468,7 @@ public class Leelaz {
   private void trySendCommandFromQueue() {
     // Defer sending "lz-analyze" if leelaz is not ready yet.
     // Though all commands should be deferred theoretically,
-    // only "lz-analyze" is differed here for fear of
+    // only "lz-analyze" is deferred here for fear of
     // possible hang-up by missing response for some reason.
     // cmdQueue can be replaced with a mere String variable in this case,
     // but it is kept for future change of our mind.
@@ -611,30 +617,14 @@ public class Leelaz {
   public void ponder() {
     isPondering = true;
     startPonderTime = System.currentTimeMillis();
-    if (this.isKataGo) {
-      if (Lizzie.config.showKataGoEstimate)
-        sendCommand(
-            "kata-analyze "
-                + Lizzie.config
-                    .config
-                    .getJSONObject("leelaz")
-                    .getInt("analyze-update-interval-centisec")
-                + " ownership true");
-      else
-        sendCommand(
-            "kata-analyze "
-                + Lizzie.config
-                    .config
-                    .getJSONObject("leelaz")
-                    .getInt("analyze-update-interval-centisec"));
-    } else {
-      sendCommand(
-          "lz-analyze "
-              + Lizzie.config
-                  .config
-                  .getJSONObject("leelaz")
-                  .getInt("analyze-update-interval-centisec"));
-    } // until it responds to this, incoming
+    sendCommand(
+        (this.isKataGo ? "kata-analyze " : "lz-analyze ")
+            + Lizzie.config
+                .config
+                .getJSONObject("leelaz")
+                .getInt("analyze-update-interval-centisec")
+            + (Lizzie.config.showKataGoEstimate ? " ownership true" : ""));
+    // until it responds to this, incoming
     // ponder results are obsolete
   }
 
@@ -673,6 +663,7 @@ public class Leelaz {
 
   public class WinrateStats {
     public double maxWinrate;
+    public double maxScoreMean;
     public int totalPlayouts;
 
     public WinrateStats(double maxWinrate, int totalPlayouts) {
@@ -702,6 +693,7 @@ public class Leelaz {
       stats.totalPlayouts = totalPlayouts;
 
       stats.maxWinrate = BoardData.getWinrateFromBestMoves(moves);
+      stats.maxScoreMean = BoardData.getScoreMeanFromBestMoves(moves);
     }
 
     return stats;
