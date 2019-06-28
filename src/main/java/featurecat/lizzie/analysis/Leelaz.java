@@ -385,6 +385,12 @@ public class Leelaz {
               isInputCommand = false;
             }
           }
+        } else if (isCheckingName) {
+          if (params[1].startsWith("KataGo")) {
+            this.isKataGo = true;
+            Lizzie.initializeAfterVersionCheck();
+          }
+          isCheckingName = false;
         } else if (isCheckingVersion && !isKataGo) {
           String[] ver = params[1].split("\\.");
           int minor = Integer.parseInt(ver[1]);
@@ -397,6 +403,7 @@ public class Leelaz {
                     + ")");
           }
           isCheckingVersion = false;
+          Lizzie.initializeAfterVersionCheck();
         }
       }
     }

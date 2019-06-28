@@ -1200,19 +1200,19 @@ public class ConfigDialog extends JDialog {
       JLabel lblWinrateMissLineColorTitle =
           new JLabel(resourceBundle.getString("LizzieConfig.title.winrateMissLineColor"));
       lblWinrateMissLineColorTitle.setHorizontalAlignment(SwingConstants.LEFT);
-      lblWinrateMissLineColorTitle.setBounds(10, 375, 163, 16);
+      lblWinrateMissLineColorTitle.setBounds(10, 370, 163, 16);
       themeTab.add(lblWinrateMissLineColorTitle);
       lblWinrateMissLineColor = new ColorLabel(owner);
-      lblWinrateMissLineColor.setBounds(175, 380, 167, 9);
+      lblWinrateMissLineColor.setBounds(175, 375, 167, 9);
       themeTab.add(lblWinrateMissLineColor);
 
       JLabel lblBlunderBarColorTitle =
           new JLabel(resourceBundle.getString("LizzieConfig.title.blunderBarColor"));
       lblBlunderBarColorTitle.setHorizontalAlignment(SwingConstants.LEFT);
-      lblBlunderBarColorTitle.setBounds(10, 405, 163, 16);
+      lblBlunderBarColorTitle.setBounds(10, 395, 163, 16);
       themeTab.add(lblBlunderBarColorTitle);
       lblBlunderBarColor = new ColorLabel(owner);
-      lblBlunderBarColor.setBounds(175, 410, 167, 9);
+      lblBlunderBarColor.setBounds(175, 400, 167, 9);
       themeTab.add(lblBlunderBarColor);
 
       JLabel lblScoreMeanLineColorTitle =
@@ -1262,10 +1262,10 @@ public class ConfigDialog extends JDialog {
 
       JLabel lblSolidStoneIndicator =
           new JLabel(resourceBundle.getString("LizzieConfig.title.solidStoneIndicator"));
-      lblSolidStoneIndicator.setBounds(10, 435, 163, 16);
+      lblSolidStoneIndicator.setBounds(10, 442, 163, 16);
       themeTab.add(lblSolidStoneIndicator);
       chkSolidStoneIndicator = new JCheckBox("");
-      chkSolidStoneIndicator.setBounds(170, 432, 57, 23);
+      chkSolidStoneIndicator.setBounds(170, 439, 57, 23);
       themeTab.add(chkSolidStoneIndicator);
 
       JLabel lblShowCommentNodeColor =
