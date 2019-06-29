@@ -244,9 +244,7 @@ public class Leelaz {
         bestMoves.add(MoveData.fromInfo(var));
       }
     }
-    if (Lizzie.config.holdWinrateToMove) {
-      Lizzie.board.getData().tryToSetBestMoves(bestMoves);
-    }
+    Lizzie.board.getData().tryToSetBestMoves(bestMoves);
     return bestMoves;
   }
 
@@ -262,9 +260,7 @@ public class Leelaz {
         bestMoves.add(MoveData.fromInfoKatago(var));
       }
     }
-    if (Lizzie.config.holdWinrateToMove) {
-      Lizzie.board.getData().tryToSetBestMoves(bestMoves);
-    }
+    Lizzie.board.getData().tryToSetBestMoves(bestMoves);
     return bestMoves;
   }
 
@@ -691,9 +687,7 @@ public class Leelaz {
       // copy the list to avoid concurrent modification exception... TODO there must be a better way
       // (note the concurrent modification exception is very very rare)
       // We should use Lizzie Board's best moves as they will generally be the most accurate
-      final List<MoveData> moves =
-          new ArrayList<MoveData>(
-              Lizzie.config.holdWinrateToMove ? Lizzie.board.getData().bestMoves : bestMoves);
+      final List<MoveData> moves = new ArrayList<MoveData>(Lizzie.board.getData().bestMoves);
 
       // get the total number of playouts in moves
       int totalPlayouts = moves.stream().mapToInt(move -> move.playouts).sum();
