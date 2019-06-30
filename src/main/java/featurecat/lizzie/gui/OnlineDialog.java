@@ -92,6 +92,7 @@ public class OnlineDialog extends JDialog {
   private long userId = -1000000;
   private long roomId = 0;
   private String channel = "";
+  private boolean chineseFlag = false;
   private Map<Integer, Map<Integer, JSONObject>> branchs =
       new HashMap<Integer, Map<Integer, JSONObject>>();
   private Map<Integer, Map<Integer, JSONObject>> comments =
@@ -389,14 +390,17 @@ public class OnlineDialog extends JDialog {
     try {
       BoardHistoryList liveNode = SGFParser.parseSgf(sgf);
       if (liveNode != null) {
+        if (live != null) {
+          double komi = live.optDouble("komi", history.getGameInfo().getKomi());
+          history.getGameInfo().setKomi(komi);
+          Lizzie.leelaz.komi(komi);
+          blackPlayer = live.optString("BlackPlayer");
+          whitePlayer = live.optString("WhitePlayer");
+        }
         int diffMove = Lizzie.board.getHistory().sync(liveNode);
         if (diffMove >= 0) {
           Lizzie.board.goToMoveNumberBeyondBranch(diffMove > 0 ? diffMove - 1 : 0);
           while (Lizzie.board.nextMove()) ;
-        }
-        if (live != null) {
-          blackPlayer = live.optString("BlackPlayer");
-          whitePlayer = live.optString("WhitePlayer");
         }
         if (Utils.isBlank(blackPlayer)) {
           Pattern spb =
@@ -415,6 +419,8 @@ public class OnlineDialog extends JDialog {
           }
         }
         Lizzie.frame.setPlayers(whitePlayer, blackPlayer);
+        history.getGameInfo().setPlayerBlack(blackPlayer);
+        history.getGameInfo().setPlayerWhite(whitePlayer);
         if (live != null && "3".equals(live.optString("Status"))) {
           if (schedule != null && !schedule.isCancelled() && !schedule.isDone()) {
             schedule.cancel(false);
@@ -855,10 +861,10 @@ public class OnlineDialog extends JDialog {
 
     for (Fragment f : fragmentList) {
       if (f != null) {
-        //        System.out.println("Msg:" + f.type + ":" + (f.line != null ? f.line.toString() :
-        // ""));
+        System.out.println("Msg:" + f.type + ":" + (f.line != null ? f.line.toString() : ""));
         if (f.type == 20032) {
           int size = ((JSONObject) f.line.opt("AAA307")).optInt("AAA16");
+          size = size > 0 ? size : 19;
           if (size > 0) {
             boardSize = size;
             Lizzie.board.reopen(boardSize, boardSize);
@@ -878,6 +884,22 @@ public class OnlineDialog extends JDialog {
                         ? a308.optString("AAA225")
                         : a308.optString("AAA224"));
             Lizzie.frame.setPlayers(whitePlayer, blackPlayer);
+            history.getGameInfo().setPlayerBlack(blackPlayer);
+            history.getGameInfo().setPlayerWhite(whitePlayer);
+            double komi = history.getGameInfo().getKomi();
+            int a4 = ((JSONObject) f.line.opt("AAA307")).optInt("AAA4");
+            int a5 = ((JSONObject) f.line.opt("AAA307")).optInt("AAA5");
+            int a10 = ((JSONObject) f.line.opt("AAA307")).optInt("AAA10");
+            if (0 == a4 && 0 == a5) {
+              komi = 6.5;
+            } else if (1 == a10) { // && 1 == chineseRule) {
+              chineseFlag = true;
+              komi = ((double) a5 / 100 * 2);
+            } else {
+              komi = ((double) a5 / 100);
+            }
+            history.getGameInfo().setKomi(komi);
+            Lizzie.leelaz.komi(komi);
           } else {
             break;
           }
@@ -1053,7 +1075,7 @@ public class OnlineDialog extends JDialog {
           double b = w - I;
           String C = decimalToFraction(b);
           F =
-              true
+              chineseFlag
                   ? (0 != I ? "黑胜" + I + (Utils.isBlank(C) ? "" : "又" + C) + "子" : "黑胜" + C + "子")
                   : "黑胜" + w + "目";
         } else if (2 == i.optInt("AAA166")) {
@@ -1061,7 +1083,7 @@ public class OnlineDialog extends JDialog {
           double d = w - E;
           String D = decimalToFraction(d);
           F =
-              true
+              chineseFlag
                   ? (0 != E ? "白胜" + E + (Utils.isBlank(D) ? "" : "又" + D) + "子" : "白胜" + D + "子")
                   : "白胜" + w + "目";
         } else {
@@ -2046,6 +2068,11 @@ public class OnlineDialog extends JDialog {
     whitePlayer = info.optString("whiteName");
     history = SGFParser.parseSgf(info.optString("sgf"));
     if (history != null) {
+      history.getGameInfo().setPlayerBlack(blackPlayer);
+      history.getGameInfo().setPlayerWhite(whitePlayer);
+      double komi = info.optDouble("komi", history.getGameInfo().getKomi());
+      history.getGameInfo().setKomi(komi);
+      Lizzie.leelaz.komi(komi);
       int diffMove = Lizzie.board.getHistory().sync(history);
       if (diffMove >= 0) {
         Lizzie.board.goToMoveNumberBeyondBranch(diffMove > 0 ? diffMove - 1 : 0);

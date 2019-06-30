@@ -590,6 +590,14 @@ public class Leelaz {
     sendCommand("boardsize " + width + (width != height ? " " + height : ""));
   }
 
+  public void komi(double komi) {
+    synchronized (this) {
+      sendCommand("komi " + (komi == 0.0 ? "0" : komi));
+      bestMoves = new ArrayList<>();
+      if (isPondering) ponder();
+    }
+  }
+
   public void undo() {
     synchronized (this) {
       sendCommand("undo");

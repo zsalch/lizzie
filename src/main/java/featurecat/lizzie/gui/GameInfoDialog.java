@@ -4,7 +4,9 @@
 
 package featurecat.lizzie.gui;
 
+import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.analysis.GameInfo;
+import featurecat.lizzie.util.Utils;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -83,7 +85,7 @@ public class GameInfoDialog extends JDialog {
     // read-only
     textFieldKomi = new JFormattedTextField(FORMAT_KOMI);
     textFieldHandicap = new JFormattedTextField(FORMAT_HANDICAP);
-    textFieldKomi.setEditable(false);
+    textFieldKomi.setEditable(true);
     textFieldHandicap.setEditable(false);
 
     contentPanel.add(new JLabel("Black"));
@@ -143,6 +145,8 @@ public class GameInfoDialog extends JDialog {
     // apply new values
     gameInfo.setPlayerBlack(playerBlack);
     gameInfo.setPlayerWhite(playerWhite);
+    gameInfo.setKomi(Utils.txtFieldDoubleValue(textFieldKomi));
+    if (Lizzie.leelaz != null) Lizzie.leelaz.komi(gameInfo.getKomi());
 
     // close window
     setVisible(false);

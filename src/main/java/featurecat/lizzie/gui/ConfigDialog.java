@@ -8,6 +8,7 @@ import static java.lang.Math.max;
 import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.rules.Board;
 import featurecat.lizzie.theme.Theme;
+import featurecat.lizzie.util.Utils;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -1716,14 +1717,6 @@ public class ConfigDialog extends JDialog {
     }
   }
 
-  private Double txtFieldDoubleValue(JTextField txt) {
-    if (txt.getText().trim().isEmpty()) {
-      return 0.0;
-    } else {
-      return new Double(txt.getText().trim());
-    }
-  }
-
   private class DigitOnlyFilter extends DocumentFilter {
     @Override
     public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
@@ -2289,7 +2282,7 @@ public class ConfigDialog extends JDialog {
       Lizzie.config.uiConfig.put("board-width", size[0]);
       Lizzie.config.uiConfig.put("board-height", size[1]);
       Lizzie.config.uiConfig.putOpt("panel-ui", chkPanelUI.isSelected());
-      Lizzie.config.minPlayoutRatioForStats = txtFieldDoubleValue(txtMinPlayoutRatioForStats);
+      Lizzie.config.minPlayoutRatioForStats = Utils.txtFieldDoubleValue(txtMinPlayoutRatioForStats);
       Lizzie.config.uiConfig.put(
           "min-playout-ratio-for-stats", Lizzie.config.minPlayoutRatioForStats);
       Lizzie.config.uiConfig.putOpt("show-coordinates", chkShowCoordinates.isSelected());
