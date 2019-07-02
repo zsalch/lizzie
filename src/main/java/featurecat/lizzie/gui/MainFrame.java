@@ -1,11 +1,13 @@
 package featurecat.lizzie.gui;
 
 import featurecat.lizzie.Lizzie;
+import featurecat.lizzie.analysis.MoveData;
 import java.awt.Font;
 import java.awt.HeadlessException;
 import java.awt.event.MouseWheelEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Optional;
 import javax.swing.JFrame;
 
 public abstract class MainFrame extends JFrame {
@@ -20,6 +22,7 @@ public abstract class MainFrame extends JFrame {
   public static Font winrateFont;
   // Force refresh board
   private boolean forceRefresh;
+  public boolean isMouseOver = false;
   public OnlineDialog onlineDialog = null;
 
   public MainFrame(String title) throws HeadlessException {
@@ -93,7 +96,19 @@ public abstract class MainFrame extends JFrame {
 
   public abstract void stopRawBoard();
 
+  public abstract boolean isShowingRawBoard();
+
+  public abstract boolean isShowingNormalBoard();
+
+  public abstract void setDisplayedBranchLength(int n);
+
   public abstract boolean incrementDisplayedBranchLength(int n);
+
+  public abstract Optional<MoveData> mouseOveredMove();
+
+  public abstract int getReplayBranch();
+
+  public abstract void addSuggestionAsBranch();
 
   public abstract void increaseMaxAlpha(int k);
 

@@ -212,7 +212,15 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         } else if (controlIsPressed(e)) {
           undo(10);
         } else {
-          undo();
+          if (Lizzie.frame.isMouseOver) {
+            if (Lizzie.frame.isShowingNormalBoard()) {
+              Lizzie.frame.setDisplayedBranchLength(1);
+            } else {
+              Lizzie.frame.incrementDisplayedBranchLength(-1);
+            }
+          } else {
+            undo();
+          }
         }
         break;
 
@@ -230,7 +238,15 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         } else if (controlIsPressed(e)) {
           redo(10);
         } else {
-          redo();
+          if (Lizzie.frame.isMouseOver) {
+            if (Lizzie.frame.isShowingNormalBoard()) {
+              Lizzie.frame.setDisplayedBranchLength(2);
+            } else {
+              Lizzie.frame.incrementDisplayedBranchLength(1);
+            }
+          } else {
+            redo();
+          }
         }
         break;
 

@@ -1467,7 +1467,8 @@ public class LizzieFrame extends MainFrame {
     setTitle(sb.toString());
   }
 
-  private void setDisplayedBranchLength(int n) {
+  @Override
+  public void setDisplayedBranchLength(int n) {
     boardRenderer.setDisplayedBranchLength(n);
   }
 
@@ -1481,8 +1482,30 @@ public class LizzieFrame extends MainFrame {
     boardRenderer.setDisplayedBranchLength(BoardRenderer.SHOW_NORMAL_BOARD);
   }
 
+  @Override
+  public boolean isShowingRawBoard() {
+    return boardRenderer.isShowingRawBoard();
+  }
+
+  @Override
+  public boolean isShowingNormalBoard() {
+    return boardRenderer.isShowingNormalBoard();
+  }
+
   public boolean incrementDisplayedBranchLength(int n) {
     return boardRenderer.incrementDisplayedBranchLength(n);
+  }
+
+  public Optional<MoveData> mouseOveredMove() {
+    return boardRenderer.mouseOveredMove();
+  }
+
+  public int getReplayBranch() {
+    return boardRenderer.getReplayBranch();
+  }
+
+  public void addSuggestionAsBranch() {
+    boardRenderer.addSuggestionAsBranch();
   }
 
   public void resetTitle() {

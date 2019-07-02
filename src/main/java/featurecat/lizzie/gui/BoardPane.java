@@ -6,6 +6,7 @@ import static java.lang.Math.min;
 
 import com.jhlabs.image.GaussianFilter;
 import featurecat.lizzie.Lizzie;
+import featurecat.lizzie.analysis.MoveData;
 import featurecat.lizzie.rules.Board;
 import featurecat.lizzie.rules.SGFParser;
 import java.awt.BasicStroke;
@@ -109,8 +110,17 @@ public class BoardPane extends LizziePane {
                 onClicked(e.getX(), e.getY());
               }
             } else if (e.getButton() == MouseEvent.BUTTON3) { // right click
-              Input.undo();
+              if (Lizzie.frame.isMouseOver) {
+                Lizzie.frame.addSuggestionAsBranch();
+              } else {
+                Input.undo();
+              }
             }
+          }
+
+          @Override
+          public void mouseExited(MouseEvent e) {
+            onMouseExited(e.getX(), e.getY());
           }
         });
     addMouseMotionListener(
@@ -342,16 +352,35 @@ public class BoardPane extends LizziePane {
     }
   }
 
+  public void onMouseExited(int x, int y) {
+    mouseOverCoordinate = outOfBoundCoordinate;
+  }
+
   public void onMouseMoved(int x, int y) {
     mouseOverCoordinate = outOfBoundCoordinate;
     Optional<int[]> coords = boardRenderer.convertScreenToCoordinates(x, y);
-    coords.filter(c -> !isMouseOver(c[0], c[1])).ifPresent(c -> repaint());
+    coords
+        .filter(c -> !isMouseOver(c[0], c[1]))
+        .ifPresent(
+            c -> {
+              isReplayVariation = false;
+              if (Lizzie.frame != null && Lizzie.frame.isMouseOver) {
+                Lizzie.frame.isMouseOver = false;
+                boardRenderer.startNormalBoard();
+              }
+              repaint();
+            });
     coords.ifPresent(
         c -> {
           mouseOverCoordinate = c;
-          isReplayVariation = false;
+          if (Lizzie.frame != null) {
+            Lizzie.frame.isMouseOver = boardRenderer.isShowingBranch();
+          }
         });
     if (!coords.isPresent() && boardRenderer.isShowingBranch()) {
+      isReplayVariation = false;
+      Lizzie.frame.isMouseOver = false;
+      boardRenderer.startNormalBoard();
       repaint();
     }
   }
@@ -382,7 +411,7 @@ public class BoardPane extends LizziePane {
     }
   }
 
-  private void setDisplayedBranchLength(int n) {
+  public void setDisplayedBranchLength(int n) {
     boardRenderer.setDisplayedBranchLength(n);
   }
 
@@ -396,8 +425,28 @@ public class BoardPane extends LizziePane {
     boardRenderer.setDisplayedBranchLength(BoardRenderer.SHOW_NORMAL_BOARD);
   }
 
+  public boolean isShowingRawBoard() {
+    return boardRenderer.isShowingRawBoard();
+  }
+
+  public boolean isShowingNormalBoard() {
+    return boardRenderer.isShowingNormalBoard();
+  }
+
   public boolean incrementDisplayedBranchLength(int n) {
     return boardRenderer.incrementDisplayedBranchLength(n);
+  }
+
+  public Optional<MoveData> mouseOveredMove() {
+    return boardRenderer.mouseOveredMove();
+  }
+
+  public int getReplayBranch() {
+    return boardRenderer.getReplayBranch();
+  }
+
+  public void addSuggestionAsBranch() {
+    boardRenderer.addSuggestionAsBranch();
   }
 
   public void copySgf() {
