@@ -134,7 +134,7 @@ public class Leelaz {
     commands = splitCommand(engineCommand);
 
     // Get weight name
-    Pattern wPattern = Pattern.compile("(?s).*?(--weights |-w )([^'\" ]+)(?s).*");
+    Pattern wPattern = Pattern.compile("(?s).*?(--weights |-w |-model )([^'\" ]+)(?s).*");
     Matcher wMatcher = wPattern.matcher(engineCommand);
     if (wMatcher.matches() && wMatcher.groupCount() == 2) {
       currentWeightFile = wMatcher.group(2);
@@ -596,6 +596,10 @@ public class Leelaz {
       bestMoves = new ArrayList<>();
       if (isPondering) ponder();
     }
+  }
+
+  public void handicap(int num) {
+    Lizzie.leelaz.sendCommand((isKataGo ? "place_free_handicap " : "fixed_handicap ") + num);
   }
 
   public void undo() {

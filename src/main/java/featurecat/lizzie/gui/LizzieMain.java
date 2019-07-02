@@ -567,7 +567,7 @@ public class LizzieMain extends MainFrame {
       Lizzie.board.getHistory().setGameInfo(gameInfo);
       if (isHandicapGame) {
         Lizzie.board.getHistory().getData().blackToPlay = false;
-        Lizzie.leelaz.sendCommand("fixed_handicap " + gameInfo.getHandicap());
+        Lizzie.leelaz.handicap(gameInfo.getHandicap());
         if (playerIsBlack) Lizzie.leelaz.genmove("W");
       } else if (!playerIsBlack) {
         Lizzie.leelaz.genmove("B");
