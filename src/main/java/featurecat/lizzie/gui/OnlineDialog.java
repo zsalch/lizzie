@@ -391,8 +391,8 @@ public class OnlineDialog extends JDialog {
       BoardHistoryList liveNode = SGFParser.parseSgf(sgf);
       if (liveNode != null) {
         if (live != null) {
-          double komi = live.optDouble("komi", history.getGameInfo().getKomi());
-          history.getGameInfo().setKomi(komi);
+          double komi = live.optDouble("komi", Lizzie.board.getHistory().getGameInfo().getKomi());
+          Lizzie.board.getHistory().getGameInfo().setKomi(komi);
           Lizzie.leelaz.komi(komi);
           blackPlayer = live.optString("BlackPlayer");
           whitePlayer = live.optString("WhitePlayer");
@@ -419,8 +419,8 @@ public class OnlineDialog extends JDialog {
           }
         }
         Lizzie.frame.setPlayers(whitePlayer, blackPlayer);
-        history.getGameInfo().setPlayerBlack(blackPlayer);
-        history.getGameInfo().setPlayerWhite(whitePlayer);
+        Lizzie.board.getHistory().getGameInfo().setPlayerBlack(blackPlayer);
+        Lizzie.board.getHistory().getGameInfo().setPlayerWhite(whitePlayer);
         if (live != null && "3".equals(live.optString("Status"))) {
           if (schedule != null && !schedule.isCancelled() && !schedule.isDone()) {
             schedule.cancel(false);
