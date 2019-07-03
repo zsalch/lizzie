@@ -749,6 +749,276 @@ public class ConfigDialog extends JDialog {
     curPath = (new File("")).getAbsoluteFile().toPath();
     osName = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
     setShowLcbWinrate();
+    JLabel lblBoardSize = new JLabel(resourceBundle.getString("LizzieConfig.title.boardSize"));
+    lblBoardSize.setBounds(6, 6, 67, 16);
+    lblBoardSize.setHorizontalAlignment(SwingConstants.LEFT);
+    uiTab.add(lblBoardSize);
+
+    rdoBoardSize19 = new JRadioButton("19x19");
+    rdoBoardSize19.setBounds(85, 2, 84, 23);
+    uiTab.add(rdoBoardSize19);
+
+    rdoBoardSize13 = new JRadioButton("13x13");
+    rdoBoardSize13.setBounds(170, 2, 84, 23);
+    uiTab.add(rdoBoardSize13);
+
+    rdoBoardSize9 = new JRadioButton("9x9");
+    rdoBoardSize9.setBounds(255, 2, 57, 23);
+    uiTab.add(rdoBoardSize9);
+
+    rdoBoardSize7 = new JRadioButton("7x7");
+    rdoBoardSize7.setBounds(325, 2, 67, 23);
+    uiTab.add(rdoBoardSize7);
+
+    rdoBoardSize5 = new JRadioButton("5x5");
+    rdoBoardSize5.setBounds(395, 2, 67, 23);
+    uiTab.add(rdoBoardSize5);
+
+    rdoBoardSize4 = new JRadioButton("4x4");
+    rdoBoardSize4.setBounds(460, 2, 60, 23);
+    uiTab.add(rdoBoardSize4);
+
+    rdoBoardSizeOther = new JRadioButton("");
+    rdoBoardSizeOther.addChangeListener(
+        new ChangeListener() {
+          public void stateChanged(ChangeEvent e) {
+            if (rdoBoardSizeOther.isSelected()) {
+              txtBoardWidth.setEnabled(true);
+              txtBoardHeight.setEnabled(true);
+            } else {
+              txtBoardWidth.setEnabled(false);
+              txtBoardHeight.setEnabled(false);
+            }
+          }
+        });
+    rdoBoardSizeOther.setBounds(524, 2, 27, 23);
+    uiTab.add(rdoBoardSizeOther);
+
+    ButtonGroup group = new ButtonGroup();
+    group.add(rdoBoardSize19);
+    group.add(rdoBoardSize13);
+    group.add(rdoBoardSize9);
+    group.add(rdoBoardSize7);
+    group.add(rdoBoardSize5);
+    group.add(rdoBoardSize4);
+    group.add(rdoBoardSizeOther);
+
+    nf.setGroupingUsed(false);
+    txtBoardWidth =
+        new JFormattedTextField(
+            new InternationalFormatter(nf) {
+              protected DocumentFilter getDocumentFilter() {
+                return filter;
+              }
+
+              private DocumentFilter filter = new DigitOnlyFilter();
+            });
+    txtBoardWidth.setBounds(551, 1, 38, 26);
+    uiTab.add(txtBoardWidth);
+    txtBoardWidth.setColumns(10);
+
+    lblBoardSign = new JLabel("x");
+    lblBoardSign.setBounds(591, 3, 26, 20);
+    uiTab.add(lblBoardSign);
+
+    txtBoardHeight =
+        new JFormattedTextField(
+            new InternationalFormatter(nf) {
+              protected DocumentFilter getDocumentFilter() {
+                return filter;
+              }
+
+              private DocumentFilter filter = new DigitOnlyFilter();
+            });
+    txtBoardHeight.setBounds(601, 1, 38, 26);
+    uiTab.add(txtBoardHeight);
+    txtBoardHeight.setColumns(10);
+
+    JLabel lblPanelUI = new JLabel(resourceBundle.getString("LizzieConfig.title.panelUI"));
+    lblPanelUI.setBounds(6, 38, 157, 16);
+    uiTab.add(lblPanelUI);
+
+    chkPanelUI = new JCheckBox("");
+    chkPanelUI.setBounds(170, 35, 97, 23);
+    uiTab.add(chkPanelUI);
+
+    JLabel lblMinPlayoutRatioForStats =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.minPlayoutRatioForStats"));
+    lblMinPlayoutRatioForStats.setBounds(6, 65, 157, 16);
+    uiTab.add(lblMinPlayoutRatioForStats);
+    txtMinPlayoutRatioForStats =
+        new JFormattedTextField(
+            new InternationalFormatter() {
+              protected DocumentFilter getDocumentFilter() {
+                return filter;
+              }
+
+              private DocumentFilter filter = new NumericFilter();
+            });
+    txtMinPlayoutRatioForStats.setColumns(10);
+    txtMinPlayoutRatioForStats.setBounds(171, 60, 57, 26);
+    uiTab.add(txtMinPlayoutRatioForStats);
+
+    JLabel lblShowCoordinates =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.showCoordinates"));
+    lblShowCoordinates.setBounds(6, 92, 157, 16);
+    uiTab.add(lblShowCoordinates);
+    chkShowCoordinates = new JCheckBox("");
+    chkShowCoordinates.addChangeListener(
+        new ChangeListener() {
+          public void stateChanged(ChangeEvent e) {
+            if (chkShowCoordinates.isSelected() != Lizzie.config.showCoordinates) {
+              Lizzie.config.toggleCoordinates();
+              Lizzie.frame.refresh(2);
+            }
+          }
+        });
+    chkShowCoordinates.setBounds(170, 89, 57, 23);
+    uiTab.add(chkShowCoordinates);
+
+    JLabel lblShowMoveNumber =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.showMoveNumber"));
+    lblShowMoveNumber.setBounds(6, 119, 157, 16);
+    uiTab.add(lblShowMoveNumber);
+
+    rdoShowMoveNumberNo =
+        new JRadioButton(resourceBundle.getString("LizzieConfig.title.showMoveNumberNo"));
+    rdoShowMoveNumberNo.setBounds(170, 116, 84, 23);
+    uiTab.add(rdoShowMoveNumberNo);
+
+    rdoShowMoveNumberAll =
+        new JRadioButton(resourceBundle.getString("LizzieConfig.title.showMoveNumberAll"));
+    rdoShowMoveNumberAll.setBounds(261, 116, 65, 23);
+    uiTab.add(rdoShowMoveNumberAll);
+
+    rdoShowMoveNumberLast =
+        new JRadioButton(resourceBundle.getString("LizzieConfig.title.showMoveNumberLast"));
+    rdoShowMoveNumberLast.addChangeListener(
+        new ChangeListener() {
+          public void stateChanged(ChangeEvent e) {
+            if (rdoShowMoveNumberLast.isSelected()) {
+              txtShowMoveNumber.setEnabled(true);
+            } else {
+              txtShowMoveNumber.setEnabled(false);
+            }
+          }
+        });
+    rdoShowMoveNumberLast.setBounds(325, 116, 67, 23);
+    uiTab.add(rdoShowMoveNumberLast);
+
+    ButtonGroup showMoveGroup = new ButtonGroup();
+    showMoveGroup.add(rdoShowMoveNumberNo);
+    showMoveGroup.add(rdoShowMoveNumberAll);
+    showMoveGroup.add(rdoShowMoveNumberLast);
+
+    txtShowMoveNumber =
+        new JFormattedTextField(
+            new InternationalFormatter(nf) {
+              protected DocumentFilter getDocumentFilter() {
+                return filter;
+              }
+
+              private DocumentFilter filter = new DigitOnlyFilter();
+            });
+    txtShowMoveNumber.setBounds(395, 114, 52, 26);
+    uiTab.add(txtShowMoveNumber);
+    txtShowMoveNumber.setColumns(10);
+
+    JLabel lblShowBlunderBar =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.showBlunderBar"));
+    lblShowBlunderBar.setBounds(6, 146, 157, 16);
+    uiTab.add(lblShowBlunderBar);
+    chkShowBlunderBar = new JCheckBox("");
+    chkShowBlunderBar.setBounds(170, 143, 57, 23);
+    uiTab.add(chkShowBlunderBar);
+
+    JLabel lblDynamicWinrateGraphWidth =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.dynamicWinrateGraphWidth"));
+    lblDynamicWinrateGraphWidth.setBounds(6, 173, 157, 16);
+    uiTab.add(lblDynamicWinrateGraphWidth);
+    chkDynamicWinrateGraphWidth = new JCheckBox("");
+    chkDynamicWinrateGraphWidth.setBounds(170, 170, 57, 23);
+    uiTab.add(chkDynamicWinrateGraphWidth);
+
+    JLabel lblAppendWinrateToComment =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.appendWinrateToComment"));
+    lblAppendWinrateToComment.setBounds(6, 200, 157, 16);
+    uiTab.add(lblAppendWinrateToComment);
+    chkAppendWinrateToComment = new JCheckBox("");
+    chkAppendWinrateToComment.setBounds(170, 197, 57, 23);
+    uiTab.add(chkAppendWinrateToComment);
+
+    JLabel lblColorByWinrateInsteadOfVisits =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.colorByWinrateInsteadOfVisits"));
+    lblColorByWinrateInsteadOfVisits.setBounds(6, 227, 163, 16);
+    uiTab.add(lblColorByWinrateInsteadOfVisits);
+    chkColorByWinrateInsteadOfVisits = new JCheckBox("");
+    chkColorByWinrateInsteadOfVisits.setBounds(170, 224, 57, 23);
+    uiTab.add(chkColorByWinrateInsteadOfVisits);
+
+    JLabel lblBoardPositionProportion =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.boardPositionProportion"));
+    lblBoardPositionProportion.setBounds(6, 254, 163, 16);
+    uiTab.add(lblBoardPositionProportion);
+    sldBoardPositionProportion = new JSlider();
+    sldBoardPositionProportion.setPaintTicks(true);
+    sldBoardPositionProportion.setSnapToTicks(true);
+    sldBoardPositionProportion.addChangeListener(
+        new ChangeListener() {
+          public void stateChanged(ChangeEvent e) {
+            if (Lizzie.frame.boardPositionProportion != sldBoardPositionProportion.getValue()) {
+              Lizzie.frame.boardPositionProportion = sldBoardPositionProportion.getValue();
+              Lizzie.frame.refresh(2);
+            }
+          }
+        });
+    sldBoardPositionProportion.setValue(4);
+    sldBoardPositionProportion.setMaximum(8);
+    sldBoardPositionProportion.setBounds(170, 250, 200, 28);
+    uiTab.add(sldBoardPositionProportion);
+
+    JLabel lblLimitBestMoveNum =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.limitBestMoveNum"));
+    lblLimitBestMoveNum.setBounds(6, 281, 157, 16);
+    uiTab.add(lblLimitBestMoveNum);
+    txtLimitBestMoveNum =
+        new JFormattedTextField(
+            new InternationalFormatter(nf) {
+              protected DocumentFilter getDocumentFilter() {
+                return filter;
+              }
+
+              private DocumentFilter filter = new DigitOnlyFilter();
+            });
+    txtLimitBestMoveNum.setBounds(171, 279, 52, 24);
+    uiTab.add(txtLimitBestMoveNum);
+    txtLimitBestMoveNum.setColumns(10);
+
+    JLabel lblLimitBranchLength =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.limitBranchLength"));
+    lblLimitBranchLength.setBounds(6, 308, 157, 16);
+    uiTab.add(lblLimitBranchLength);
+    txtLimitBranchLength =
+        new JFormattedTextField(
+            new InternationalFormatter(nf) {
+              protected DocumentFilter getDocumentFilter() {
+                return filter;
+              }
+
+              private DocumentFilter filter = new DigitOnlyFilter();
+            });
+    txtLimitBranchLength.setBounds(171, 306, 52, 24);
+    uiTab.add(txtLimitBranchLength);
+    txtLimitBranchLength.setColumns(10);
+
+    JLabel lblGtpConsoleStyle =
+        new JLabel(resourceBundle.getString("LizzieConfig.title.gtpConsoleStyle"));
+    lblGtpConsoleStyle.setBounds(6, 335, 157, 16);
+    uiTab.add(lblGtpConsoleStyle);
+    tpGtpConsoleStyle = new JTextPane();
+    tpGtpConsoleStyle.setBounds(171, 333, 460, 80);
+    uiTab.add(tpGtpConsoleStyle);
+
     new ComsWorker(this).execute();
     setLocationRelativeTo(getOwner());
   }
@@ -763,277 +1033,6 @@ public class ConfigDialog extends JDialog {
 
     @Override
     protected Void doInBackground() throws Exception {
-
-      JLabel lblBoardSize = new JLabel(resourceBundle.getString("LizzieConfig.title.boardSize"));
-      lblBoardSize.setBounds(6, 6, 67, 16);
-      lblBoardSize.setHorizontalAlignment(SwingConstants.LEFT);
-      uiTab.add(lblBoardSize);
-
-      rdoBoardSize19 = new JRadioButton("19x19");
-      rdoBoardSize19.setBounds(85, 2, 84, 23);
-      uiTab.add(rdoBoardSize19);
-
-      rdoBoardSize13 = new JRadioButton("13x13");
-      rdoBoardSize13.setBounds(170, 2, 84, 23);
-      uiTab.add(rdoBoardSize13);
-
-      rdoBoardSize9 = new JRadioButton("9x9");
-      rdoBoardSize9.setBounds(255, 2, 57, 23);
-      uiTab.add(rdoBoardSize9);
-
-      rdoBoardSize7 = new JRadioButton("7x7");
-      rdoBoardSize7.setBounds(325, 2, 67, 23);
-      uiTab.add(rdoBoardSize7);
-
-      rdoBoardSize5 = new JRadioButton("5x5");
-      rdoBoardSize5.setBounds(395, 2, 67, 23);
-      uiTab.add(rdoBoardSize5);
-
-      rdoBoardSize4 = new JRadioButton("4x4");
-      rdoBoardSize4.setBounds(460, 2, 60, 23);
-      uiTab.add(rdoBoardSize4);
-
-      rdoBoardSizeOther = new JRadioButton("");
-      rdoBoardSizeOther.addChangeListener(
-          new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-              if (rdoBoardSizeOther.isSelected()) {
-                txtBoardWidth.setEnabled(true);
-                txtBoardHeight.setEnabled(true);
-              } else {
-                txtBoardWidth.setEnabled(false);
-                txtBoardHeight.setEnabled(false);
-              }
-            }
-          });
-      rdoBoardSizeOther.setBounds(524, 2, 27, 23);
-      uiTab.add(rdoBoardSizeOther);
-
-      ButtonGroup group = new ButtonGroup();
-      group.add(rdoBoardSize19);
-      group.add(rdoBoardSize13);
-      group.add(rdoBoardSize9);
-      group.add(rdoBoardSize7);
-      group.add(rdoBoardSize5);
-      group.add(rdoBoardSize4);
-      group.add(rdoBoardSizeOther);
-
-      NumberFormat nf = NumberFormat.getIntegerInstance();
-      nf.setGroupingUsed(false);
-      txtBoardWidth =
-          new JFormattedTextField(
-              new InternationalFormatter(nf) {
-                protected DocumentFilter getDocumentFilter() {
-                  return filter;
-                }
-
-                private DocumentFilter filter = new DigitOnlyFilter();
-              });
-      txtBoardWidth.setBounds(551, 1, 38, 26);
-      uiTab.add(txtBoardWidth);
-      txtBoardWidth.setColumns(10);
-
-      lblBoardSign = new JLabel("x");
-      lblBoardSign.setBounds(591, 3, 26, 20);
-      uiTab.add(lblBoardSign);
-
-      txtBoardHeight =
-          new JFormattedTextField(
-              new InternationalFormatter(nf) {
-                protected DocumentFilter getDocumentFilter() {
-                  return filter;
-                }
-
-                private DocumentFilter filter = new DigitOnlyFilter();
-              });
-      txtBoardHeight.setBounds(601, 1, 38, 26);
-      uiTab.add(txtBoardHeight);
-      txtBoardHeight.setColumns(10);
-
-      JLabel lblPanelUI = new JLabel(resourceBundle.getString("LizzieConfig.title.panelUI"));
-      lblPanelUI.setBounds(6, 38, 157, 16);
-      uiTab.add(lblPanelUI);
-
-      chkPanelUI = new JCheckBox("");
-      chkPanelUI.setBounds(170, 35, 97, 23);
-      uiTab.add(chkPanelUI);
-
-      JLabel lblMinPlayoutRatioForStats =
-          new JLabel(resourceBundle.getString("LizzieConfig.title.minPlayoutRatioForStats"));
-      lblMinPlayoutRatioForStats.setBounds(6, 65, 157, 16);
-      uiTab.add(lblMinPlayoutRatioForStats);
-      txtMinPlayoutRatioForStats =
-          new JFormattedTextField(
-              new InternationalFormatter() {
-                protected DocumentFilter getDocumentFilter() {
-                  return filter;
-                }
-
-                private DocumentFilter filter = new NumericFilter();
-              });
-      txtMinPlayoutRatioForStats.setColumns(10);
-      txtMinPlayoutRatioForStats.setBounds(171, 60, 57, 26);
-      uiTab.add(txtMinPlayoutRatioForStats);
-
-      JLabel lblShowCoordinates =
-          new JLabel(resourceBundle.getString("LizzieConfig.title.showCoordinates"));
-      lblShowCoordinates.setBounds(6, 92, 157, 16);
-      uiTab.add(lblShowCoordinates);
-      chkShowCoordinates = new JCheckBox("");
-      chkShowCoordinates.addChangeListener(
-          new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-              if (chkShowCoordinates.isSelected() != Lizzie.config.showCoordinates) {
-                Lizzie.config.toggleCoordinates();
-                Lizzie.frame.refresh(2);
-              }
-            }
-          });
-      chkShowCoordinates.setBounds(170, 89, 57, 23);
-      uiTab.add(chkShowCoordinates);
-
-      JLabel lblShowMoveNumber =
-          new JLabel(resourceBundle.getString("LizzieConfig.title.showMoveNumber"));
-      lblShowMoveNumber.setBounds(6, 119, 157, 16);
-      uiTab.add(lblShowMoveNumber);
-
-      rdoShowMoveNumberNo =
-          new JRadioButton(resourceBundle.getString("LizzieConfig.title.showMoveNumberNo"));
-      rdoShowMoveNumberNo.setBounds(170, 116, 84, 23);
-      uiTab.add(rdoShowMoveNumberNo);
-
-      rdoShowMoveNumberAll =
-          new JRadioButton(resourceBundle.getString("LizzieConfig.title.showMoveNumberAll"));
-      rdoShowMoveNumberAll.setBounds(261, 116, 65, 23);
-      uiTab.add(rdoShowMoveNumberAll);
-
-      rdoShowMoveNumberLast =
-          new JRadioButton(resourceBundle.getString("LizzieConfig.title.showMoveNumberLast"));
-      rdoShowMoveNumberLast.addChangeListener(
-          new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-              if (rdoShowMoveNumberLast.isSelected()) {
-                txtShowMoveNumber.setEnabled(true);
-              } else {
-                txtShowMoveNumber.setEnabled(false);
-              }
-            }
-          });
-      rdoShowMoveNumberLast.setBounds(325, 116, 67, 23);
-      uiTab.add(rdoShowMoveNumberLast);
-
-      ButtonGroup showMoveGroup = new ButtonGroup();
-      showMoveGroup.add(rdoShowMoveNumberNo);
-      showMoveGroup.add(rdoShowMoveNumberAll);
-      showMoveGroup.add(rdoShowMoveNumberLast);
-
-      txtShowMoveNumber =
-          new JFormattedTextField(
-              new InternationalFormatter(nf) {
-                protected DocumentFilter getDocumentFilter() {
-                  return filter;
-                }
-
-                private DocumentFilter filter = new DigitOnlyFilter();
-              });
-      txtShowMoveNumber.setBounds(395, 114, 52, 26);
-      uiTab.add(txtShowMoveNumber);
-      txtShowMoveNumber.setColumns(10);
-
-      JLabel lblShowBlunderBar =
-          new JLabel(resourceBundle.getString("LizzieConfig.title.showBlunderBar"));
-      lblShowBlunderBar.setBounds(6, 146, 157, 16);
-      uiTab.add(lblShowBlunderBar);
-      chkShowBlunderBar = new JCheckBox("");
-      chkShowBlunderBar.setBounds(170, 143, 57, 23);
-      uiTab.add(chkShowBlunderBar);
-
-      JLabel lblDynamicWinrateGraphWidth =
-          new JLabel(resourceBundle.getString("LizzieConfig.title.dynamicWinrateGraphWidth"));
-      lblDynamicWinrateGraphWidth.setBounds(6, 173, 157, 16);
-      uiTab.add(lblDynamicWinrateGraphWidth);
-      chkDynamicWinrateGraphWidth = new JCheckBox("");
-      chkDynamicWinrateGraphWidth.setBounds(170, 170, 57, 23);
-      uiTab.add(chkDynamicWinrateGraphWidth);
-
-      JLabel lblAppendWinrateToComment =
-          new JLabel(resourceBundle.getString("LizzieConfig.title.appendWinrateToComment"));
-      lblAppendWinrateToComment.setBounds(6, 200, 157, 16);
-      uiTab.add(lblAppendWinrateToComment);
-      chkAppendWinrateToComment = new JCheckBox("");
-      chkAppendWinrateToComment.setBounds(170, 197, 57, 23);
-      uiTab.add(chkAppendWinrateToComment);
-
-      JLabel lblColorByWinrateInsteadOfVisits =
-          new JLabel(resourceBundle.getString("LizzieConfig.title.colorByWinrateInsteadOfVisits"));
-      lblColorByWinrateInsteadOfVisits.setBounds(6, 227, 163, 16);
-      uiTab.add(lblColorByWinrateInsteadOfVisits);
-      chkColorByWinrateInsteadOfVisits = new JCheckBox("");
-      chkColorByWinrateInsteadOfVisits.setBounds(170, 224, 57, 23);
-      uiTab.add(chkColorByWinrateInsteadOfVisits);
-
-      JLabel lblBoardPositionProportion =
-          new JLabel(resourceBundle.getString("LizzieConfig.title.boardPositionProportion"));
-      lblBoardPositionProportion.setBounds(6, 254, 163, 16);
-      uiTab.add(lblBoardPositionProportion);
-      sldBoardPositionProportion = new JSlider();
-      sldBoardPositionProportion.setPaintTicks(true);
-      sldBoardPositionProportion.setSnapToTicks(true);
-      sldBoardPositionProportion.addChangeListener(
-          new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-              if (Lizzie.frame.boardPositionProportion != sldBoardPositionProportion.getValue()) {
-                Lizzie.frame.boardPositionProportion = sldBoardPositionProportion.getValue();
-                Lizzie.frame.refresh(2);
-              }
-            }
-          });
-      sldBoardPositionProportion.setValue(4);
-      sldBoardPositionProportion.setMaximum(8);
-      sldBoardPositionProportion.setBounds(170, 250, 200, 28);
-      uiTab.add(sldBoardPositionProportion);
-
-      JLabel lblLimitBestMoveNum =
-          new JLabel(resourceBundle.getString("LizzieConfig.title.limitBestMoveNum"));
-      lblLimitBestMoveNum.setBounds(6, 281, 157, 16);
-      uiTab.add(lblLimitBestMoveNum);
-      txtLimitBestMoveNum =
-          new JFormattedTextField(
-              new InternationalFormatter(nf) {
-                protected DocumentFilter getDocumentFilter() {
-                  return filter;
-                }
-
-                private DocumentFilter filter = new DigitOnlyFilter();
-              });
-      txtLimitBestMoveNum.setBounds(171, 279, 52, 24);
-      uiTab.add(txtLimitBestMoveNum);
-      txtLimitBestMoveNum.setColumns(10);
-
-      JLabel lblLimitBranchLength =
-          new JLabel(resourceBundle.getString("LizzieConfig.title.limitBranchLength"));
-      lblLimitBranchLength.setBounds(6, 308, 157, 16);
-      uiTab.add(lblLimitBranchLength);
-      txtLimitBranchLength =
-          new JFormattedTextField(
-              new InternationalFormatter(nf) {
-                protected DocumentFilter getDocumentFilter() {
-                  return filter;
-                }
-
-                private DocumentFilter filter = new DigitOnlyFilter();
-              });
-      txtLimitBranchLength.setBounds(171, 306, 52, 24);
-      uiTab.add(txtLimitBranchLength);
-      txtLimitBranchLength.setColumns(10);
-
-      JLabel lblGtpConsoleStyle =
-          new JLabel(resourceBundle.getString("LizzieConfig.title.gtpConsoleStyle"));
-      lblGtpConsoleStyle.setBounds(6, 335, 157, 16);
-      uiTab.add(lblGtpConsoleStyle);
-      tpGtpConsoleStyle = new JTextPane();
-      tpGtpConsoleStyle.setBounds(171, 333, 460, 80);
-      uiTab.add(tpGtpConsoleStyle);
 
       File themeFolder = new File(Theme.pathPrefix);
       File[] themes =
@@ -1243,6 +1242,7 @@ public class ConfigDialog extends JDialog {
       lblCommentFontColor.setBounds(529, 372, 22, 22);
       themeTab.add(lblCommentFontColor);
 
+      NumberFormat nf = NumberFormat.getIntegerInstance();
       JLabel lblCommentFontSize =
           new JLabel(resourceBundle.getString("LizzieConfig.title.commentFontSize"));
       lblCommentFontSize.setHorizontalAlignment(SwingConstants.LEFT);
