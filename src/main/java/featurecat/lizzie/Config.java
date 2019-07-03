@@ -304,6 +304,10 @@ public class Config {
     this.showBranch = !this.showBranch;
   }
 
+  public void toggleShowCaptured() {
+    this.showCaptured = !this.showCaptured;
+  }
+
   public void toggleShowWinrate() {
     this.showWinrate = !this.showWinrate;
   }
