@@ -861,7 +861,8 @@ public class OnlineDialog extends JDialog {
 
     for (Fragment f : fragmentList) {
       if (f != null) {
-        System.out.println("Msg:" + f.type + ":" + (f.line != null ? f.line.toString() : ""));
+        //        System.out.println("Msg:" + f.type + ":" + (f.line != null ? f.line.toString() :
+        // ""));
         if (f.type == 20032) {
           int size = ((JSONObject) f.line.opt("AAA307")).optInt("AAA16");
           size = size > 0 ? size : 19;
@@ -884,9 +885,9 @@ public class OnlineDialog extends JDialog {
                         ? a308.optString("AAA225")
                         : a308.optString("AAA224"));
             Lizzie.frame.setPlayers(whitePlayer, blackPlayer);
-            history.getGameInfo().setPlayerBlack(blackPlayer);
-            history.getGameInfo().setPlayerWhite(whitePlayer);
-            double komi = history.getGameInfo().getKomi();
+            Lizzie.board.getHistory().getGameInfo().setPlayerBlack(blackPlayer);
+            Lizzie.board.getHistory().getGameInfo().setPlayerWhite(whitePlayer);
+            double komi = Lizzie.board.getHistory().getGameInfo().getKomi();
             int a4 = ((JSONObject) f.line.opt("AAA307")).optInt("AAA4");
             int a5 = ((JSONObject) f.line.opt("AAA307")).optInt("AAA5");
             int a10 = ((JSONObject) f.line.opt("AAA307")).optInt("AAA10");
@@ -898,7 +899,7 @@ public class OnlineDialog extends JDialog {
             } else {
               komi = ((double) a5 / 100);
             }
-            history.getGameInfo().setKomi(komi);
+            Lizzie.board.getHistory().getGameInfo().setKomi(komi);
             Lizzie.leelaz.komi(komi);
           } else {
             break;
@@ -914,6 +915,8 @@ public class OnlineDialog extends JDialog {
           whitePlayer = blackPlayer;
           blackPlayer = t;
           Lizzie.frame.setPlayers(whitePlayer, blackPlayer);
+          Lizzie.board.getHistory().getGameInfo().setPlayerBlack(blackPlayer);
+          Lizzie.board.getHistory().getGameInfo().setPlayerWhite(whitePlayer);
         } else if (f.type == 7005) {
           long uid = f.line.optLong("AAA303");
           int num = f.line.optInt("AAA102");
@@ -2068,10 +2071,8 @@ public class OnlineDialog extends JDialog {
     whitePlayer = info.optString("whiteName");
     history = SGFParser.parseSgf(info.optString("sgf"));
     if (history != null) {
-      history.getGameInfo().setPlayerBlack(blackPlayer);
-      history.getGameInfo().setPlayerWhite(whitePlayer);
       double komi = info.optDouble("komi", history.getGameInfo().getKomi());
-      history.getGameInfo().setKomi(komi);
+      Lizzie.board.getHistory().getGameInfo().setKomi(komi);
       Lizzie.leelaz.komi(komi);
       int diffMove = Lizzie.board.getHistory().sync(history);
       if (diffMove >= 0) {
@@ -2099,6 +2100,8 @@ public class OnlineDialog extends JDialog {
       }
     }
     Lizzie.frame.setPlayers(whitePlayer, blackPlayer);
+    Lizzie.board.getHistory().getGameInfo().setPlayerBlack(blackPlayer);
+    Lizzie.board.getHistory().getGameInfo().setPlayerWhite(whitePlayer);
   }
 
   private void channel() {
