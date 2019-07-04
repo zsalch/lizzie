@@ -594,6 +594,7 @@ public class Leelaz {
     synchronized (this) {
       sendCommand("komi " + (komi == 0.0 ? "0" : komi));
       bestMoves = new ArrayList<>();
+      Lizzie.board.getData().tryToClearBestMoves();
       if (isPondering) ponder();
     }
   }
