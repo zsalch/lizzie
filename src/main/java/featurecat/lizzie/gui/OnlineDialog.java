@@ -895,7 +895,7 @@ public class OnlineDialog extends JDialog {
               komi = 6.5;
             } else if (1 == a10) { // && 1 == chineseRule) {
               chineseFlag = true;
-              komi = ((double) a5 / 100 * 2);
+              komi = ((double) a5 / 100); // * 2);
             } else {
               komi = ((double) a5 / 100);
             }
