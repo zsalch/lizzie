@@ -213,11 +213,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
           undo(10);
         } else {
           if (Lizzie.frame.isMouseOver) {
-            if (Lizzie.frame.isShowingNormalBoard()) {
-              Lizzie.frame.setDisplayedBranchLength(1);
-            } else {
-              Lizzie.frame.incrementDisplayedBranchLength(-1);
-            }
+            Lizzie.frame.doBranch(-1);
           } else {
             undo();
           }
@@ -239,11 +235,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
           redo(10);
         } else {
           if (Lizzie.frame.isMouseOver) {
-            if (Lizzie.frame.isShowingNormalBoard()) {
-              Lizzie.frame.setDisplayedBranchLength(2);
-            } else {
-              Lizzie.frame.incrementDisplayedBranchLength(1);
-            }
+            Lizzie.frame.doBranch(1);
           } else {
             redo();
           }
@@ -555,9 +547,17 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
       wheelWhen = e.getWhen();
       if (Lizzie.board.inAnalysisMode()) Lizzie.board.toggleAnalysis();
       if (e.getWheelRotation() > 0) {
-        redo();
+        if (Lizzie.frame.isMouseOver) {
+          Lizzie.frame.doBranch(1);
+        } else {
+          redo();
+        }
       } else if (e.getWheelRotation() < 0) {
-        undo();
+        if (Lizzie.frame.isMouseOver) {
+          Lizzie.frame.doBranch(-1);
+        } else {
+          undo();
+        }
       }
       Lizzie.frame.refresh();
     }

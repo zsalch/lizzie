@@ -345,7 +345,7 @@ public class BoardHistoryNode {
     BoardHistoryNode top = start;
     while (start.previous().isPresent()) {
       BoardHistoryNode pre = start.previous().get();
-      if (pre.next().isPresent() && pre.next().get() != start) {
+      if (pre.next(true).isPresent() && pre.next(true).get() != start) {
         top = pre;
       }
       start = pre;

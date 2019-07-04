@@ -725,31 +725,13 @@ public class LizzieMain extends MainFrame {
   }
 
   @Override
-  public boolean isShowingRawBoard() {
-    return boardPane.isShowingRawBoard();
-  }
-
-  @Override
-  public boolean isShowingNormalBoard() {
-    return boardPane.isShowingNormalBoard();
-  }
-
-  @Override
-  public void setDisplayedBranchLength(int n) {
-    boardPane.setDisplayedBranchLength(n);
-  }
-
-  @Override
   public boolean incrementDisplayedBranchLength(int n) {
     return boardPane.incrementDisplayedBranchLength(n);
   }
 
-  public Optional<MoveData> mouseOveredMove() {
-    return boardPane.mouseOveredMove();
-  }
-
-  public int getReplayBranch() {
-    return boardPane.getReplayBranch();
+  @Override
+  public void doBranch(int moveTo) {
+    boardPane.doBranch(moveTo);
   }
 
   public void addSuggestionAsBranch() {

@@ -6,7 +6,6 @@ import static java.lang.Math.min;
 
 import com.jhlabs.image.GaussianFilter;
 import featurecat.lizzie.Lizzie;
-import featurecat.lizzie.analysis.MoveData;
 import featurecat.lizzie.rules.Board;
 import featurecat.lizzie.rules.SGFParser;
 import java.awt.BasicStroke;
@@ -352,8 +351,17 @@ public class BoardPane extends LizziePane {
     }
   }
 
+  public void clearMoved() {
+    isReplayVariation = false;
+    if (Lizzie.frame != null && Lizzie.frame.isMouseOver) {
+      Lizzie.frame.isMouseOver = false;
+      boardRenderer.startNormalBoard();
+    }
+  }
+
   public void onMouseExited(int x, int y) {
     mouseOverCoordinate = outOfBoundCoordinate;
+    clearMoved();
   }
 
   public void onMouseMoved(int x, int y) {
@@ -363,11 +371,7 @@ public class BoardPane extends LizziePane {
         .filter(c -> !isMouseOver(c[0], c[1]))
         .ifPresent(
             c -> {
-              isReplayVariation = false;
-              if (Lizzie.frame != null && Lizzie.frame.isMouseOver) {
-                Lizzie.frame.isMouseOver = false;
-                boardRenderer.startNormalBoard();
-              }
+              clearMoved();
               repaint();
             });
     coords.ifPresent(
@@ -378,9 +382,7 @@ public class BoardPane extends LizziePane {
           }
         });
     if (!coords.isPresent() && boardRenderer.isShowingBranch()) {
-      isReplayVariation = false;
-      Lizzie.frame.isMouseOver = false;
-      boardRenderer.startNormalBoard();
+      clearMoved();
       repaint();
     }
   }
@@ -425,24 +427,28 @@ public class BoardPane extends LizziePane {
     boardRenderer.setDisplayedBranchLength(BoardRenderer.SHOW_NORMAL_BOARD);
   }
 
-  public boolean isShowingRawBoard() {
-    return boardRenderer.isShowingRawBoard();
-  }
-
-  public boolean isShowingNormalBoard() {
-    return boardRenderer.isShowingNormalBoard();
-  }
-
   public boolean incrementDisplayedBranchLength(int n) {
     return boardRenderer.incrementDisplayedBranchLength(n);
   }
 
-  public Optional<MoveData> mouseOveredMove() {
-    return boardRenderer.mouseOveredMove();
-  }
-
-  public int getReplayBranch() {
-    return boardRenderer.getReplayBranch();
+  public void doBranch(int moveTo) {
+    if (moveTo > 0) {
+      if (boardRenderer.isShowingNormalBoard()) {
+        setDisplayedBranchLength(2);
+      } else {
+        if (boardRenderer.getReplayBranch() > boardRenderer.getDisplayedBranchLength()) {
+          boardRenderer.incrementDisplayedBranchLength(1);
+        }
+      }
+    } else {
+      if (boardRenderer.isShowingNormalBoard()) {
+        setDisplayedBranchLength(boardRenderer.getReplayBranch());
+      } else {
+        if (boardRenderer.getDisplayedBranchLength() > 1) {
+          boardRenderer.incrementDisplayedBranchLength(-1);
+        }
+      }
+    }
   }
 
   public void addSuggestionAsBranch() {

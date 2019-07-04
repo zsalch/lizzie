@@ -15,19 +15,16 @@ import featurecat.lizzie.rules.BoardData;
 import featurecat.lizzie.rules.GIBParser;
 import featurecat.lizzie.rules.SGFParser;
 import featurecat.lizzie.util.Utils;
+import java.awt.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.FontMetrics;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
-import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -38,23 +35,15 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.*;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.StyleSheet;
@@ -1467,8 +1456,7 @@ public class LizzieFrame extends MainFrame {
     setTitle(sb.toString());
   }
 
-  @Override
-  public void setDisplayedBranchLength(int n) {
+  private void setDisplayedBranchLength(int n) {
     boardRenderer.setDisplayedBranchLength(n);
   }
 
@@ -1482,30 +1470,8 @@ public class LizzieFrame extends MainFrame {
     boardRenderer.setDisplayedBranchLength(BoardRenderer.SHOW_NORMAL_BOARD);
   }
 
-  @Override
-  public boolean isShowingRawBoard() {
-    return boardRenderer.isShowingRawBoard();
-  }
-
-  @Override
-  public boolean isShowingNormalBoard() {
-    return boardRenderer.isShowingNormalBoard();
-  }
-
   public boolean incrementDisplayedBranchLength(int n) {
     return boardRenderer.incrementDisplayedBranchLength(n);
-  }
-
-  public Optional<MoveData> mouseOveredMove() {
-    return boardRenderer.mouseOveredMove();
-  }
-
-  public int getReplayBranch() {
-    return boardRenderer.getReplayBranch();
-  }
-
-  public void addSuggestionAsBranch() {
-    boardRenderer.addSuggestionAsBranch();
   }
 
   public void resetTitle() {
