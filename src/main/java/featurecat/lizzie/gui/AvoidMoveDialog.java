@@ -21,7 +21,7 @@ import javax.swing.text.DocumentFilter;
 import javax.swing.text.InternationalFormatter;
 
 public class AvoidMoveDialog extends JDialog {
-  public final ResourceBundle resourceBundle = ResourceBundle.getBundle("l10n.DisplayStrings");
+  public final ResourceBundle resourceBundle = MainFrame.resourceBundle;
   private JRadioButton rdoAvoid;
   private JRadioButton rdoAllow;
   private JRadioButton rdoBlack;

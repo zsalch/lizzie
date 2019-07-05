@@ -66,7 +66,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class OnlineDialog extends JDialog {
-  public final ResourceBundle resourceBundle = ResourceBundle.getBundle("l10n.DisplayStrings");
+  public final ResourceBundle resourceBundle = MainFrame.resourceBundle;
   private ScheduledExecutorService online = Executors.newScheduledThreadPool(1);
   private ScheduledFuture<?> schedule = null;
   private WebSocketClient client;

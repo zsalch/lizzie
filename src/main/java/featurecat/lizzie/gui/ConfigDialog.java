@@ -98,7 +98,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class ConfigDialog extends JDialog {
-  public final ResourceBundle resourceBundle = ResourceBundle.getBundle("l10n.DisplayStrings");
+  public final ResourceBundle resourceBundle = MainFrame.resourceBundle;
 
   public String enginePath = "";
   public String weightPath = "";

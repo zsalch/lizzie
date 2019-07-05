@@ -28,7 +28,7 @@ import javax.swing.text.DocumentFilter;
 import javax.swing.text.InternationalFormatter;
 
 public class ChangeMoveDialog extends JDialog {
-  public final ResourceBundle resourceBundle = ResourceBundle.getBundle("l10n.DisplayStrings");
+  public final ResourceBundle resourceBundle = MainFrame.resourceBundle;
   private JRadioButton rdoChangeCoord;
   private JRadioButton rdoPass;
   private JRadioButton rdoSwap;
