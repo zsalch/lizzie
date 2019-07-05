@@ -55,6 +55,7 @@ import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
@@ -74,6 +75,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -648,55 +650,53 @@ public class ConfigDialog extends JDialog {
         new LinkLabel(resourceBundle.getString("LizzieConfig.lizzie.contributors"));
     lblContributors.setFont(new Font("Tahoma", Font.PLAIN, 14));
     GroupLayout gl = new GroupLayout(aboutTab);
-    //    gl.setHorizontalGroup(
-    //        gl.createParallelGroup(Alignment.LEADING)
-    //            .addGroup(
-    //                gl.createSequentialGroup()
-    //                    .addGroup(
-    //                        gl.createParallelGroup(Alignment.LEADING)
-    //                            .addGroup(
-    //                                gl.createSequentialGroup()
-    //                                    .addContainerGap()
-    //                                    .addComponent(
-    //                                        lblLizzieInfo,
-    //                                        GroupLayout.DEFAULT_SIZE,
-    //                                        628,
-    //                                        Short.MAX_VALUE))
-    //                            .addGroup(
-    //                                gl.createSequentialGroup()
-    //                                    .addContainerGap()
-    //                                    .addComponent(lblContributorsTitle))
-    //                            .addGroup(
-    //                                gl.createSequentialGroup()
-    //                                    .addContainerGap()
-    //                                    .addComponent(
-    //                                        lblContributors,
-    //                                        GroupLayout.PREFERRED_SIZE,
-    //                                        620,
-    //                                        GroupLayout.PREFERRED_SIZE))
-    //                            .addGroup(
-    //
-    // gl.createSequentialGroup().addGap(254).addComponent(lblLizzieName)))
-    //                    .addContainerGap()));
-    //    gl.setVerticalGroup(
-    //        gl.createParallelGroup(Alignment.LEADING)
-    //            .addGroup(
-    //                gl.createSequentialGroup()
-    //                    .addGap(18)
-    //                    .addComponent(lblLizzieName)
-    //                    .addPreferredGap(ComponentPlacement.RELATED)
-    //                    .addComponent(
-    //                        lblLizzieInfo, GroupLayout.PREFERRED_SIZE, 183,
-    // GroupLayout.PREFERRED_SIZE)
-    //                    .addPreferredGap(ComponentPlacement.RELATED)
-    //                    .addComponent(lblContributorsTitle)
-    //                    .addPreferredGap(ComponentPlacement.RELATED)
-    //                    .addComponent(
-    //                        lblContributors,
-    //                        GroupLayout.PREFERRED_SIZE,
-    //                        282,
-    //                        GroupLayout.PREFERRED_SIZE)
-    //                    .addGap(126)));
+    gl.setHorizontalGroup(
+        gl.createParallelGroup(Alignment.LEADING)
+            .addGroup(
+                gl.createSequentialGroup()
+                    .addGroup(
+                        gl.createParallelGroup(Alignment.LEADING)
+                            .addGroup(
+                                gl.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(
+                                        lblLizzieInfo,
+                                        GroupLayout.DEFAULT_SIZE,
+                                        628,
+                                        Short.MAX_VALUE))
+                            .addGroup(
+                                gl.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(lblContributorsTitle))
+                            .addGroup(
+                                gl.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(
+                                        lblContributors,
+                                        GroupLayout.PREFERRED_SIZE,
+                                        620,
+                                        GroupLayout.PREFERRED_SIZE))
+                            .addGroup(
+                                gl.createSequentialGroup().addGap(254).addComponent(lblLizzieName)))
+                    .addContainerGap()));
+    gl.setVerticalGroup(
+        gl.createParallelGroup(Alignment.LEADING)
+            .addGroup(
+                gl.createSequentialGroup()
+                    .addGap(18)
+                    .addComponent(lblLizzieName)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(
+                        lblLizzieInfo, GroupLayout.PREFERRED_SIZE, 183, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(lblContributorsTitle)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(
+                        lblContributors,
+                        GroupLayout.PREFERRED_SIZE,
+                        282,
+                        GroupLayout.PREFERRED_SIZE)
+                    .addGap(126)));
     aboutTab.setLayout(gl);
 
     // Engines
