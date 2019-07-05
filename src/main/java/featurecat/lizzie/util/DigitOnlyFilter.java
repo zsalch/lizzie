@@ -6,10 +6,9 @@ import javax.swing.text.DocumentFilter;
 
 public class DigitOnlyFilter extends DocumentFilter {
   private String pattern = "\\D++";
-  
-  public DigitOnlyFilter() {
-  }
-  
+
+  public DigitOnlyFilter() {}
+
   public DigitOnlyFilter(String pattern) {
     this.pattern = pattern;
   }
