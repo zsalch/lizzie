@@ -8,6 +8,7 @@ import static java.lang.Math.max;
 import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.rules.Board;
 import featurecat.lizzie.theme.Theme;
+import featurecat.lizzie.util.DigitOnlyFilter;
 import featurecat.lizzie.util.Utils;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -90,8 +91,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.InternationalFormatter;
 import org.json.JSONArray;
@@ -860,7 +859,7 @@ public class ConfigDialog extends JDialog {
                 return filter;
               }
 
-              private DocumentFilter filter = new NumericFilter();
+              private DocumentFilter filter = new DigitOnlyFilter("[^0-9\\.]++");
             });
     txtMinPlayoutRatioForStats.setColumns(10);
     txtMinPlayoutRatioForStats.setBounds(170, 357, 52, 24);
@@ -1827,46 +1826,6 @@ public class ConfigDialog extends JDialog {
       return 0;
     } else {
       return Integer.parseInt(txt.getText().trim());
-    }
-  }
-
-  private class DigitOnlyFilter extends DocumentFilter {
-    @Override
-    public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
-        throws BadLocationException {
-      String newStr = string != null ? string.replaceAll("\\D++", "") : "";
-      if (!newStr.isEmpty()) {
-        fb.insertString(offset, newStr, attr);
-      }
-    }
-
-    @Override
-    public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
-        throws BadLocationException {
-      String newStr = text != null ? text.replaceAll("\\D++", "") : "";
-      if (!newStr.isEmpty()) {
-        fb.replace(offset, length, newStr, attrs);
-      }
-    }
-  }
-
-  private class NumericFilter extends DocumentFilter {
-    @Override
-    public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
-        throws BadLocationException {
-      String newStr = string != null ? string.replaceAll("[^0-9\\.]++", "") : "";
-      if (!newStr.isEmpty()) {
-        fb.insertString(offset, newStr, attr);
-      }
-    }
-
-    @Override
-    public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
-        throws BadLocationException {
-      String newStr = text != null ? text.replaceAll("[^0-9\\.]++", "") : "";
-      if (!newStr.isEmpty()) {
-        fb.replace(offset, length, newStr, attrs);
-      }
     }
   }
 

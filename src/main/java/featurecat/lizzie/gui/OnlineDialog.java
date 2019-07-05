@@ -7,6 +7,7 @@ import featurecat.lizzie.rules.BoardHistoryNode;
 import featurecat.lizzie.rules.SGFParser;
 import featurecat.lizzie.rules.Stone;
 import featurecat.lizzie.util.AjaxHttpRequest;
+import featurecat.lizzie.util.DigitOnlyFilter;
 import featurecat.lizzie.util.Utils;
 import io.socket.client.Ack;
 import io.socket.client.IO;
@@ -220,26 +221,6 @@ public class OnlineDialog extends JDialog {
       }
     } else {
       error(true);
-    }
-  }
-
-  private class DigitOnlyFilter extends DocumentFilter {
-    @Override
-    public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
-        throws BadLocationException {
-      String newStr = string != null ? string.replaceAll("\\D++", "") : "";
-      if (!newStr.isEmpty()) {
-        fb.insertString(offset, newStr, attr);
-      }
-    }
-
-    @Override
-    public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
-        throws BadLocationException {
-      String newStr = text != null ? text.replaceAll("\\D++", "") : "";
-      if (!newStr.isEmpty()) {
-        fb.replace(offset, length, newStr, attrs);
-      }
     }
   }
 
