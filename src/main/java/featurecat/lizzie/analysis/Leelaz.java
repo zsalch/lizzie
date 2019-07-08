@@ -441,7 +441,7 @@ public class Leelaz {
         }
       }
       // this line will be reached when Leelaz shuts down
-      System.out.println("Leelaz process ended.");
+      System.out.println("Engine process ended.");
 
       shutdown();
       // Do no exit for switching weights
