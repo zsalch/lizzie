@@ -8,6 +8,7 @@ import featurecat.lizzie.rules.SGFParser;
 import featurecat.lizzie.rules.Stone;
 import featurecat.lizzie.util.AjaxHttpRequest;
 import featurecat.lizzie.util.DigitOnlyFilter;
+import featurecat.lizzie.util.EncodingDetector;
 import featurecat.lizzie.util.Utils;
 import io.socket.client.Ack;
 import io.socket.client.IO;
@@ -20,9 +21,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -369,12 +368,13 @@ public class OnlineDialog extends JDialog {
     try {
       BoardHistoryList liveNode = SGFParser.parseSgf(sgf);
       if (liveNode != null) {
+        blackPlayer = liveNode.getGameInfo().getPlayerBlack();
+        whitePlayer = liveNode.getGameInfo().getPlayerWhite();
+        double komi = liveNode.getGameInfo().getKomi();
         if (live != null) {
-          double komi = live.optDouble("komi", Lizzie.board.getHistory().getGameInfo().getKomi());
-          Lizzie.board.getHistory().getGameInfo().setKomi(komi);
-          Lizzie.leelaz.komi(komi);
-          blackPlayer = live.optString("BlackPlayer");
-          whitePlayer = live.optString("WhitePlayer");
+          komi = live.optDouble("komi", komi);
+          blackPlayer = live.optString("BlackPlayer", blackPlayer);
+          whitePlayer = live.optString("WhitePlayer", whitePlayer);
         }
         int diffMove = Lizzie.board.getHistory().sync(liveNode);
         if (diffMove >= 0) {
@@ -400,6 +400,8 @@ public class OnlineDialog extends JDialog {
         Lizzie.frame.setPlayers(whitePlayer, blackPlayer);
         Lizzie.board.getHistory().getGameInfo().setPlayerBlack(blackPlayer);
         Lizzie.board.getHistory().getGameInfo().setPlayerWhite(whitePlayer);
+        Lizzie.board.getHistory().getGameInfo().setKomi(komi);
+        Lizzie.leelaz.komi(komi);
         if (live != null && "3".equals(live.optString("Status"))) {
           if (schedule != null && !schedule.isCancelled() && !schedule.isDone()) {
             schedule.cancel(false);
@@ -431,15 +433,7 @@ public class OnlineDialog extends JDialog {
         "Mozilla/5.0 (Linux; U; Android 2.3.6; zh-cn; GT-S5660 Build/GINGERBREAD) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 MicroMessenger/4.5.255");
 
     int responseCode = con.getResponseCode();
-
-    BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-    StringBuffer response = new StringBuffer();
-    String line;
-    while ((line = in.readLine()) != null) {
-      response.append(line);
-    }
-    in.close();
-    String sgf = response.toString();
+    String sgf = EncodingDetector.toString(con.getInputStream());
     parseSgf(sgf, "", 0, false);
   }
 
