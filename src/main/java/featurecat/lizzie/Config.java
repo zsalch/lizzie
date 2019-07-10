@@ -225,7 +225,7 @@ public class Config {
     winrateStrokeWidth = theme.winrateStrokeWidth();
     minimumBlunderBarWidth = theme.minimumBlunderBarWidth();
     shadowSize = theme.shadowSize();
-    showLcbWinrate = config.getJSONObject("leelaz").getBoolean("show-lcb-winrate");
+    showLcbWinrate = config.getJSONObject("leelaz").optBoolean("show-lcb-winrate");
 
     showKataGoScoreMean = uiConfig.optBoolean("show-katago-scoremean", true);
     showKataGoBoardScoreMean = uiConfig.optBoolean("show-katago-boardscoremean", false);
