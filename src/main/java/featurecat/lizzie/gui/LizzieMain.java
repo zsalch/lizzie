@@ -187,7 +187,12 @@ public class LizzieMain extends MainFrame {
     WindowPosition.restorePane(Lizzie.config.persistedUi, commentPane);
 
     try {
-      this.setIconImage(ImageIO.read(getClass().getResourceAsStream("/assets/logo.png")));
+      if (System.getProperty("os.name").contains("Mac")) {
+        com.apple.eawt.Application.getApplication()
+            .setDockIconImage(ImageIO.read(getClass().getResourceAsStream("/assets/logo.png")));
+      } else {
+        this.setIconImage(ImageIO.read(getClass().getResourceAsStream("/assets/logo.png")));
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }
