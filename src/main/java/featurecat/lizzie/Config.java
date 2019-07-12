@@ -91,7 +91,7 @@ public class Config {
   public Color scoreMeanLineColor = null;
   public Color winrateMissLineColor = null;
   public Color blunderBarColor = null;
-  public boolean solidStoneIndicator = false;
+  public int stoneIndicatorType = 1; // 0: non, 1: circle, 2: solid
   public boolean showCommentNodeColor = true;
   public Color commentNodeColor = null;
   public Optional<List<Double>> blunderWinrateThresholds;
@@ -249,7 +249,7 @@ public class Config {
     scoreMeanLineColor = theme.scoreMeanLineColor();
     winrateMissLineColor = theme.winrateMissLineColor();
     blunderBarColor = theme.blunderBarColor();
-    solidStoneIndicator = theme.solidStoneIndicator();
+    stoneIndicatorType = theme.stoneIndicatorType();
     showCommentNodeColor = theme.showCommentNodeColor();
     commentNodeColor = theme.commentNodeColor();
     blunderWinrateThresholds = theme.blunderWinrateThresholds();
