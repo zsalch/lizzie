@@ -23,6 +23,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -187,9 +189,21 @@ public class LizzieMain extends MainFrame {
     WindowPosition.restorePane(Lizzie.config.persistedUi, commentPane);
 
     try {
-      if (System.getProperty("os.name").contains("Mac")) {
-        com.apple.eawt.Application.getApplication()
-            .setDockIconImage(ImageIO.read(getClass().getResourceAsStream("/assets/logo.png")));
+      if (System.getProperty("os.name").contains("Mac")
+          && Utils.classExists("com.apple.eawt.Application")) {
+        try {
+          Class c = Class.forName("com.apple.eawt.Application");
+          Method m = c.getDeclaredMethod("getApplication");
+          Object o = m.invoke(null);
+          Method mset = c.getDeclaredMethod("setDockIconImage", BufferedImage.class);
+          mset.invoke(o, ImageIO.read(getClass().getResourceAsStream("/assets/logo.png")));
+        } catch (ClassNotFoundException e1) {
+        } catch (NoSuchMethodException e1) {
+        } catch (SecurityException e1) {
+        } catch (IllegalAccessException e1) {
+        } catch (IllegalArgumentException e1) {
+        } catch (InvocationTargetException e1) {
+        }
       } else {
         this.setIconImage(ImageIO.read(getClass().getResourceAsStream("/assets/logo.png")));
       }

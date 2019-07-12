@@ -598,7 +598,7 @@ public class BoardPane extends LizziePane {
     JSONObject filesystem = Lizzie.config.persisted.getJSONObject("filesystem");
     JFileChooser chooser = new JFileChooser(filesystem.getString("last-folder"));
     chooser.setAcceptAllFileFilterUsed(false);
-//    String writerNames[] = ImageIO.getWriterFormatNames();
+    //    String writerNames[] = ImageIO.getWriterFormatNames();
     FileNameExtensionFilter filter1 = new FileNameExtensionFilter("*.png", "PNG");
     FileNameExtensionFilter filter2 = new FileNameExtensionFilter("*.jpg", "JPG", "JPEG");
     FileNameExtensionFilter filter3 = new FileNameExtensionFilter("*.gif", "GIF");
