@@ -16,6 +16,7 @@ import java.awt.FontMetrics;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.TexturePaint;
@@ -195,7 +196,7 @@ public class LizzieMain extends MainFrame {
           Class c = Class.forName("com.apple.eawt.Application");
           Method m = c.getDeclaredMethod("getApplication");
           Object o = m.invoke(null);
-          Method mset = c.getDeclaredMethod("setDockIconImage", BufferedImage.class);
+          Method mset = c.getDeclaredMethod("setDockIconImage", Image.class);
           mset.invoke(o, ImageIO.read(getClass().getResourceAsStream("/assets/logo.png")));
         } catch (ClassNotFoundException e1) {
         } catch (NoSuchMethodException e1) {
