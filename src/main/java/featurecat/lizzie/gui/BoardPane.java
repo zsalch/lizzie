@@ -503,7 +503,7 @@ public class BoardPane extends LizziePane {
     boardRenderer.increaseMaxAlpha(k);
   }
 
-  String gifPath = null;
+  private String gifPath = null;
 
   public void replayBranch(boolean generateGif) {
     if (isReplayVariation) return;
