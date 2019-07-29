@@ -127,8 +127,9 @@ public class LizzieMain extends MainFrame {
               // pondering message
               int maxBound = Math.max(width, height);
               double ponderingSize = .02;
-              int ponderingX = 0;
-              int ponderingY = height - 2 - (int) (maxBound * ponderingSize);
+              LizzieLayout ll = (LizzieLayout) this.getLayout();
+              int ponderingX = ll.ponderingX;
+              int ponderingY = ll.ponderingY;
 
               // dynamic komi
               double dynamicKomiSize = .02;
@@ -184,6 +185,8 @@ public class LizzieMain extends MainFrame {
     countResults = new CountResults();
     menu = new Menu();
     setJMenuBar(menu);
+    toolBar = new ToolBar();
+    getContentPane().add(toolBar, LizzieLayout.SOUTH);
     getContentPane().add(boardPane, LizzieLayout.MAIN_BOARD);
     getContentPane().add(basicInfoPane, LizzieLayout.BASIC_INFO);
     getContentPane().add(winratePane, LizzieLayout.WINRATE);
@@ -654,11 +657,12 @@ public class LizzieMain extends MainFrame {
   }
 
   @Override
-  public void noEstimateByZen() {
+  public void noEstimateByZen(boolean byToolBar) {
     // TODO Auto-generated method stub
     removeEstimateRect();
     isEstimating = false;
     countResults.button.setText(resourceBundle.getString("CountDialog.estimateButton.clickone"));
+    if (byToolBar) countResults.setVisible(false);
   }
 
   @Override
