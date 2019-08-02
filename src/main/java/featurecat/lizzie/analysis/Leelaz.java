@@ -732,7 +732,9 @@ public class Leelaz {
       stats.totalPlayouts = totalPlayouts;
 
       stats.maxWinrate = BoardData.getWinrateFromBestMoves(moves);
-      stats.maxScoreMean = BoardData.getScoreMeanFromBestMoves(moves);
+      if (isKataGo) {
+        stats.maxScoreMean = BoardData.getScoreMeanFromBestMoves(moves);
+      }
     }
 
     return stats;

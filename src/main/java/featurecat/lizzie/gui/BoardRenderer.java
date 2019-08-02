@@ -800,7 +800,7 @@ public class BoardRenderer {
         text = String.format("%.1f", roundedWinrate);
       }
 
-      if (Lizzie.leelaz.isKataGo && Lizzie.config.showScoremeanInSuggestion) {
+      if (Lizzie.config.showScoremeanInSuggestion) {
         double score = textData.move.scoreMean;
         if (Lizzie.board.getHistory().isBlacksTurn()) {
           if (Lizzie.config.showKataGoBoardScoreMean) {
