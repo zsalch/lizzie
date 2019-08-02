@@ -84,6 +84,7 @@ public class Leelaz {
   private float dynamicKomi = Float.NaN;
   private float dynamicOppKomi = Float.NaN;
   public boolean isKataGo = false;
+  public boolean supportScoremean = false;
   ArrayList<Double> esitmateArray = new ArrayList<Double>();
   public double scoreMean = 0;
   public double scoreStdev = 0;
@@ -133,6 +134,7 @@ public class Leelaz {
     }
 
     isLoaded = false;
+    isKataGo = false;
     bestMoves = new ArrayList<>();
     Lizzie.board.getData().tryToClearBestMoves();
 
@@ -592,6 +594,7 @@ public class Leelaz {
 
   public void clear() {
     synchronized (this) {
+      supportScoremean = false;
       sendCommand("clear_board");
       bestMoves = new ArrayList<>();
       if (isPondering) ponder();
@@ -893,6 +896,10 @@ public class Leelaz {
 
   public boolean isLoaded() {
     return isLoaded;
+  }
+
+  public boolean supportScoremean() {
+    return isKataGo || supportScoremean;
   }
 
   public String currentWeight() {
