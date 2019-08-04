@@ -497,6 +497,7 @@ public class Menu extends JMenuBar {
             try {
               Lizzie.config.save();
             } catch (IOException es) {
+              // TODO Auto-generated catch block
             }
           }
         });
