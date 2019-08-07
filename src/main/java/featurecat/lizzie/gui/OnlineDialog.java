@@ -2067,14 +2067,15 @@ public class OnlineDialog extends JDialog {
         }
       }
     }
-    if (history == null || (isEnd && type == 1)) {
+    if (history == null || isEnd) {
       //      error(true);
       sio.close();
-      try {
-        refresh("(?s).*?(\\\"Content\\\":\\\")(.+)(\\\",\\\")(?s).*", 2, false, false);
-      } catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+      if (isEnd && type == 1) {
+        try {
+          refresh("(?s).*?(\\\"Content\\\":\\\")(.+)(\\\",\\\")(?s).*", 2, false, false);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
       }
     }
     Lizzie.frame.setPlayers(whitePlayer, blackPlayer);
