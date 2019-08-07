@@ -339,11 +339,13 @@ public class OnlineDialog extends JDialog {
   public void parseSgf(String data, String format, int num, boolean decode) {
     JSONObject o = null;
     JSONObject live = null;
+    JSONObject branchs = null;
     try {
       o = new JSONObject(data);
       o = o.optJSONObject("Result");
       if (o != null) {
         live = o.optJSONObject("live");
+        branchs = o.optJSONObject("branch");
       }
     } catch (JSONException e) {
     }
@@ -2042,7 +2044,10 @@ public class OnlineDialog extends JDialog {
     history = new BoardHistoryList(BoardData.empty(size, size)); // TODO boardSize
     blackPlayer = info.optString("blackName");
     whitePlayer = info.optString("whiteName");
-    history = SGFParser.parseSgf(info.optString("sgf"));
+    history =
+        !Utils.isBlank(info.optString("resultDesc"))
+            ? null
+            : SGFParser.parseSgf(info.optString("sgf"));
     if (history != null) {
       double komi = info.optDouble("komi", history.getGameInfo().getKomi());
       Lizzie.board.getHistory().getGameInfo().setKomi(komi);
@@ -2066,7 +2071,7 @@ public class OnlineDialog extends JDialog {
       //      error(true);
       sio.close();
       try {
-        refresh("(?s).*?(\\\"Content\\\":\\\")(.+)(\\\",\\\")(?s).*");
+        refresh("(?s).*?(\\\"Content\\\":\\\")(.+)(\\\",\\\")(?s).*", 2, false, false);
       } catch (IOException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
