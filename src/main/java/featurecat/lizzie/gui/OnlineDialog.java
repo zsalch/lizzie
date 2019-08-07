@@ -261,8 +261,8 @@ public class OnlineDialog extends JDialog {
     if (um.matches() && um.groupCount() >= 3) {
       roomId = Long.parseLong(um.group(3));
       if (roomId > 0) { // !Utils.isBlank(id)) {
-        ajaxUrl = "https://api." + um.group(1) + "/golive/dtl?id=" + id;
-        return 1;
+        ajaxUrl = "https://api." + um.group(1) + "/golive/dtl?id=" + roomId;
+        return 5;
       }
     }
 
@@ -273,8 +273,8 @@ public class OnlineDialog extends JDialog {
     if (um.matches() && um.groupCount() >= 3) {
       roomId = Long.parseLong(um.group(3));
       if (roomId > 0) { // !Utils.isBlank(id)) {
-        ajaxUrl = "https://api." + um.group(1) + "/golive/dtl?id=" + id;
-        return 1;
+        ajaxUrl = "https://api." + um.group(1) + "/golive/dtl?id=" + roomId;
+        return 5;
       }
     }
 
@@ -317,6 +317,7 @@ public class OnlineDialog extends JDialog {
     Lizzie.board.clear();
     switch (type) {
       case 1:
+      case 5:
         req2();
         break;
       case 2:
@@ -2044,10 +2045,8 @@ public class OnlineDialog extends JDialog {
     history = new BoardHistoryList(BoardData.empty(size, size)); // TODO boardSize
     blackPlayer = info.optString("blackName");
     whitePlayer = info.optString("whiteName");
-    history =
-        !Utils.isBlank(info.optString("resultDesc"))
-            ? null
-            : SGFParser.parseSgf(info.optString("sgf"));
+    boolean isEnd = !Utils.isBlank(info.optString("resultDesc"));
+    history = SGFParser.parseSgf(info.optString("sgf"));
     if (history != null) {
       double komi = info.optDouble("komi", history.getGameInfo().getKomi());
       Lizzie.board.getHistory().getGameInfo().setKomi(komi);
@@ -2067,7 +2066,8 @@ public class OnlineDialog extends JDialog {
           Lizzie.board.nextMove();
         }
       }
-    } else {
+    }
+    if (history == null || (isEnd && type == 1)) {
       //      error(true);
       sio.close();
       try {
