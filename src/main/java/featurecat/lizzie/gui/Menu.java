@@ -1348,13 +1348,18 @@ public class Menu extends JMenuBar {
   }
 
   public void updateEngineIcon(List<Leelaz> engineList, int currentEngineNo) {
-    for (int i = 0; i < engineList.size(); i++) {
-      Leelaz engineDt = engineList.get(i);
-      if (engineDt != null) {
-        if (i == currentEngineNo) {
-          engine[i].setIcon(running);
-          engineMenu.setText(engine[i].getText());
-        } else if (engineDt.isLoaded()) engine[i].setIcon(ready);
+    if (engine != null) {
+      for (int i = 0; i < engineList.size(); i++) {
+        if (engine[i] != null) {
+          Leelaz engineDt = engineList.get(i);
+          if (engineDt != null) {
+            if (i == currentEngineNo) {
+              engine[i].setIcon(running);
+              engineMenu.setText(engine[i].getText());
+            } else if (engineDt.isLoaded()) engine[i].setIcon(ready);
+            else if (engine[i].getIcon() != null) engine[i].setIcon(null);
+          }
+        }
       }
     }
   }
