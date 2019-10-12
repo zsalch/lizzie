@@ -40,6 +40,7 @@ public class SGFParser {
     }
 
     String encoding = EncodingDetector.detect(filename);
+    if (encoding == "WINDOWS-1252") encoding = "gb2312";
     FileInputStream fp = new FileInputStream(file);
     InputStreamReader reader = new InputStreamReader(fp, encoding);
     StringBuilder builder = new StringBuilder();
