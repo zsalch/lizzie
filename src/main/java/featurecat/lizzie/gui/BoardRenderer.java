@@ -253,6 +253,9 @@ public class BoardRenderer {
       cachedBoardHeight = boardHeight;
       Lizzie.frame.setForceRefresh(false);
 
+      cachedShadow = null;
+      cachedGhostShadow = null;
+
       cachedBackgroundImage = new BufferedImage(width, height, TYPE_INT_ARGB);
       Graphics2D g = cachedBackgroundImage.createGraphics();
       g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -1067,7 +1070,6 @@ public class BoardRenderer {
   /**
    * Calculates the lengths and pixel margins from a given boardLength.
    *
-   * @param boardLength go board's length in pixels; must be boardLength >= BOARD_SIZE - 1
    * @return an array containing the three outputs: new boardLength, scaledMargin, availableLength
    */
   private static int[] calculatePixelMargins(
@@ -1151,63 +1153,78 @@ public class BoardRenderer {
     drawShadow(g, centerX, centerY, isGhost, 1);
   }
 
+  private BufferedImage cachedShadow = null;
+  private BufferedImage cachedGhostShadow = null;
+
   private void drawShadow(
-      Graphics2D g, int centerX, int centerY, boolean isGhost, float shadowStrength) {
+      Graphics2D g1, int centerX, int centerY, boolean isGhost, float shadowStrength) {
     if (!uiConfig.getBoolean("shadows-enabled")) return;
 
     double r = stoneRadius * Lizzie.config.shadowSize / 100;
     final int shadowSize = (int) (r * 0.3) == 0 ? 1 : (int) (r * 0.3);
-    final int fartherShadowSize = (int) (r * 0.17) == 0 ? 1 : (int) (r * 0.17);
+    final int stoneCenter = stoneRadius + shadowSize;
 
-    final Paint TOP_GRADIENT_PAINT;
-    final Paint LOWER_RIGHT_GRADIENT_PAINT;
+    if (cachedShadow == null || cachedGhostShadow == null) {
+      final int fartherShadowSize = (int) (r * 0.17) == 0 ? 1 : (int) (r * 0.17);
+      final int width = 2 * (stoneRadius + shadowSize) + shadowSize;
 
-    if (isGhost) {
-      TOP_GRADIENT_PAINT =
-          new RadialGradientPaint(
-              new Point2D.Float(centerX, centerY),
-              stoneRadius + shadowSize,
-              new float[] {
-                ((float) stoneRadius / (stoneRadius + shadowSize)) - 0.0001f,
-                ((float) stoneRadius / (stoneRadius + shadowSize)),
-                1.0f
-              },
-              new Color[] {
-                new Color(0, 0, 0, 0),
-                new Color(50, 50, 50, (int) (120 * shadowStrength)),
-                new Color(0, 0, 0, 0)
-              });
+      cachedShadow = new BufferedImage(width, width, TYPE_INT_ARGB);
+      cachedGhostShadow = new BufferedImage(width, width, TYPE_INT_ARGB);
 
-      LOWER_RIGHT_GRADIENT_PAINT =
-          new RadialGradientPaint(
-              new Point2D.Float(centerX + shadowSize * 2 / 3, centerY + shadowSize * 2 / 3),
-              stoneRadius + fartherShadowSize,
-              new float[] {0.6f, 1.0f},
-              new Color[] {new Color(0, 0, 0, 180), new Color(0, 0, 0, 0)});
-    } else {
-      TOP_GRADIENT_PAINT =
-          new RadialGradientPaint(
-              new Point2D.Float(centerX, centerY),
-              stoneRadius + shadowSize,
-              new float[] {0.3f, 1.0f},
-              new Color[] {new Color(50, 50, 50, 150), new Color(0, 0, 0, 0)});
-      LOWER_RIGHT_GRADIENT_PAINT =
-          new RadialGradientPaint(
-              new Point2D.Float(centerX + shadowSize, centerY + shadowSize),
-              stoneRadius + fartherShadowSize,
-              new float[] {0.6f, 1.0f},
-              new Color[] {new Color(0, 0, 0, 140), new Color(0, 0, 0, 0)});
+      Paint TOP_GRADIENT_PAINT;
+      Paint LOWER_RIGHT_GRADIENT_PAINT;
+
+      {
+        Graphics2D g = (Graphics2D) cachedGhostShadow.getGraphics();
+        TOP_GRADIENT_PAINT =
+            new RadialGradientPaint(
+                new Point2D.Float(stoneCenter, stoneCenter),
+                stoneRadius + shadowSize,
+                new float[] {
+                  ((float) stoneRadius / (stoneRadius + shadowSize)) - 0.0001f,
+                  ((float) stoneRadius / (stoneRadius + shadowSize)),
+                  1.0f
+                },
+                new Color[] {
+                  new Color(0, 0, 0, 0),
+                  new Color(50, 50, 50, (int) (90 * shadowStrength)),
+                  new Color(0, 0, 0, 0)
+                });
+
+        Paint originalPaint = g.getPaint();
+
+        g.setPaint(TOP_GRADIENT_PAINT);
+        fillCircle(g, stoneCenter, stoneCenter, stoneRadius + shadowSize);
+        g.setPaint(originalPaint);
+      }
+      {
+        Graphics2D g = (Graphics2D) cachedShadow.getGraphics();
+        TOP_GRADIENT_PAINT =
+            new RadialGradientPaint(
+                new Point2D.Float(stoneCenter, stoneCenter),
+                stoneRadius + shadowSize,
+                new float[] {0.3f, 1.0f},
+                new Color[] {new Color(50, 50, 50, 150), new Color(0, 0, 0, 0)});
+        LOWER_RIGHT_GRADIENT_PAINT =
+            new RadialGradientPaint(
+                new Point2D.Float(stoneCenter + shadowSize, stoneCenter + shadowSize),
+                stoneRadius + fartherShadowSize,
+                new float[] {0.6f, 1.0f},
+                new Color[] {new Color(0, 0, 0, 140), new Color(0, 0, 0, 0)});
+        Paint originalPaint = g.getPaint();
+
+        g.setPaint(TOP_GRADIENT_PAINT);
+        fillCircle(g, stoneCenter, stoneCenter, stoneRadius + shadowSize);
+        g.setPaint(LOWER_RIGHT_GRADIENT_PAINT);
+        fillCircle(
+            g, stoneCenter + shadowSize, stoneCenter + shadowSize, stoneRadius + fartherShadowSize);
+        g.setPaint(originalPaint);
+      }
     }
 
-    final Paint originalPaint = g.getPaint();
-
-    g.setPaint(TOP_GRADIENT_PAINT);
-    fillCircle(g, centerX, centerY, stoneRadius + shadowSize);
-    if (!isGhost) {
-      g.setPaint(LOWER_RIGHT_GRADIENT_PAINT);
-      fillCircle(g, centerX + shadowSize, centerY + shadowSize, stoneRadius + fartherShadowSize);
-    }
-    g.setPaint(originalPaint);
+    if (isGhost)
+      g1.drawImage(cachedGhostShadow, centerX - stoneCenter, centerY - stoneCenter, null);
+    else g1.drawImage(cachedShadow, centerX - stoneCenter, centerY - stoneCenter, null);
   }
 
   /** Draws a stone centered at (centerX, centerY) */
@@ -1506,11 +1523,7 @@ public class BoardRenderer {
     return new Point(x, y);
   }
 
-  /**
-   * Set the maximum boardLength to render the board
-   *
-   * @param boardLength the boardLength of the board
-   */
+  /** Set the maximum boardLength to render the board */
   public void setBoardLength(int boardWidth, int boardHeight) {
     // The board border is no longer supported, add another option if needed
     //    this.shadowRadius =
@@ -1594,7 +1607,6 @@ public class BoardRenderer {
   /**
    * Calculate the boardLength of each intersection square
    *
-   * @param availableLength the pixel board length of the game board without margins
    * @return the board length of each intersection square
    */
   private static int calculateSquareWidth(int availableWidth) {
