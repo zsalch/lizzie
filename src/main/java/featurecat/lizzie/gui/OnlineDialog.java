@@ -97,8 +97,8 @@ public class OnlineDialog extends JDialog {
   private Map<Integer, Map<Integer, JSONObject>> comments =
       new HashMap<Integer, Map<Integer, JSONObject>>();
   private byte[] b = {
-    119, 115, 58, 47, 47, 119, 115, 46, 104, 117, 97, 110, 108, 101, 46, 113, 113, 46, 99, 111, 109,
-    47, 119, 113, 98, 114, 111, 97, 100, 99, 97, 115, 116, 108, 111, 116, 117, 115
+    119, 115, 115, 58, 47, 47, 104, 108, 119, 115, 46, 104, 117, 97, 110, 108, 101, 46, 113, 113,
+    46, 99, 111, 109, 47, 119, 113, 98, 114, 111, 97, 100, 99, 97, 115, 116, 108, 111, 116, 117, 115
   };
   private byte[] b2 = {
     119, 115, 58, 47, 47, 119, 115, 104, 97, 108, 108, 46, 104, 117, 97, 110, 108, 101, 46, 113,
@@ -111,6 +111,7 @@ public class OnlineDialog extends JDialog {
     108, 108, 98, 97, 99, 107, 61, 106, 81, 117, 101, 114, 121, 49, 38, 103, 97, 109, 101, 99, 111,
     100, 101, 61
   };
+  private byte[] b4 = {104, 117, 97, 110, 108, 101, 46, 113, 113, 46, 99, 111, 109};
   private byte[] c1 = {
     104, 116, 116, 112, 115, 58, 47, 47, 114, 116, 103, 97, 109, 101, 46, 121, 105, 107, 101, 119,
     101, 105, 113, 105, 46, 99, 111, 109
@@ -291,7 +292,7 @@ public class OnlineDialog extends JDialog {
           query = uri.getRawQuery();
           ajaxUrl =
               "http://wshall."
-                  + uri.getHost()
+                  + new String(b4) // uri.getHost()
                   + "/wxnseed/Broadcast/RequestBroadcast?callback=jQuery1&"
                   + query;
           return 4;
