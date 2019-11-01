@@ -148,7 +148,9 @@ public class SGFParser {
     StringBuilder tagContentBuilder = new StringBuilder();
     // MultiGo 's branch: (Main Branch (Main Branch) (Branch) )
     // Other 's branch: (Main Branch (Branch) Main Branch)
-    if (value.matches("(?s).*\\)\\s*\\)")) {
+    Pattern szPattern = Pattern.compile("(?s).*\\)\\s*\\)");
+    Matcher szMatcher = szPattern.matcher(value);
+    if (szMatcher.matches()) {
       isMultiGo = true;
     }
     if (isBranch) {
@@ -160,7 +162,8 @@ public class SGFParser {
     String blackPlayer = "", whitePlayer = "";
 
     // Support unicode characters (UTF-8)
-    for (int i = 0; i < value.length(); i++) {
+    int len = value.length();
+    for (int i = 0; i < len; i++) {
       char c = value.charAt(i);
       if (escaping) {
         // Any char following "\" is inserted verbatim
@@ -191,7 +194,8 @@ public class SGFParser {
               int varStep = subTreeStepMap.get(subTreeDepth);
               for (int s = 0; s < varStep; s++) {
                 if (history == null) {
-                  Lizzie.board.previousMove();
+                  //                  Lizzie.board.previousMove();
+                  Lizzie.board.getHistory().previous();
                 } else {
                   history.previous();
                 }
@@ -242,13 +246,15 @@ public class SGFParser {
             boolean newBranch = (subTreeStepMap.get(subTreeDepth) == 1);
             if (move == null) {
               if (history == null) {
-                Lizzie.board.pass(color, newBranch, false);
+                //                Lizzie.board.pass(color, newBranch, false);
+                Lizzie.board.getHistory().pass(color, newBranch, false);
               } else {
                 history.pass(color, newBranch, false);
               }
             } else {
               if (history == null) {
-                Lizzie.board.place(move[0], move[1], color, newBranch);
+                //                Lizzie.board.place(move[0], move[1], color, newBranch);
+                Lizzie.board.getHistory().place(move[0], move[1], color, newBranch);
               } else {
                 history.place(move[0], move[1], color, newBranch);
               }
@@ -315,7 +321,8 @@ public class SGFParser {
                 subTreeStepMap.put(subTreeDepth, subTreeStepMap.get(subTreeDepth) + 1);
                 boolean newBranch = (subTreeStepMap.get(subTreeDepth) == 1);
                 if (history == null) {
-                  Lizzie.board.pass(color, newBranch, true);
+                  //                  Lizzie.board.pass(color, newBranch, true);
+                  Lizzie.board.getHistory().pass(color, newBranch, true);
                 } else {
                   history.pass(color, newBranch, true);
                 }
@@ -335,7 +342,8 @@ public class SGFParser {
               }
               if (move != null) {
                 if (history == null) {
-                  Lizzie.board.addStone(move[0], move[1], color);
+                  //                  Lizzie.board.addStone(move[0], move[1], color);
+                  Lizzie.board.getHistory().addStone(move[0], move[1], color);
                 } else {
                   history.addStone(move[0], move[1], color);
                 }
@@ -343,19 +351,22 @@ public class SGFParser {
             } else {
               if (move == null) {
                 if (history == null) {
-                  Lizzie.board.pass(color);
+                  //                  Lizzie.board.pass(color);
+                  Lizzie.board.getHistory().pass(color);
                 } else {
                   history.pass(color);
                 }
               } else {
                 if (history == null) {
-                  Lizzie.board.place(move[0], move[1], color);
+                  //                  Lizzie.board.place(move[0], move[1], color);
+                  Lizzie.board.getHistory().place(move[0], move[1], color);
                 } else {
                   history.place(move[0], move[1], color);
                 }
               }
               if (history == null) {
-                Lizzie.board.flatten();
+                //                Lizzie.board.flatten();
+                Lizzie.board.getHistory().flatten();
               } else {
                 history.flatten();
               }
@@ -418,6 +429,7 @@ public class SGFParser {
                   boolean newBranch = (subTreeStepMap.get(subTreeDepth) == 1);
                   if (history == null) {
                     Lizzie.board.pass(color, newBranch, true);
+                    Lizzie.board.getHistory().pass(color, newBranch, true);
                   } else {
                     history.pass(color, newBranch, true);
                   }
@@ -438,8 +450,13 @@ public class SGFParser {
                 int[] move = convertSgfPosToCoord(tagContent);
                 if (move != null) {
                   if (history == null) {
-                    Lizzie.board.removeStone(
-                        move[0], move[1], tag.equals("AB") ? Stone.BLACK : Stone.WHITE);
+                    //                    Lizzie.board.removeStone(
+                    //                        move[0], move[1], tag.equals("AB") ? Stone.BLACK :
+                    // Stone.WHITE);
+                    Lizzie.board
+                        .getHistory()
+                        .removeStone(
+                            move[0], move[1], tag.equals("AB") ? Stone.BLACK : Stone.WHITE);
                   } else {
                     history.removeStone(
                         move[0], move[1], tag.equals("AB") ? Stone.BLACK : Stone.WHITE);
