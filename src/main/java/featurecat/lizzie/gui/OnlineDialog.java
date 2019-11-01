@@ -2069,7 +2069,7 @@ public class OnlineDialog extends JDialog {
         while (Lizzie.board.nextMove()) ;
       }
       if ("3".equals(info.optString("status"))) {
-        sio.close();
+        //        sio.close();  // Fixed Sgf Length Issue
         String result = info.optString("resultDesc");
         if (!Utils.isBlank(result)) {
           Lizzie.board.getHistory().getData().comment =
@@ -2079,7 +2079,7 @@ public class OnlineDialog extends JDialog {
         }
       }
     }
-    if (history == null || isEnd) {
+    if (history == null) { // || isEnd) { // Fixed Sgf Length Issue
       //      error(true);
       sio.close();
       if (isEnd && type == 1) {
